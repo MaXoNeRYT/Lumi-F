@@ -2885,7 +2885,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
             this.sendData(this, this.dataProperties.clone());
 
-            if (!this.server.getSettings().player().checkOpMovement() && this.isOp()) {
+            if (!this.server.getSettings().player().checkOpMovement() && this.isOp() && this.isPlayer) {
                 this.setCheckMovement(false);
             }
 
