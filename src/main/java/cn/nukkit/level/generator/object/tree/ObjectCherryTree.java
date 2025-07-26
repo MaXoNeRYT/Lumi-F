@@ -5,114 +5,242 @@ import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockWood;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * @author MaXoNeRYT
- * @since 2025/07/19
- */
+import static cn.nukkit.block.BlockID.CHERRY_LEAVES;
+import static cn.nukkit.block.BlockID.CHERRY_LOG;
+
 public class ObjectCherryTree extends TreeGenerator {
-    private static final Block CHERRY_LOG = Block.get(BlockID.CHERRY_LOG, BlockWood.faces[BlockFace.DOWN.getIndex()]);
-    private static final Block CHERRY_LEAVES = Block.get(BlockID.CHERRY_LEAVES);
-    private static final Block DIRT = Block.get(BlockID.DIRT);
+
+    protected Block LOG_Y_AXIS = Block.get(CHERRY_LOG, BlockWood.faces[BlockFace.DOWN.getIndex()]);
+    protected Block LOG_X_AXIS = Block.get(CHERRY_LOG, BlockWood.faces[BlockFace.WEST.getIndex()]);
+    protected Block LOG_Z_AXIS = Block.get(CHERRY_LOG, BlockWood.faces[BlockFace.NORTH.getIndex()]);
+    protected Block LEAVES = Block.get(CHERRY_LEAVES, 0);
 
     @Override
     public boolean generate(ChunkManager level, NukkitRandom rand, Vector3 position) {
-        int x = position.getFloorX();
-        int y = position.getFloorY();
-        int z = position.getFloorZ();
+        final int x = position.getFloorX();
+        final int y = position.getFloorY();
+        final int z = position.getFloorZ();
 
-        if (y < -64 || y >= 256) return false;
+        final var isBigTree = rand.nextBoolean();
+        if (isBigTree) {
+            var ok = generateBigTree(level, rand, x, y, z);
+            if (ok) return true;
+        }
+        return generateSmallTree(level, rand, x, y, z);
+    }
 
-        this.setDirtAt(level, new Vector3(x, y - 1, z));
+    protected boolean generateBigTree(ChunkManager level, @NotNull NukkitRandom rand, final int x, final int y, final int z) {
+        final int mainTrunkHeight = (rand.nextBoolean() ? 1 : 0) + 10;
 
-        int trunkHeight = 7 + rand.nextBoundedInt(2);
-        int branchCount = rand.nextBoundedInt(3) + 1;
-        boolean hasDoubleBranch = branchCount >= 2;
+        if (!canPlaceObject(level, mainTrunkHeight, x, y, z)) return false;
 
-        for (int dy = 0; dy < trunkHeight; dy++) {
-            setBlockIfAir(level, x, y + dy, z, CHERRY_LOG);
+        var growOnXAxis = rand.nextBoolean();
+        int xMultiplier = growOnXAxis ? 1 : 0;
+        int zMultiplier = growOnXAxis ? 0 : 1;
+
+        final int leftSideTrunkLength = rand.nextRange(2, 4);
+        final int leftSideTrunkHeight = rand.nextRange(3, 5);
+        final int leftSideTrunkStartY = rand.nextRange(4, 5);
+
+        if (!canPlaceObject(level, leftSideTrunkHeight, x - leftSideTrunkLength * xMultiplier,
+                y + leftSideTrunkStartY, z - leftSideTrunkLength * zMultiplier)) {
+            growOnXAxis = !growOnXAxis;
+            xMultiplier = growOnXAxis ? 1 : 0;
+            zMultiplier = growOnXAxis ? 0 : 1;
+            if (!canPlaceObject(level, leftSideTrunkHeight, x - leftSideTrunkLength * xMultiplier,
+                    y + leftSideTrunkStartY, z - leftSideTrunkLength * zMultiplier)) {
+                return false;
+            }
         }
 
-        int branchStartOffset = -4 + rand.nextBoundedInt(3);
-        int branchEndOffset = -1 + rand.nextBoundedInt(2);
+        final int rightSideTrunkLength = rand.nextRange(2, 4);
+        final int rightSideTrunkHeight = rand.nextRange(3, 5);
+        final int rightSideTrunkStartY = rand.nextRange(4, 5);
 
-        generateBranch(level, rand, x, y, z, trunkHeight, branchStartOffset, branchEndOffset);
+        if (!canPlaceObject(level, rightSideTrunkHeight, x + rightSideTrunkLength * xMultiplier,
+                y + rightSideTrunkStartY, z + rightSideTrunkLength * zMultiplier)) return false;
 
-        if (hasDoubleBranch) {
-            int secondBranchOffset = branchStartOffset - 1;
-            generateBranch(level, rand, x, y, z, trunkHeight, secondBranchOffset, branchEndOffset);
+        this.setDirtAt(level, new BlockVector3(x, y - 1, z));
+
+        // Generate main trunk
+        for (int yy = 0; yy < mainTrunkHeight; ++yy) {
+            this.setBlockAndNotifyAdequately(level, x, y + yy, z, LOG_Y_AXIS.getBlock());
+        }
+        // generate side trunks
+        final var sideBlockState = growOnXAxis ? LOG_X_AXIS : LOG_Z_AXIS;
+        // generate left-side trunk
+        for (int xx = 1; xx <= leftSideTrunkLength; ++xx) {
+            if (this.canGrowInto(level.getBlockIdAt(x - xx * xMultiplier, y + leftSideTrunkStartY, z - xx * zMultiplier)))
+                this.setBlockAndNotifyAdequately(level, x - xx * xMultiplier, y + leftSideTrunkStartY, z - xx * zMultiplier, sideBlockState);
+        }
+        for (int yy = 1; yy < leftSideTrunkHeight; ++yy) {
+            if (this.canGrowInto(level.getBlockIdAt(x - leftSideTrunkLength * xMultiplier,
+                    y + leftSideTrunkStartY + yy, z - leftSideTrunkLength * zMultiplier)))
+                this.setBlockAndNotifyAdequately(level, x - leftSideTrunkLength * xMultiplier, y + leftSideTrunkStartY + yy,
+                        z - leftSideTrunkLength * zMultiplier, LOG_Y_AXIS);
+        }
+        // We just generated this above
+        //       |
+        // |     |     |
+        // └-----|-----┘
+        //       |
+        // However, when start y == 4, minecraft generate trunk like this:
+        //       |
+        // └-┐   |   ┌-┘
+        //   └---|---┘
+        //       |
+        if (leftSideTrunkStartY == 4) {
+            var tmpX = x - leftSideTrunkLength * xMultiplier;
+            var tmpY = y + leftSideTrunkStartY;
+            var tmpZ = z - leftSideTrunkLength * zMultiplier;
+            level.setBlockIdAt(tmpX, tmpY, tmpZ, 0);
+            tmpX += xMultiplier;
+            tmpY += 1;
+            tmpZ += zMultiplier;
+            if (this.canGrowInto(level.getBlockIdAt(tmpX, tmpY, tmpZ))) {
+                this.setBlockAndNotifyAdequately(level, tmpX, tmpY, tmpZ, LOG_Y_AXIS);
+            }
+            tmpX -= xMultiplier;
+            tmpZ -= zMultiplier;
+            if (this.canGrowInto(level.getBlockIdAt(tmpX, tmpY, tmpZ))) {
+                this.setBlockAndNotifyAdequately(level, tmpX, tmpY, tmpZ, sideBlockState);
+            }
+        }
+        // generate right-side trunk
+        for (int xx = 1; xx <= rightSideTrunkLength; ++xx) {
+            if (this.canGrowInto(level.getBlockIdAt(x + xx * xMultiplier, y + rightSideTrunkStartY, z + xx * zMultiplier)))
+                this.setBlockAndNotifyAdequately(level, x + xx * xMultiplier, y + rightSideTrunkStartY, z + xx * zMultiplier, sideBlockState);
+        }
+        for (int yy = 1; yy < rightSideTrunkHeight; ++yy) {
+            if (this.canGrowInto(level.getBlockIdAt(x + rightSideTrunkLength * xMultiplier,
+                    y + rightSideTrunkStartY + yy, z + rightSideTrunkLength * zMultiplier)))
+                this.setBlockAndNotifyAdequately(level,
+                        x + rightSideTrunkLength * xMultiplier,
+                        y + rightSideTrunkStartY + yy,
+                        z + rightSideTrunkLength * zMultiplier,
+                        LOG_Y_AXIS
+                );
+        }
+        if (rightSideTrunkStartY == 4) {
+            var tmpX = x + rightSideTrunkLength * xMultiplier;
+            var tmpY = y + rightSideTrunkStartY;
+            var tmpZ = z + rightSideTrunkLength * zMultiplier;
+            level.setBlockIdAt(tmpX, tmpY, tmpZ, 0);
+            tmpX -= xMultiplier;
+            tmpY += 1;
+            tmpZ -= zMultiplier;
+            if (this.canGrowInto(level.getBlockIdAt(tmpX, tmpY, tmpZ))) {
+                this.setBlockAndNotifyAdequately(level, tmpX, tmpY, tmpZ, LOG_Y_AXIS);
+            }
+            tmpX += xMultiplier;
+            tmpZ += zMultiplier;
+            if (this.canGrowInto(level.getBlockIdAt(tmpX, tmpY, tmpZ))) {
+                this.setBlockAndNotifyAdequately(level, tmpX, tmpY, tmpZ, sideBlockState);
+            }
+        }
+        // generate main trunk leaves
+        generateLeaves(level, rand, x, y + mainTrunkHeight + 1, z);
+        // generate left-side trunk leaves
+        generateLeaves(level, rand, x - leftSideTrunkLength * xMultiplier,
+                y + leftSideTrunkStartY + leftSideTrunkHeight + 1, z - leftSideTrunkLength * zMultiplier);
+        // generate right-side trunk leaves
+        generateLeaves(level, rand, x + rightSideTrunkLength * xMultiplier,
+                y + rightSideTrunkStartY + rightSideTrunkHeight + 1, z + rightSideTrunkLength * zMultiplier);
+        return true;
+    }
+
+    protected boolean generateSmallTree(ChunkManager level, @NotNull NukkitRandom rand, final int x, final int y, final int z) {
+        final int mainTrunkHeight = (rand.nextBoolean() ? 1 : 0) + 4;
+        final int sideTrunkHeight = rand.nextRange(3, 5);
+
+        if (!canPlaceObject(level, mainTrunkHeight + 1, x, y, z)) return false;
+
+        var growDirection = rand.nextRange(0, 3);
+        int xMultiplier = 0;
+        int zMultiplier = 0;
+        var canPlace = false;
+        for (int i = 0; i < 4; i++) {
+            growDirection = (growDirection + 1) % 4;
+            xMultiplier = switch (growDirection) {
+                case 0 -> -1;
+                case 1 -> 1;
+                default -> 0;
+            };
+            zMultiplier = switch (growDirection) {
+                case 2 -> -1;
+                case 3 -> 1;
+                default -> 0;
+            };
+            if (canPlaceObject(level, sideTrunkHeight, x + xMultiplier * sideTrunkHeight, y,
+                    z + zMultiplier * sideTrunkHeight)) {
+                canPlace = true;
+                break;
+            }
+        }
+        if (!canPlace) {
+            return false;
         }
 
 
-        if (branchCount == 3) {
-            generateTopBranch(level, rand, x, y, z, trunkHeight);
+        final var sideBlockState = xMultiplier == 0 ? LOG_Z_AXIS : LOG_X_AXIS;
+        // Generate main trunk
+        for (int yy = 0; yy < mainTrunkHeight; ++yy) {
+            if (this.canGrowInto(level.getBlockIdAt(x, y + yy, z)))
+                this.setBlockAndNotifyAdequately(level, x, y + yy, z, LOG_Y_AXIS);
+        }
+        // Generate side trunk
+        // (└)-┐      <- if side trunk is 4 or more blocks high, do not place the last block
+        //     └-┐    <- side trunk
+        //       └-┐
+        //         |  <- main trunk
+        //         |
+        for (int yy = 1; yy <= sideTrunkHeight; ++yy) {
+            var tmpX = x + yy * xMultiplier;
+            var tmpY = y + mainTrunkHeight + yy - 2;
+            var tmpZ = z + yy * zMultiplier;
+            if (this.canGrowInto(level.getBlockIdAt(tmpX, tmpY, tmpZ))) {
+                this.setBlockAndNotifyAdequately(level, tmpX, tmpY, tmpZ, sideBlockState);
+            }
+            // if side trunk is 4 or 5 blocks high, do not place the last block
+            if (yy == sideTrunkHeight - 1 && sideTrunkHeight > 3) {
+                continue;
+            }
+            tmpY += 1;
+            if (this.canGrowInto(level.getBlockIdAt(tmpX, tmpY, tmpZ))) {
+                this.setBlockAndNotifyAdequately(level, tmpX, tmpY, tmpZ, LOG_Y_AXIS);
+            }
         }
 
-        generateLeaves(level, rand, x, y + trunkHeight, z);
+        // generate leaves
+        generateLeaves(level, rand, x + sideTrunkHeight * xMultiplier, y + mainTrunkHeight + sideTrunkHeight,
+                z + sideTrunkHeight * zMultiplier);
 
         return true;
     }
 
-    private void generateBranch(ChunkManager level, NukkitRandom rand, int baseX, int baseY, int baseZ,
-                                int trunkHeight, int branchStartOffset, int branchEndOffset) {
-        int branchStartY = baseY + trunkHeight + branchStartOffset;
-        if (branchStartY < baseY) branchStartY = baseY;
+    static final int LEAVES_RADIUS = 4;
 
-        int branchEndY = baseY + trunkHeight + branchEndOffset;
-
-        BlockFace[] faces = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
-        BlockFace direction = faces[rand.nextBoundedInt(4)];
-
-        int length = 2 + rand.nextBoundedInt(3);
-
-        int dx = 0, dz = 0;
-        for (int i = 1; i <= length; i++) {
-            dx = direction.getXOffset() * i;
-            dz = direction.getZOffset() * i;
-
-            setBlockIfAir(level, baseX + dx, branchStartY, baseZ + dz,
-                    getLogWithAxis(direction.getAxis() == BlockFace.Axis.X ? BlockFace.Axis.X : BlockFace.Axis.Z));
-        }
-
-        int yDir = branchEndY > branchStartY ? 1 : -1;
-        int currentY = branchStartY;
-        int targetY = branchEndY;
-
-        while (currentY != targetY) {
-            currentY += yDir;
-            setBlockIfAir(level, baseX + dx, currentY, baseZ + dz, CHERRY_LOG);
-        }
-
-        generateLeaves(level, rand, baseX + dx, currentY, baseZ + dz);
-    }
-
-    private void generateTopBranch(ChunkManager level, NukkitRandom rand, int baseX, int baseY, int baseZ, int trunkHeight) {
-        int topY = baseY + trunkHeight;
-        setBlockIfAir(level, baseX, topY, baseZ, CHERRY_LOG);
-        generateLeaves(level, rand, baseX, topY, baseZ);
-    }
-
-    private void generateLeaves(ChunkManager level, NukkitRandom rand, int centerX, int centerY, int centerZ) {
+    public void generateLeaves(ChunkManager level, NukkitRandom rand, final int x, final int y, final int z) {
         for (int dy = -2; dy <= 2; dy++) {
-            int radius = 4 - Math.max(1, Math.abs(dy));
-
-            for (int dx = -radius; dx <= radius; dx++) {
-                for (int dz = -radius; dz <= radius; dz++) {
-                    if (dx*dx + dz*dz > radius*radius) continue;
-
-                    if (dy == -2 && rand.nextBoundedInt(4) == 0) continue;
-
-                    if (Math.abs(dx) == radius && Math.abs(dz) == radius && rand.nextBoundedInt(6) == 0) continue;
-
-                    setLeafIfAir(level, centerX + dx, centerY + dy, centerZ + dz);
-
-                    if (dy == -2 && rand.nextBoundedInt(6) == 0) {
-                        setLeafIfAir(level, centerX + dx, centerY + dy - 1, centerZ + dz);
-
-                        if (rand.nextBoundedInt(3) == 0) {
-                            setLeafIfAir(level, centerX + dx, centerY + dy - 2, centerZ + dz);
+            for (int dx = -LEAVES_RADIUS; dx <= LEAVES_RADIUS; dx++) {
+                for (int dz = -LEAVES_RADIUS; dz <= LEAVES_RADIUS; dz++) {
+                    var currentRadius = LEAVES_RADIUS - (Math.max(1, Math.abs(dy)));
+                    if (dx * dx + dz * dz > currentRadius * currentRadius) continue;
+                    var blockId = level.getBlockIdAt(x + dx, y + dy, z + dz);
+                    if (blockId == 0 || blockId == BlockID.LEAVES || blockId == BlockID.LEAVES2 ||
+                            blockId == BlockID.AZALEA_LEAVES || blockId == BlockID.AZALEA_LEAVES_FLOWERED) {
+                        this.setBlockAndNotifyAdequately(level, x + dx, y + dy, z + dz, LEAVES);
+                    }
+                    if (dy == -2 && rand.nextRange(0, 2) == 0) {
+                        blockId = level.getBlockIdAt(x + dx, y + dy - 1, z + dz);
+                        if (blockId == 0 || blockId == BlockID.LEAVES || blockId == BlockID.LEAVES2 ||
+                                blockId == BlockID.AZALEA_LEAVES || blockId == BlockID.AZALEA_LEAVES_FLOWERED) {
+                            this.setBlockAndNotifyAdequately(level, x + dx, y + dy - 1, z + dz, LEAVES);
                         }
                     }
                 }
@@ -120,32 +248,21 @@ public class ObjectCherryTree extends TreeGenerator {
         }
     }
 
-    private Block getLogWithAxis(BlockFace.Axis axis) {
-        if (axis == BlockFace.Axis.X) {
-            return Block.get(BlockID.CHERRY_LOG, BlockWood.faces[BlockFace.WEST.getIndex()]);
-        } else if (axis == BlockFace.Axis.Z) {
-            return Block.get(BlockID.CHERRY_LOG, BlockWood.faces[BlockFace.NORTH.getIndex()]);
+    public boolean canPlaceObject(ChunkManager level, int treeHeight, int x, int y, int z) {
+        int radiusToCheck = 0;
+        for (int yy = 0; yy < treeHeight + 3; ++yy) {
+            if (yy == 1 || yy == treeHeight) {
+                ++radiusToCheck;
+            }
+            for (int xx = -radiusToCheck; xx < (radiusToCheck + 1); ++xx) {
+                for (int zz = -radiusToCheck; zz < (radiusToCheck + 1); ++zz) {
+                    if (!this.canGrowInto(level.getBlockIdAt(x + xx, y + yy, z + zz))) {
+                        return false;
+                    }
+                }
+            }
         }
-        return CHERRY_LOG;
-    }
 
-    private void setBlockIfAir(ChunkManager level, int x, int y, int z, Block block) {
-        if (canGrowInto(level.getBlockIdAt(x, y, z))) {
-            this.setBlockAndNotifyAdequately(level, new Vector3(x, y, z), block);
-        }
-    }
-
-    private void setLeafIfAir(ChunkManager level, int x, int y, int z) {
-        int id = level.getBlockIdAt(x, y, z);
-        if (id == BlockID.AIR || id == BlockID.CHERRY_LEAVES) {
-            this.setBlockAndNotifyAdequately(level, new Vector3(x, y, z), CHERRY_LEAVES);
-        }
-    }
-
-    public boolean canGrowInto(int blockId) {
-        return blockId == BlockID.AIR || blockId == BlockID.CHERRY_LEAVES ||
-                blockId == BlockID.LEAVES || blockId == BlockID.LEAVES2 ||
-                blockId == BlockID.CHERRY_SAPLING ||
-                blockId == BlockID.AZALEA_LEAVES || blockId == BlockID.AZALEA_LEAVES_FLOWERED;
+        return true;
     }
 }
