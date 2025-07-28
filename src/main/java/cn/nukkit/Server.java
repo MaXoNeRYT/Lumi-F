@@ -1,7 +1,6 @@
 package cn.nukkit;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.custom.CustomBlockManager;
 import cn.nukkit.blockentity.*;
 import cn.nukkit.command.*;
 import cn.nukkit.console.NukkitConsole;
@@ -28,7 +27,6 @@ import cn.nukkit.event.server.ServerStopEvent;
 import cn.nukkit.inventory.CraftingManager;
 import cn.nukkit.inventory.Recipe;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
@@ -341,7 +339,6 @@ public class Server {
         EnumBiome.values();
         Attribute.init();
         DispenseBehaviorRegister.init();
-        CustomBlockManager.init(this);
         GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
 
         // Convert legacy data before plugins get the chance to mess with it
@@ -387,17 +384,8 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
-        try {
-            if (CustomBlockManager.get().closeRegistry()) {
-                for (RuntimeItemMapping runtimeItemMapping : RuntimeItems.VALUES) {
-                    runtimeItemMapping.generatePalette();
-                }
-            }
-
-            Item.initCreativeItems();
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to init custom blocks", e);
-        }
+        Item.initCreativeItems();
+        Block.initCustomBlocks();
 
         LevelProviderManager.addProvider(this, Anvil.class);
         LevelProviderManager.addProvider(this, LevelDBProvider.class);

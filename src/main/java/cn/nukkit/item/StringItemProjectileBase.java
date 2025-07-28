@@ -6,16 +6,16 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public abstract class StringItemProjectileBase extends ProjectileItem implements StringItem {
+public abstract class StringItemProjectileBase extends ItemProjectile implements StringItem {
 
     private final String namespaceId;
 
     public StringItemProjectileBase(@NotNull String namespaceId, @Nullable String name) {
-        super(STRING_IDENTIFIED_ITEM, 0, 1, StringItem.notEmpty(name));
+        super(STRING_IDENTIFIED_ITEM, 0, 1, StringItem.checkNotEmpty(name));
         Preconditions.checkNotNull(namespaceId, "id can't be null");
         Preconditions.checkArgument(namespaceId.contains(":"), "The ID must be a namespaced ID, like minecraft:stone");
         this.namespaceId = namespaceId;
-        clearNamedTag();
+        this.clearNamedTag();
     }
 
     @Override

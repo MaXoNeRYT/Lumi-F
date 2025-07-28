@@ -1,12 +1,15 @@
 package cn.nukkit.item;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 /**
  * Created on 2015/12/27 by xtypr.
  * Package cn.nukkit.item in project Nukkit .
  */
-public class ItemPotionSplash extends ProjectileItem {
+public class ItemPotionSplash extends ItemProjectile {
 
     public ItemPotionSplash(Integer meta) {
         this(meta, 1);
@@ -27,7 +30,7 @@ public class ItemPotionSplash extends ProjectileItem {
     }
 
     @Override
-    public String getProjectileEntityType() {
+    public String getEntityType() {
         return "ThrownPotion";
     }
 
@@ -37,7 +40,13 @@ public class ItemPotionSplash extends ProjectileItem {
     }
 
     @Override
-    protected void correctNBT(CompoundTag nbt) {
+    public void onThrown(Player player, EntityProjectile projectile) {
+        player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);
+    }
+
+    @Override
+    protected CompoundTag correctNBT(CompoundTag nbt) {
         nbt.putInt("PotionId", this.meta);
+        return nbt;
     }
 }

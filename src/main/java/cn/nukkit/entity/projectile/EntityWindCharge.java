@@ -35,12 +35,12 @@ public class EntityWindCharge extends EntityProjectile {
 
     @Override
     public void onCollideWithEntity(Entity entity) {
-        if (directionChanged != null) {
-            if(directionChanged == entity) return;
+        if (directionChanged != null && directionChanged == entity) {
+            return;
         }
         entity.attack(new EntityDamageByEntityEvent(this, entity, EntityDamageEvent.DamageCause.PROJECTILE, 1f));
-        level.addLevelSoundEvent(entity.getPosition().add(0, 1), LevelSoundEventPacket.SOUND_WIND_CHARGE_BURST);
-        knockBack(entity);
+        this.level.addLevelSoundEvent(entity.getPosition().add(0, 1), LevelSoundEventPacket.SOUND_WIND_CHARGE_BURST);
+        this.knockBack(entity);
         this.kill();
     }
 
@@ -53,7 +53,7 @@ public class EntityWindCharge extends EntityProjectile {
                 }
             }
         }
-        level.addLevelSoundEvent(this.add(0, 1), LevelSoundEventPacket.SOUND_WIND_CHARGE_BURST);
+        this.level.addLevelSoundEvent(this.add(0, 1), LevelSoundEventPacket.SOUND_WIND_CHARGE_BURST);
         this.kill();
 
         this.level.addParticle(new GenericParticle(this, Particle.TYPE_WIND_EXPLOSION));

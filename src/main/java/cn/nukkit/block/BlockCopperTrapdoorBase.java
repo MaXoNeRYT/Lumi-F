@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,10 +36,23 @@ public abstract class BlockCopperTrapdoorBase extends BlockTrapdoor implements O
     public boolean onActivate(@NotNull Item item, Player player) {
         if (player != null) {
             if (player.isSneaking()) {
-                return Waxable.super.onActivate(item, player) || Oxidizable.super.onActivate(item, player);
+                if (Waxable.super.onActivate(item, player) || Oxidizable.super.onActivate(item, player)) {
+                    return true;
+                }
             }
         }
         return super.onActivate(item, player);
+    }
+
+    @Override
+    public void playOpenSound() {
+        this.level.addSound(this, Sound.OPEN_TRAPDOOR_COPPER);
+    }
+
+    @Override
+    public void playCloseSound() {
+        // Copper trapdoor does not have close sound
+        this.level.addSound(this, Sound.OPEN_TRAPDOOR_COPPER);
     }
 
     @Override

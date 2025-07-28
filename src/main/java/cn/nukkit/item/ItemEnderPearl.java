@@ -1,6 +1,11 @@
 package cn.nukkit.item;
 
-public class ItemEnderPearl extends ProjectileItem {
+import cn.nukkit.Player;
+import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
+
+public class ItemEnderPearl extends ItemProjectile {
 
     public ItemEnderPearl() {
         this(0, 1);
@@ -20,8 +25,19 @@ public class ItemEnderPearl extends ProjectileItem {
     }
 
     @Override
-    public String getProjectileEntityType() {
+    public String getEntityType() {
         return "EnderPearl";
+    }
+
+    @Override
+    public boolean canThrow(Player player) {
+        return player.getServer().getTick() - player.getLastEnderPearlThrowingTick() >= 20;
+    }
+
+    @Override
+    public void onThrown(Player player, EntityProjectile projectile) {
+        player.setLastEnderPearlThrowingTick();
+        player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);
     }
 
     @Override

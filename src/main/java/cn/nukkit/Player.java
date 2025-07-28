@@ -76,7 +76,6 @@ import cn.nukkit.scoreboard.displayer.IScoreboardViewer;
 import cn.nukkit.scoreboard.scoreboard.IScoreboard;
 import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
 import cn.nukkit.scoreboard.scorer.PlayerScorer;
-import cn.nukkit.settings.GeneralSettings;
 import cn.nukkit.settings.GeneralSettings.ServerAuthoritativeMovement;
 import cn.nukkit.utils.*;
 import com.google.common.base.Strings;
@@ -342,7 +341,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean shouldLogin = false;
 
     private int lastEmote;
-    private int lastEnderPearl = 20;
+    private int lastEnderPearlThrow = 20;
+    private int lastWindChargeThrow = 10;
     private int lastChorusFruitTeleport = 20;
     public long lastSkinChange = -1;
     private double lastRightClickTime = 0.0;
@@ -435,11 +435,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public int getLastEnderPearlThrowingTick() {
-        return lastEnderPearl;
+        return lastEnderPearlThrow;
     }
 
-    public void onThrowEnderPearl() {
-        this.lastEnderPearl = this.server.getTick();
+    public void setLastEnderPearlThrowingTick() {
+        this.lastEnderPearlThrow = this.server.getTick();
+    }
+
+    public int getLastWindChargeThrowingTick() {
+        return lastWindChargeThrow;
+    }
+
+    public void setLastWindChargeThrowingTick() {
+        this.lastWindChargeThrow = this.server.getTick();
     }
 
     public int getLastChorusFruitTeleport() {

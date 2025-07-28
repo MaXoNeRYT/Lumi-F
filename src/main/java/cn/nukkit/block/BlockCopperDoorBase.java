@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,12 +40,24 @@ public abstract class BlockCopperDoorBase extends BlockDoor implements Oxidizabl
 
     @Override
     public boolean onActivate(@NotNull Item item, Player player) {
-       //if (player != null) {
-       //    if (player.isSneaking()) {
-       //        return Waxable.super.onActivate(item, player) || Oxidizable.super.onActivate(item, player);
-       //    }
-       //}
+       if (player != null) {
+           if (player.isSneaking()) {
+               if (Waxable.super.onActivate(item, player) || Oxidizable.super.onActivate(item, player)) {
+                   return true;
+               }
+           }
+       }
         return super.onActivate(item, player);
+    }
+
+    @Override
+    public void playOpenSound() {
+        this.level.addSound(this, Sound.OPEN_DOOR_COPPER);
+    }
+
+    @Override
+    public void playCloseSound() {
+        this.level.addSound(this, Sound.CLOSE_DOOR_COPPER);
     }
 
     @Override
