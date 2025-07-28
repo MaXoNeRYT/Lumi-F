@@ -24,6 +24,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.apache.commons.math3.util.FastMath;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -31,35 +34,91 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
 
-    private static final Int2ObjectMap<Float> ARMOR_POINTS = new Int2ObjectOpenHashMap<>() {
-        {
-            put(Item.LEATHER_CAP, Float.valueOf(1));
-            put(Item.LEATHER_TUNIC, Float.valueOf(3));
-            put(Item.LEATHER_PANTS, Float.valueOf(2));
-            put(Item.LEATHER_BOOTS, Float.valueOf(1));
-            put(Item.CHAIN_HELMET, Float.valueOf(2));
-            put(Item.CHAIN_CHESTPLATE, Float.valueOf(5));
-            put(Item.CHAIN_LEGGINGS, Float.valueOf(4));
-            put(Item.CHAIN_BOOTS, Float.valueOf(1));
-            put(Item.GOLD_HELMET, Float.valueOf(2));
-            put(Item.GOLD_CHESTPLATE, Float.valueOf(5));
-            put(Item.GOLD_LEGGINGS, Float.valueOf(3));
-            put(Item.GOLD_BOOTS, Float.valueOf(1));
-            put(Item.IRON_HELMET, Float.valueOf(2));
-            put(Item.IRON_CHESTPLATE, Float.valueOf(6));
-            put(Item.IRON_LEGGINGS, Float.valueOf(5));
-            put(Item.IRON_BOOTS, Float.valueOf(2));
-            put(Item.DIAMOND_HELMET, Float.valueOf(3));
-            put(Item.DIAMOND_CHESTPLATE, Float.valueOf(8));
-            put(Item.DIAMOND_LEGGINGS, Float.valueOf(6));
-            put(Item.DIAMOND_BOOTS, Float.valueOf(3));
-            put(Item.NETHERITE_HELMET, Float.valueOf(3));
-            put(Item.NETHERITE_CHESTPLATE, Float.valueOf(8));
-            put(Item.NETHERITE_LEGGINGS, Float.valueOf(6));
-            put(Item.NETHERITE_BOOTS, Float.valueOf(3));
-            put(Item.TURTLE_SHELL, Float.valueOf(2));
-        }
-    };
+    private static final Map<String, Float> ARMOR_POINTS = new HashMap<>() {{
+        put("minecraft:leather_helmet", 1f);
+        put("minecraft:leather_chestplate", 3f);
+        put("minecraft:leather_leggings", 2f);
+        put("minecraft:leather_boots", 1f);
+
+        put("minecraft:golden_helmet", 2f);
+        put("minecraft:golden_chestplate", 5f);
+        put("minecraft:golden_leggings", 3f);
+        put("minecraft:golden_boots", 1f);
+
+        put("minecraft:chainmail_helmet", 2f);
+        put("minecraft:chainmail_chestplate", 5f);
+        put("minecraft:chainmail_leggings", 4f);
+        put("minecraft:chainmail_boots", 1f);
+
+        put("minecraft:iron_helmet", 2f);
+        put("minecraft:iron_chestplate", 6f);
+        put("minecraft:iron_leggings", 5f);
+        put("minecraft:iron_boots", 2f);
+
+        put("minecraft:diamond_helmet", 3f);
+        put("minecraft:diamond_chestplate", 8f);
+        put("minecraft:diamond_leggings", 6f);
+        put("minecraft:diamond_boots", 3f);
+
+        put("minecraft:netherite_helmet", 3f);
+        put("minecraft:netherite_chestplate", 8f);
+        put("minecraft:netherite_leggings", 6f);
+        put("minecraft:netherite_boots", 3f);
+
+        put("minecraft:turtle_helmet", 2f);
+
+        put("fireshaldrpg:leather_helmet", 1f);
+        put("fireshaldrpg:leather_platebody", 3f);
+        put("fireshaldrpg:leather_platelegs", 2f);
+        put("fireshaldrpg:leather_boots", 1f);
+
+        put("fireshaldrpg:adamant_helm", 6f);
+        put("fireshaldrpg:adamant_platebody", 8f);
+        put("fireshaldrpg:adamant_platelegs", 7f);
+        put("fireshaldrpg:adamant_boots", 6f);
+
+        put("fireshaldrpg:black_helm", 3f);
+        put("fireshaldrpg:black_platebody", 5f);
+        put("fireshaldrpg:black_platelegs", 4f);
+        put("fireshaldrpg:black_boots", 3f);
+
+        put("fireshaldrpg:bronze_helm", 2f);
+        put("fireshaldrpg:bronze_platebody", 4f);
+        put("fireshaldrpg:bronze_platelegs", 3f);
+        put("fireshaldrpg:bronze_boots", 2f);
+
+        put("fireshaldrpg:iron_helm", 3f);
+        put("fireshaldrpg:iron_platebody", 5f);
+        put("fireshaldrpg:iron_platelegs", 4f);
+        put("fireshaldrpg:iron_boots", 3f);
+
+        put("fireshaldrpg:mithril_helm", 5f);
+        put("fireshaldrpg:mithril_platebody", 7f);
+        put("fireshaldrpg:mithril_platelegs", 6f);
+        put("fireshaldrpg:mithril_boots", 5f);
+
+        put("fireshaldrpg:drake_bone_boots", 5f);
+        put("fireshaldrpg:drake_bone_helm", 5f);
+        put("fireshaldrpg:drake_bone_platebody", 7f);
+        put("fireshaldrpg:drake_bone_platelegs", 6f);
+
+        put("fireshaldrpg:wrought_helm", 7f);
+        put("fireshaldrpg:argent_platebody", 9f);
+        put("fireshaldrpg:argent_platelegs", 8f);
+        put("fireshaldrpg:argent_boots", 7f);
+
+        put("fireshaldrpg:rune_helm", 7f);
+        put("fireshaldrpg:rune_platebody", 9f);
+        put("fireshaldrpg:rune_platelegs", 8f);
+        put("fireshaldrpg:rune_boots", 7f);
+
+        put("fireshaldrpg:steel_helm", 4f);
+        put("fireshaldrpg:steel_platebody", 6f);
+        put("fireshaldrpg:steel_platelegs", 5f);
+        put("fireshaldrpg:steel_boots", 4f);
+    }};
+
+
 
     /**
      * Empty inventory
@@ -84,6 +143,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     private boolean friendly = false;
 
     public Item[] armor;
+
 
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -345,6 +405,20 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         }
 
         this.blocksAround = null;
+        List<Entity> collidingEntities = List.of(this.level.getCollidingEntities(this.boundingBox.addCoord(dx, dy, dz)));
+
+        for (Entity entity : collidingEntities) {
+            if (entity instanceof EntityLiving && entity != this) {
+
+                double edx = this.x - entity.x;
+                double edz = this.z - entity.z;
+                double distance = Math.max(0.01, Math.sqrt(edx * edx + edz * edz));
+
+                double force = 0.15;
+                dx += (edx / distance) * force;
+                dz += (edz / distance) * force;
+            }
+        }
 
         double movX = dx * moveMultiplier;
         double movY = dy;

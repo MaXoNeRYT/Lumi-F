@@ -41,12 +41,12 @@ public class BlockMonsterEgg extends BlockSolidMeta {
 
     @Override
     public double getHardness() {
-        return 0.75;
+        return 1.5;
     }
 
     @Override
     public double getResistance() {
-        return 3.75;
+        return 30;
     }
 
     @Override
@@ -56,19 +56,25 @@ public class BlockMonsterEgg extends BlockSolidMeta {
 
     @Override
     public Item[] getDrops(Item item) {
-        return Item.EMPTY_ARRAY;
+        switch (this.getDamage()) {
+            case STONE: // заражённый камень
+                // Дропаем заражённый булыжник
+                if (item != null && item.isPickaxe()) {
+                    return new Item[]{Item.get(Block.MONSTER_EGG, COBBLESTONE, 1)};
+                }
+
+            case COBBLESTONE: // заражённый булыжник
+                // Только если ломается киркой
+                if (item != null && item.isPickaxe()) {
+                    return new Item[]{Item.get(Block.MONSTER_EGG, COBBLESTONE, 1)};
+                }
+                return Item.EMPTY_ARRAY;
+
+            default:
+                return Item.EMPTY_ARRAY;
+        }
     }
 
-    @Override
-    public boolean onBreak(Item item) {
-        if (Utils.rand(1, 5) == 1 && !item.hasEnchantment(Enchantment.ID_SILK_TOUCH) && this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12) {
-            EntitySilverfish entity = (EntitySilverfish) Entity.createEntity("Silverfish", this.add(0.5, 0, 0.5));
-            entity.spawnToAll();
-            EntityEventPacket pk = new EntityEventPacket();
-            pk.eid = entity.getId();
-            pk.event = EntityEventPacket.SILVERFISH_SPAWN_ANIMATION;
-            entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
-        }
-        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
-    }
+
+
 }

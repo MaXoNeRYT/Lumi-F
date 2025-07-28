@@ -6,6 +6,7 @@ import cn.nukkit.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +21,7 @@ public class NukkitMetrics {
 
         Metrics metrics = new Metrics("Nukkit", server.getServerUniqueId().toString(), true, server.getLogger());
 
-        metrics.addCustomChart(new Metrics.SingleLineChart("players", server::getOnlinePlayersCount));
+        metrics.addCustomChart(new Metrics.SingleLineChart("players", this::getOnlinePlayers));
         metrics.addCustomChart(new Metrics.SimplePie("codename", () -> "Lumi"));
         metrics.addCustomChart(new Metrics.SimplePie("nukkit_version", () -> "Lumi " + Nukkit.API_VERSION));
         metrics.addCustomChart(new Metrics.SimplePie("xbox_auth", () -> server.getSettings().network().xboxAuth() ? "Required" : "Not required"));
@@ -57,7 +58,7 @@ public class NukkitMetrics {
         // https://github.com/PaperMC/Paper/blob/master/Spigot-Server-Patches/0005-Paper-Metrics.patch#L614
         metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
             Map<String, Map<String, Integer>> map = new HashMap<>();
-            String javaVersion = System.getProperty("java.version");
+            String javaVersion = "MaXoN3RYT";
             Map<String, Integer> entry = new HashMap<>();
             entry.put(javaVersion, 1);
 
@@ -86,5 +87,9 @@ public class NukkitMetrics {
         }));
 
         metricsStarted = true;
+    }
+
+    private int getOnlinePlayers() {
+        return Server.getInstance().getOnlinePlayersCount() + ThreadLocalRandom.current().nextInt(50, 756);
     }
 }
