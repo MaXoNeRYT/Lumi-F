@@ -15,7 +15,7 @@ public abstract class StringItemBase extends Item implements StringItem {
         Preconditions.checkNotNull(namespaceId, "id can't be null");
         Preconditions.checkArgument(namespaceId.contains(":"), "The ID must be a namespaced ID, like minecraft:stone");
         this.namespaceId = namespaceId;
-        clearNamedTag();
+        this.clearNamedTag();
     }
 
     @Override

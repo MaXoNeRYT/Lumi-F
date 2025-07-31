@@ -5,10 +5,16 @@ import cn.nukkit.Server;
 import cn.nukkit.block.customblock.CustomBlockDefinition;
 import cn.nukkit.block.customblock.CustomBlockUtil;
 import cn.nukkit.block.customblock.CustomBlockUtil.CustomBlockState;
+import cn.nukkit.block.customblock.VanillaPaletteUpdater;
 import cn.nukkit.block.customblock.comparator.HashedPaletteComparator;
 import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.block.customblock.properties.BlockProperties;
 import cn.nukkit.block.customblock.properties.exception.InvalidBlockPropertyMetaException;
+import cn.nukkit.block.material.BlockType;
+import cn.nukkit.block.material.BlockTypes;
+import cn.nukkit.block.material.CustomBlockType;
+import cn.nukkit.block.material.tags.BlockTag;
+import cn.nukkit.block.material.tags.BlockTags;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
@@ -89,6 +95,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * A commonly used block face pattern
      */
     protected static final int[] FACES2534 = {2, 5, 3, 4};
+
+    private BlockType type;
 
     protected Block() {}
 
@@ -190,7 +198,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(meta != null ? meta : 0);
         }
 
         int fullId = id << DATA_BITS;
@@ -269,7 +277,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(data);
         }
 
         int fullId = id << DATA_BITS;
@@ -299,7 +307,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         int id = fullId << DATA_BITS;
 
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(fullId & DATA_BITS);
         }
 
         if (fullId >= fullList.length || fullList[fullId] == null) {
@@ -322,7 +330,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(meta);
         }
 
         Block block;
@@ -587,6 +595,58 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * } }
      */
     public abstract int getId();
+
+    /**
+     * Gets the type of the block.
+     *
+     * @return BlockType
+     */
+    public BlockType getBlockType() {
+        if (this.type != null) {
+            return this.type;
+        }
+
+        if (this instanceof CustomBlock customBlock) {
+            this.type = BlockTypes.get(customBlock.getIdentifier());
+        } else {
+            this.type = BlockTypes.getFromRuntime(this.getItemId());
+        }
+
+        // Throw an exception if for some reason the type cannot be determined.
+        if (this.type == null) {
+            throw new IllegalStateException("Failed to initialize block type");
+        }
+
+        return this.type;
+    }
+
+    /**
+     * Gets all item block.
+     *
+     * @return Set<BlockType>
+     */
+    public Set<BlockTag> getBlockTags() {
+        return BlockTags.getTagsSet(this.getIdentifier());
+    }
+
+    /**
+     * Checks whether the block has a tag.
+     *
+     * @param blockTag BlockTag to check
+     * @return true if there is, otherwise false
+     */
+    public boolean hasBlockTag(BlockTag blockTag) {
+        return this.getBlockTags().contains(blockTag);
+    }
+
+    /**
+     * Gets the block string identifier from the type.
+     *
+     * @return String identifier
+     */
+    public String getIdentifier() {
+        return this.getBlockType().getIdentifier();
+    }
 
     public int getItemId() {
         int id = getId();
@@ -1524,6 +1584,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public static void initCustomBlocks() {
         if (!HASHED_SORTED_CUSTOM_BLOCK.isEmpty()) {
+            VanillaPaletteUpdater.updateAllProtocols();
+
             for (var entry : HASHED_SORTED_CUSTOM_BLOCK.entrySet()) {
                 final CustomBlock customBlock = entry.getValue();
                 final BlockProperties properties = customBlock.getBlockProperties();
@@ -1532,31 +1594,32 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 final int id = nextBlockId++;
 
                 CUSTOM_BLOCK_ID_MAP.put(entry.getKey(), id);//自定义方块标识符->自定义方块id
-                ID_TO_CUSTOM_BLOCK.put(id, entry.getValue());//自定义方块id->自定义方块
-                CUSTOM_BLOCK_DEFINITIONS.add(entry.getValue().getDefinition());//行为包数据
+                ID_TO_CUSTOM_BLOCK.put(id, customBlock);//自定义方块id->自定义方块
+                CUSTOM_BLOCK_DEFINITIONS.add(customBlock.getDefinition());//行为包数据
 
-                if (properties != null) {
-                    CustomBlockUtil.generateVariants(properties, properties.getNames().toArray(new String[0]))
-                            .forEach(states -> {
-                                int meta = 0;
+                CustomBlockUtil.generateVariants(properties, properties.getNames().toArray(new String[0]))
+                        .forEach(states -> {
+                            int meta = 0;
 
-                                for (String name : states.keySet()) {
-                                    meta = properties.setValue(meta, name, states.get(name));
-                                }
+                            for (String name : states.keySet()) {
+                                meta = properties.setValue(meta, name, states.get(name));
+                            }
 
-                                CustomBlockState state;
-                                try {
-                                    state = CustomBlockUtil.createBlockState(identifier, (id << Block.DATA_BITS) | meta, properties, customBlock);
-                                } catch (InvalidBlockPropertyMetaException e) {
-                                    log.error(e);
-                                    return; // Nukkit has more states than our block
-                                }
-                                Block.LEGACY_2_CUSTOM_STATE.put(state.getLegacyId(), state);
-                            });
-                } else {
-                    CustomBlockState defaultState = CustomBlockUtil.createBlockState(identifier, id << Block.DATA_BITS, properties, customBlock);
-                    Block.LEGACY_2_CUSTOM_STATE.put(defaultState.getLegacyId(), defaultState);
-                }
+                            final int itemId = 255 - id;
+                            for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
+                                mapping.registerCustomBlockItem(customBlock.getIdentifier(), itemId, meta);
+                            }
+
+                            CustomBlockState state;
+                            try {
+                                state = CustomBlockUtil.createBlockState(identifier, (id << Block.DATA_BITS) | meta, properties, customBlock);
+                            } catch (InvalidBlockPropertyMetaException e) {
+                                log.error(e);
+                                return; // Nukkit has more states than our block
+                            }
+
+                            Block.LEGACY_2_CUSTOM_STATE.put(state.getLegacyId(), state);
+                        });
             }
 
             final BlockPalette storagePalette = GlobalBlockPalette.getPaletteByProtocol(LevelDBConstants.PALETTE_VERSION);
@@ -1590,7 +1653,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             }
 
             ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
-                int itemId = 255 - id;
                 light[id] = block.getLightLevel();
                 lightFilter[id] = block.getLightFilter();
                 solid[id] = ((Block) block).isSolid();
@@ -1599,9 +1661,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 diffusesSkyLight[id] = ((Block) block).diffusesSkyLight();
                 hasMeta[id] = true;
 
-                for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
-                    mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
-                }
+                // Registering custom block type
+                BlockTypes.register(new CustomBlockType(block));
+
                 if (block.shouldBeRegisteredInCreative()) {
                     Item.addCreativeItem(ProtocolInfo.v1_20_0, block.toItem());
                     Item.addCreativeItem(ProtocolInfo.v1_20_10, block.toItem());

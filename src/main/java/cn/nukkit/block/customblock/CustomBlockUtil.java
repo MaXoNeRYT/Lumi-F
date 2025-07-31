@@ -37,14 +37,14 @@ import java.util.Map;
 @UtilityClass
 public class CustomBlockUtil {
 
-    public static final Path BIN_PATH = Paths.get("bin/");
+    public static final Path VANILLA_PALETTES_PATH = Paths.get("vanilla_palettes/");
 
-    public static Path getBinPath() {
-        return Paths.get(Server.getInstance().getDataPath()).resolve(BIN_PATH);
+    public static Path getVanillaPalettesPath() {
+        return Paths.get(Server.getInstance().getDataPath()).resolve(VANILLA_PALETTES_PATH);
     }
 
-    public static Path getVanillaPalettePath(int version) {
-        return CustomBlockUtil.getBinPath().resolve("vanilla_palette_" + version + ".nbt");
+    public static Path getVanillaPalettePath(int protocol) {
+        return CustomBlockUtil.getVanillaPalettesPath().resolve("vanilla_palette_" + protocol + ".nbt");
     }
 
     private static void generateVariants(BlockProperties properties, String[] states, List<Map<String, Serializable>> variants, Map<String, Serializable> temp, int offset) {
@@ -186,25 +186,17 @@ public class CustomBlockUtil {
             legacyIds.add(entry.getIntKey());
         }
 
-        lastName = null;
-        group = new ObjectArrayList<>();
         for (CustomBlockState definition : Block.getLegacy2CustomState().values()) {
             NbtMap state = definition.getBlockState();
+
+            final List<NbtMap> states = vanillaPaletteList.computeIfAbsent(state.getString("name"), (k) -> new ObjectArrayList<>());
+
             if (state.getInt("version") != paletteVersion) {
                 state = state.toBuilder().putInt("version", paletteVersion).build();
             }
-            state2Legacy.computeIfAbsent(state, s -> new IntOpenHashSet()).add(convertLegacyToFullId(definition.getLegacyId()));
 
-            String name = state.getString("name");
-            if (lastName != null && !name.equals(lastName)) {
-                vanillaPaletteList.put(lastName, group);
-                group = new ObjectArrayList<>();
-            }
-            group.add(state);
-            lastName = name;
-        }
-        if (lastName != null) {
-            vanillaPaletteList.put(lastName, group);
+            states.add(definition.getBlockState());
+            state2Legacy.computeIfAbsent(state, s -> new IntOpenHashSet()).add(convertLegacyToFullId(definition.getLegacyId()));
         }
 
         palette.clearStates();

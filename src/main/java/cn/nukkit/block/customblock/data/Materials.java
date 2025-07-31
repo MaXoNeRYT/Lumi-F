@@ -209,6 +209,31 @@ public class Materials implements NBTData {
     }
 
     /**
+     * ambientOcclusion=true, faceDimming=true
+     *
+     * @see #any(RenderMethod, boolean, boolean, String)
+     */
+    public Materials custom(String face, RenderMethod renderMethod, String texture) {
+        this.process(face, true, true, renderMethod, texture);
+        return this;
+    }
+
+    /**
+     * Specify all corresponding rendering method, rendering parameters and texture name.
+     *
+     * @param renderMethod     Rendering method to be used
+     * @param texture          Specify the texture's name
+     * @param ambientOcclusion Should I apply ambient light shielding when lighting?
+     * @param faceDimming      Should it be dimmed according to the direction it is facing?
+     * @return the materials
+     */
+    public Materials custom(String face, RenderMethod renderMethod, boolean ambientOcclusion, boolean faceDimming, String texture) {
+        this.process(face, ambientOcclusion, faceDimming, renderMethod, texture);
+        return this;
+    }
+
+
+    /**
      * 指定对应对应的渲染方法、渲染参数和材质。此方法是完全自定义的，请在使用之前抓包确认参数合法性
      *
      * @param face             指定面的名称，可选值为：up, down, north, south, east, west, *
