@@ -2155,9 +2155,6 @@ public class Server {
         Entity.registerEntity("ThrownPotion", EntityPotionSplash.class);
         Entity.registerEntity("Egg", EntityEgg.class);
         Entity.registerEntity("SmallFireBall", EntitySmallFireBall.class);
-        // 和原版名称不一样，已弃用
-        // The name is different from the vanilla version and has been deprecated
-        Entity.registerEntity("BlazeFireBall", EntityBlazeFireBall.class);
         Entity.registerEntity("GhastFireBall", EntityGhastFireBall.class);
         Entity.registerEntity("ShulkerBullet", EntityShulkerBullet.class);
         Entity.registerEntity("ThrownLingeringPotion", EntityPotionLingering.class);
@@ -2307,6 +2304,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.CONDUIT, BlockEntityConduit.class);
         BlockEntity.registerBlockEntity(BlockEntity.CHISELED_BOOKSHELF, BlockEntityChiseledBookshelf.class);
         BlockEntity.registerBlockEntity(BlockEntity.HANGING_SIGN, BlockEntityHangingSign.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SCULK_SENSOR, BlockEntitySculkSensor.class);
 
         // Persistent container, not on vanilla
         BlockEntity.registerBlockEntity(BlockEntity.PERSISTENT_CONTAINER, PersistentDataContainerBlockEntity.class);
