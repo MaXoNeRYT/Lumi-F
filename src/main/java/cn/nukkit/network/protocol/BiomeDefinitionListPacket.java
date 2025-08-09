@@ -34,6 +34,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
     private static final BatchPacket CACHED_PACKET_527;
     private static final BatchPacket CACHED_PACKET_544;
     private static final BatchPacket CACHED_PACKET_786;
+    private static final BatchPacket CACHED_PACKET_800;
     private static final BatchPacket CACHED_PACKET;
 
     private static final byte[] TAG_361;
@@ -43,6 +44,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
     private static final byte[] TAG_544;
     private static final byte[] TAG_786;
 
+    private LinkedHashMap<String, BiomeDefinitionData> biomeDefinitions800;
     private LinkedHashMap<String, BiomeDefinitionData> biomeDefinitions;
 
     static {
@@ -102,19 +104,32 @@ public class BiomeDefinitionListPacket extends DataPacket {
         }
         try {
             BiomeDefinitionListPacket pk = new BiomeDefinitionListPacket();
-            pk.biomeDefinitions = new GsonBuilder().registerTypeAdapter(Color.class, new ColorTypeAdapter()).create().fromJson(Utils.loadJsonResource("stripped_biome_definitions_800.json"), new TypeToken<LinkedHashMap<String, BiomeDefinitionData>>() {
+            pk.biomeDefinitions800 = new GsonBuilder().registerTypeAdapter(Color.class, new ColorTypeAdapter()).create().fromJson(Utils.loadJsonResource("stripped_biome_definitions_800.json"), new TypeToken<LinkedHashMap<String, BiomeDefinitionData>>() {
             }.getType());
             pk.protocol = ProtocolInfo.v1_21_80;
             pk.tryEncode();
-            CACHED_PACKET = pk.compress(Deflater.BEST_COMPRESSION);
+            CACHED_PACKET_800 = pk.compress(Deflater.BEST_COMPRESSION);
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading biome definitions 800", e);
+        }
+
+        try {
+            BiomeDefinitionListPacket pk = new BiomeDefinitionListPacket();
+            pk.biomeDefinitions = new GsonBuilder().registerTypeAdapter(Color.class, new ColorTypeAdapter()).create().fromJson(Utils.loadJsonResource("stripped_biome_definitions_827.json"), new TypeToken<LinkedHashMap<String, BiomeDefinitionData>>() {
+            }.getType());
+            pk.protocol = ProtocolInfo.v1_21_100;
+            pk.tryEncode();
+            CACHED_PACKET = pk.compress(Deflater.BEST_COMPRESSION);
+        } catch (Exception e) {
+            throw new AssertionError("Error whilst loading biome definitions 827", e);
         }
     }
 
     public static BatchPacket getCachedPacket(int protocol) {
-        if (protocol >= ProtocolInfo.v1_21_80) {
+        if (protocol >= ProtocolInfo.v1_21_100) {
             return CACHED_PACKET;
+        } else if (protocol >= ProtocolInfo.v1_21_80) {
+            return CACHED_PACKET_800;
         } else if (protocol >= ProtocolInfo.v1_21_70_24) {
             return CACHED_PACKET_786;
         } else if (protocol >= ProtocolInfo.v1_19_30_23) {
@@ -142,19 +157,30 @@ public class BiomeDefinitionListPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
+        LinkedHashMap<String, BiomeDefinitionData> biomeDefinitionsEncode = null;
+        if(protocol >= ProtocolInfo.v1_21_80) {
+            biomeDefinitionsEncode = biomeDefinitions800;
+        }
+        if(protocol >= ProtocolInfo.v1_21_100) {
+            biomeDefinitionsEncode = biomeDefinitions;
+        }
         if (this.protocol >= ProtocolInfo.v1_21_80) {
-            if (this.biomeDefinitions == null) {
+            if (biomeDefinitionsEncode == null) {
                 throw new RuntimeException("biomeDefinitions == null, use getCachedPacket!");
             }
 
             SequencedHashSet<String> strings = new SequencedHashSet<>();
 
-            this.putUnsignedVarInt(this.biomeDefinitions.size());
-            for (Map.Entry<String, BiomeDefinitionData> entry : this.biomeDefinitions.entrySet()) {
+            this.putUnsignedVarInt(biomeDefinitionsEncode.size());
+            for (Map.Entry<String, BiomeDefinitionData> entry : biomeDefinitionsEncode.entrySet()) {
                 String name = entry.getKey();
                 BiomeDefinitionData definition = entry.getValue();
                 this.putLShort(strings.addAndGetIndex(name));
-                this.putBoolean(false); // Optional ID
+                if(protocol >= ProtocolInfo.v1_21_100) {
+                    this.putLShort(-1);
+                } else {
+                    this.putBoolean(false); // Optional ID
+                }
                 this.putLFloat(definition.getTemperature());
                 this.putLFloat(definition.getDownfall());
                 this.putLFloat(definition.getRedSporeDensity());
