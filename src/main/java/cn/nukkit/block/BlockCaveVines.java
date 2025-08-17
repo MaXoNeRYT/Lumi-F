@@ -2,10 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.block.BlockGrowEvent;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemDye;
-import cn.nukkit.item.ItemID;
+import cn.nukkit.item.*;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.BoneMealParticle;
@@ -93,7 +90,7 @@ public class BlockCaveVines extends BlockTransparentMeta {
             return true;
         }
 
-        if (item.getId() != Item.DYE || item.getDamage() != ItemDye.BONE_MEAL) {
+        if (!(item instanceof ItemBoneMeal)) {
             return false;
         }
 

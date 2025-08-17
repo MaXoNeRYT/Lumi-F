@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.generator.math.Mth;
@@ -96,7 +96,7 @@ public class BlockBamboo extends BlockTransparentMeta {
         int count = 0;
         Optional<Block> opt;
         Block down = this;
-        while ((opt = down.down().firstInLayers(b-> b.getId() == BAMBOO)).isPresent()) {
+        while ((opt = down.down().firstInLayers(b -> b.getId() == BAMBOO)).isPresent()) {
             down = opt.get();
             if (++count >= 16) {
                 break;
@@ -128,7 +128,8 @@ public class BlockBamboo extends BlockTransparentMeta {
                 this.getLevel().addChunkPacket(player.getChunkX(), player.getChunkZ(), animatePacket);
             }
             this.setLeafSize(LEAF_SIZE_SMALL);
-        } if (down instanceof BlockBamboo) {
+        }
+        if (down instanceof BlockBamboo) {
             BlockBamboo bambooDown = (BlockBamboo) down;
             canGrow = bambooDown.getAge() == 0;
             boolean thick = bambooDown.isThick();
@@ -184,7 +185,7 @@ public class BlockBamboo extends BlockTransparentMeta {
             return false;
         }
 
-        int height = canGrow? this.countHeight() : 0;
+        int height = canGrow ? this.countHeight() : 0;
         if (!canGrow || height >= 15 || height >= 11 && ThreadLocalRandom.current().nextFloat() < 0.25F) {
             this.setAge(1);
         }
@@ -195,7 +196,7 @@ public class BlockBamboo extends BlockTransparentMeta {
 
     @Override
     public boolean onBreak(Item item) {
-        Optional<Block> down = this.down().firstInLayers(b-> b instanceof BlockBamboo);
+        Optional<Block> down = this.down().firstInLayers(b -> b instanceof BlockBamboo);
         if (down.isPresent()) {
             BlockBamboo bambooDown = (BlockBamboo) down.get();
             int height = bambooDown.countHeight();
@@ -237,7 +238,7 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     public void setThick(boolean thick) {
-        this.setDamage(this.getDamage() & (DATA_MASK ^ 0x1) | (thick? 0x1 : 0x0));
+        this.setDamage(this.getDamage() & (DATA_MASK ^ 0x1) | (thick ? 0x1 : 0x0));
     }
 
     @Override
@@ -261,7 +262,7 @@ public class BlockBamboo extends BlockTransparentMeta {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == ItemID.DYE && item.getDamage() == 0x0F) { //Bonemeal
+        if (item instanceof ItemBoneMeal) {
             int top = (int) y;
             int count = 1;
 
@@ -291,7 +292,7 @@ public class BlockBamboo extends BlockTransparentMeta {
 
             boolean success = false;
 
-            Block block = this.up(top - (int)y + 1);
+            Block block = this.up(top - (int) y + 1);
             if (block.getId() == BlockID.AIR) {
                 success = this.grow(block);
             }

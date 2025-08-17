@@ -3,6 +3,7 @@ package cn.nukkit.entity.data.profession;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemLapisLazuli;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.utils.RecipeBuildUtils;
@@ -38,7 +39,7 @@ public class ProfessionCleric extends Profession {
                         .setTier(2)
                         .setTraderExp(10)
                         .build())
-                .add(RecipeBuildUtils.of(Item.get(Item.EMERALD, 0, 1), Item.get(Item.DYE, ItemDye.LAPIS_LAZULI))
+                .add(RecipeBuildUtils.of(Item.get(Item.EMERALD, 0, 1), new ItemLapisLazuli())
                         .setMaxUses(12)
                         .setRewardExp((byte) 1)
                         .setTier(2)

@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.generator.object.tree.ObjectAzaleaTree;
@@ -31,7 +31,7 @@ public class BlockAzalea extends BlockTransparent {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) { // BoneMeal
+        if (item instanceof ItemBoneMeal) {
             if (player != null && !player.isCreative()) {
                 item.count--;
             }

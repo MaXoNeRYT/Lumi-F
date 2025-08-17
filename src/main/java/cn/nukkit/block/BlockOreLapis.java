@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemLapisLazuli;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.utils.Utils;
@@ -60,9 +60,9 @@ public class BlockOreLapis extends BlockSolid {
                 count = count + i;
             }
 
-            return new Item[]{
-                    new ItemDye(4, count)
-            };
+            ItemLapisLazuli lapis = new ItemLapisLazuli();
+            lapis.setCount(count);
+            return new Item[]{lapis};
         } else {
             return Item.EMPTY_ARRAY;
         }
@@ -77,7 +77,7 @@ public class BlockOreLapis extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
-    
+
     @Override
     public boolean canSilkTouch() {
         return true;

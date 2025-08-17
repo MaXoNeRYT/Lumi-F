@@ -13,7 +13,7 @@ import cn.nukkit.level.GlobalBlockPalette;
 public class BlockNode extends ParamNode<Block> {
     @Override
     public void fill(String arg) {
-        Block block = Item.fromString(arg).getBlockUnsafe();
+        Block block = Item.get(arg).getBlockUnsafe();
         if (block == null) {
             this.error();
             return;

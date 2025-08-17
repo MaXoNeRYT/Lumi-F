@@ -173,7 +173,11 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.AZALEA] = true;
         randomTickBlocks[Block.FLOWERING_AZALEA] = true;
 
+        randomTickBlocks[Block.MANGROVE_PROPAGULE] = true;
+        randomTickBlocks[Block.MANGROVE_LEAVES] = true;
+
         randomTickBlocks[Block.CHERRY_SAPLING] = true;
+        randomTickBlocks[Block.CHERRY_LEAVES] = true;
 
         randomTickBlocks[Block.COPPER_BLOCK] = true;
         randomTickBlocks[Block.EXPOSED_COPPER] = true;
@@ -2382,7 +2386,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (tag instanceof ListTag) {
                     for (Tag v : ((ListTag<? extends Tag>) tag).getAll()) {
                         if (v instanceof StringTag) {
-                            Item entry = Item.fromString(((StringTag) v).data);
+                            Item entry = Item.get(((StringTag) v).data);
                             if (entry.getId() > 0 && entry.getBlockUnsafe() != null && entry.getBlockUnsafe().getId() == target.getId()) {
                                 canBreak = true;
                                 break;
@@ -2677,7 +2681,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (tag instanceof ListTag) {
                     for (Tag v : ((ListTag<Tag>) tag).getAll()) {
                         if (v instanceof StringTag) {
-                            Item entry = Item.fromString(((StringTag) v).data);
+                            Item entry = Item.get(((StringTag) v).data);
                             if (entry.getId() > 0 && entry.getBlockUnsafe() != null && entry.getBlockUnsafe().getId() == target.getId()) {
                                 canPlace = true;
                                 break;
@@ -2753,11 +2757,11 @@ public class Level implements ChunkManager, Metadatable {
                         return null;
                     }
                 }
-            } else if (item.getId() == Item.SKULL && item.getDamage() == 1) {
+            } else if (item.getBlock() instanceof BlockSkull && item.getDamage() == 1) {
                 if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
                     Block first, second;
 
-                    if (!(((first = block.getSide(BlockFace.EAST)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)).getId() == Item.SKULL && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)).getId() == Item.SKULL && second.toItem().getDamage() == 1))) {
+                    if (!(((first = block.getSide(BlockFace.EAST)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)) instanceof BlockSkull && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)) instanceof BlockSkull && second.toItem().getDamage() == 1))) {
                         return null;
                     }
 

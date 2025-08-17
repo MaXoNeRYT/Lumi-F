@@ -1,19 +1,11 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockBambooSignPost;
+import cn.nukkit.block.BlockID;
 
 public class ItemBambooSign extends ItemSign {
 
     public ItemBambooSign() {
-        this(0, 1);
-    }
-
-    public ItemBambooSign(Integer meta) {
-        this(meta, 1);
-    }
-
-    public ItemBambooSign(Integer meta, int count) {
-        super(BAMBOO_SIGN, meta, count, "Bamboo Sign", new BlockBambooSignPost());
+        super(ItemNamespaceId.BAMBOO_SIGN, "Bamboo Sign", BlockID.BAMBOO_STANDING_SIGN);
     }
 }
 

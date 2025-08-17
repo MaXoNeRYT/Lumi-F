@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created by CreeperFace on 7.8.2017.
@@ -35,7 +35,7 @@ public class BlockGlassPaneStained extends BlockGlassPane {
 
     @Override
     public BlockColor getColor() {
-        return getDyeColor().getColor();
+        return getDyeColor().getBlockColor();
     }
 
     public DyeColor getDyeColor() {

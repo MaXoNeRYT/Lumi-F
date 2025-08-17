@@ -19,7 +19,7 @@ public class ItemRecordCreatorMusicBox extends ItemRecord implements StringItem 
 
     @Override
     public String getNamespaceId(int protocolId) {
-        return MUSIC_DISC_CREATOR_BOX;
+        return MUSIC_DISC_CREATOR_MUSIC_BOX;
     }
 
     @Override

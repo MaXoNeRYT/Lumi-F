@@ -20,7 +20,7 @@ import java.util.Set;
 @ToString
 public class LazyBlockTag implements BlockTag {
 
-    public static final Map<String, Set<String>> VANILLA_DEFINITIONS;
+    private static final Map<String, Set<String>> VANILLA_DEFINITIONS;
 
     private final String tag;
     private Set<BlockType> blockTypes;
@@ -43,7 +43,7 @@ public class LazyBlockTag implements BlockTag {
             }
         }
 
-        return blockTypes;
+        return Collections.unmodifiableSet(blockTypes);
     }
 
     @Override

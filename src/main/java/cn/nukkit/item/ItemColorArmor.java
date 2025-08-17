@@ -2,7 +2,7 @@ package cn.nukkit.item;
 
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created by fromgate on 27.03.2016.
@@ -32,7 +32,7 @@ abstract public class ItemColorArmor extends ItemArmor {
      * @return - Return colored item
      */
     public ItemColorArmor setColor(int dyeColor) {
-        BlockColor blockColor = DyeColor.getByDyeData(dyeColor).getColor();
+        BlockColor blockColor = DyeColor.getByDyeData(dyeColor).getBlockColor();
         return setColor(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue());
     }
 
@@ -43,7 +43,7 @@ abstract public class ItemColorArmor extends ItemArmor {
      * @return - Return colored item
      */
     public ItemColorArmor setColor(DyeColor dyeColor) {
-        BlockColor blockColor = dyeColor.getColor();
+        BlockColor blockColor = dyeColor.getBlockColor();
         return setColor(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue());
     }
 

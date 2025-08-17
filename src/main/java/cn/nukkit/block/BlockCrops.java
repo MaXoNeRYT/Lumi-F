@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
@@ -51,8 +52,7 @@ public abstract class BlockCrops extends BlockFlowable implements BlockPropertie
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        // Bone meal
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
+        if (item instanceof ItemBoneMeal) {
             if (this.getPropertyValue(GROWTH) < 7) {
                 BlockCrops block = (BlockCrops) this.clone();
 

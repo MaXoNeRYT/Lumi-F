@@ -2,10 +2,9 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
-import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.Utils;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,7 +15,7 @@ public class BlockAzaleaFlowering extends BlockAzalea {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) { // BoneMeal
+        if (item instanceof ItemBoneMeal) {
             if (player != null && !player.isCreative()) {
                 item.count--;
             }

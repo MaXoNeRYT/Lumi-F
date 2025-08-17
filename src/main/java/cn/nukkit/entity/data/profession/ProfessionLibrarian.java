@@ -2,6 +2,7 @@ package cn.nukkit.entity.data.profession;
 
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDyeBlack;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
@@ -36,6 +37,9 @@ public class ProfessionLibrarian extends Profession {
         Enchantment e_book4 = Enchantment.getEnchantments()[random.nextInt(Enchantment.getEnchantments().length)];
         e_book4.setLevel(random.nextInt(e_book4.getMaxLevel()) + 1);
         book4.addEnchantment(e_book4);
+
+        Item dye = new ItemDyeBlack();
+        dye.setCount(5);
 
         recipes.add(RecipeBuildUtils.of(Item.get(Item.PAPER, 0, 24), Item.get(Item.EMERALD))
                         .setMaxUses(16)
@@ -73,7 +77,7 @@ public class ProfessionLibrarian extends Profession {
                         .setTier(2)
                         .setTraderExp(2)
                         .build())
-                .add(RecipeBuildUtils.of(Item.get(Item.DYE, 0, 5), Item.get(Item.EMERALD))
+                .add(RecipeBuildUtils.of(dye, Item.get(Item.EMERALD))
                         .setMaxUses(16)
                         .setRewardExp((byte) 1)
                         .setTier(3)

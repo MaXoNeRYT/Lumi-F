@@ -215,7 +215,7 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable, BlockEnt
         Item origin = original;
         original = original.clone();
 
-        DispenseBehavior behavior = DispenseBehaviorRegister.getBehavior(original.getId());
+        DispenseBehavior behavior = DispenseBehaviorRegister.getBehavior(original.getNamespaceId());
         Item result = behavior.dispense(this, facing, original);
 
         pk.evid = LevelEventPacket.EVENT_SOUND_CLICK;
@@ -237,7 +237,7 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable, BlockEnt
                 if (result.getId() == Item.HONEY_BOTTLE || result.getId() == Item.GLASS_BOTTLE || (result.getId() == Item.BUCKET && result.getDamage() > 0)) {
                     Item[] invFull = inv.addItem(original.decrement(result.count));
                     for (Item drop : invFull) {
-                        DispenseBehaviorRegister.getBehavior(-1).dispense(this, getBlockFace(), drop);
+                        DispenseBehaviorRegister.getBehavior("none").dispense(this, getBlockFace(), drop);
                     }
                 }
             }

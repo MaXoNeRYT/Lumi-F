@@ -89,6 +89,7 @@ public abstract class Fuel {
         duration.put(Item.BANNER, (short) 300);
         duration.put(Item.CROSSBOW, (short) 200);
         duration.put(Item.DEAD_BUSH, (short) 100);
-        duration.put(Item.SIGN, (short) 200);
+        //TODO: Refactor fuel
+        // duration.put(Item.SIGN, (short) 200);
     }
 }

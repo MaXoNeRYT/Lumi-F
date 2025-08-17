@@ -99,7 +99,7 @@ public class BlockEntityChiseledBookshelf extends BlockEntitySpawnable {
                     this.items[i] = null;
                     continue;
                 }
-                Item item = Item.fromString(name);
+                Item item = Item.get(name);
                 item.setDamage(compoundTag.getByte("Damage"));
                 item.setCount(compoundTag.getByte("Count"));
                 if (compoundTag.containsCompound("tag")) {

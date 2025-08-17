@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.ItemSpruceSign;
 
 public class BlockSpruceWallSign extends BlockWallSign {
@@ -30,6 +31,6 @@ public class BlockSpruceWallSign extends BlockWallSign {
 
     @Override
     public Item toItem() {
-        return new ItemSpruceSign();
+        return Item.get(ItemNamespaceId.SPRUCE_SIGN);
     }
 }

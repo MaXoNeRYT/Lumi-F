@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.BoneMealParticle;
@@ -42,9 +42,9 @@ public class BlockMoss extends BlockDirt {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE || item.getDamage() == ItemDye.BONE_MEAL) {
-            convertToMoss(this);
-            populateRegion(this);
+        if (item instanceof ItemBoneMeal) {
+            this.convertToMoss(this);
+            this.populateRegion(this);
             this.level.addParticle(new BoneMealParticle(this));
             item.count--;
             return true;
@@ -64,19 +64,20 @@ public class BlockMoss extends BlockDirt {
 
     }
 
-    public boolean canBePopulated(Position pos){
-        return pos.add(0,-1,0).getLevelBlock().isSolid() && pos.add(0,-1,0).getLevelBlock().getId() != BlockID.MOSS_CARPET && pos.getLevelBlock().getId() == BlockID.AIR;
-    }
-    public boolean canBePopulated2BlockAir(Position pos){
-        return pos.add(0,-1,0).getLevelBlock().isSolid() && pos.add(0,-1,0).getLevelBlock().getId() != BlockID.MOSS_CARPET && pos.getLevelBlock().getId() == BlockID.AIR && pos.add(0,1,0).getLevelBlock().getId() == BlockID.AIR;
+    public boolean canBePopulated(Position pos) {
+        return pos.add(0, -1, 0).getLevelBlock().isSolid() && pos.add(0, -1, 0).getLevelBlock().getId() != BlockID.MOSS_CARPET && pos.getLevelBlock().getId() == BlockID.AIR;
     }
 
-    public void convertToMoss(Position pos){
+    public boolean canBePopulated2BlockAir(Position pos) {
+        return pos.add(0, -1, 0).getLevelBlock().isSolid() && pos.add(0, -1, 0).getLevelBlock().getId() != BlockID.MOSS_CARPET && pos.getLevelBlock().getId() == BlockID.AIR && pos.add(0, 1, 0).getLevelBlock().getId() == BlockID.AIR;
+    }
+
+    public void convertToMoss(Position pos) {
         Random random = new Random();
         for (double x = pos.x - 3; x <= pos.x + 3; x++) {
             for (double z = pos.z - 3; z <= pos.z + 3; z++) {
                 for (double y = pos.y + 5; y >= pos.y - 5; y--) {
-                    if (canConvertToMoss(pos.level.getBlock(new Position(x, y, z, pos.level))) && (random.nextDouble() < 0.6 || Math.abs(x-pos.x) < 3 && Math.abs(z-pos.z) < 3)) {
+                    if (canConvertToMoss(pos.level.getBlock(new Position(x, y, z, pos.level))) && (random.nextDouble() < 0.6 || Math.abs(x - pos.x) < 3 && Math.abs(z - pos.z) < 3)) {
                         pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.MOSS_BLOCK));
                         break;
                     }
@@ -85,20 +86,20 @@ public class BlockMoss extends BlockDirt {
         }
     }
 
-    public void populateRegion(Position pos){
+    public void populateRegion(Position pos) {
         Random random = new Random();
         for (double x = pos.x - 3; x <= pos.x + 3; x++) {
             for (double z = pos.z - 3; z <= pos.z + 3; z++) {
                 for (double y = pos.y + 5; y >= pos.y - 5; y--) {
-                    if(canBePopulated(new Position(x,y,z,pos.level))) {
-                        if (!canGrowPlant(new Position(x,y,z,pos.level)))
+                    if (canBePopulated(new Position(x, y, z, pos.level))) {
+                        if (!canGrowPlant(new Position(x, y, z, pos.level)))
                             break;
                         double randomDouble = random.nextDouble();
                         if (randomDouble >= 0 && randomDouble < 0.3125) {
-                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.TALL_GRASS),true,true);
+                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.TALL_GRASS), true, true);
                         }
                         if (randomDouble >= 0.3125 && randomDouble < 0.46875) {
-                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.MOSS_CARPET),true,true);
+                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.MOSS_CARPET), true, true);
                         }
                         if (randomDouble >= 0.46875 && randomDouble < 0.53125) {
                             //TODO: double plants
@@ -117,13 +118,13 @@ public class BlockMoss extends BlockDirt {
                             }*/
                         }
                         if (randomDouble >= 0.53125 && randomDouble < 0.575) {
-                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.AZALEA),true,true);
+                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.AZALEA), true, true);
                         }
                         if (randomDouble >= 0.575 && randomDouble < 0.6) {
-                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.FLOWERING_AZALEA),true,true);
+                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.FLOWERING_AZALEA), true, true);
                         }
                         if (randomDouble >= 0.6 && randomDouble < 1) {
-                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.AIR),true,true);
+                            pos.level.setBlock(new Position(x, y, z, pos.level), Block.get(BlockID.AIR), true, true);
                         }
                         break;
                     }
@@ -133,7 +134,7 @@ public class BlockMoss extends BlockDirt {
     }
 
     public boolean canGrowPlant(Position pos) {
-        switch (pos.add(0,-1,0).getLevelBlock().getId()) {
+        switch (pos.add(0, -1, 0).getLevelBlock().getId()) {
             case GRASS:
             case DIRT:
             case PODZOL:

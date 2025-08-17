@@ -3,6 +3,7 @@ package cn.nukkit.entity.item;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockSkull;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityInteractable;
 import cn.nukkit.entity.data.StringEntityData;
@@ -13,6 +14,7 @@ import cn.nukkit.inventory.EntityEquipmentInventory;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemArmor;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.DestroyBlockParticle;
@@ -147,7 +149,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
                 isArmorSlot = true;
             }
 
-            if (flag && (item.getId() == Item.SKULL) || item.getId() == (255 - BlockID.CARVED_PUMPKIN)) {
+            if (flag && (item.getBlock() instanceof BlockSkull) || item.getId() == (255 - BlockID.CARVED_PUMPKIN)) {
                 i = 0;
                 isArmorSlot = true;
             }
@@ -274,7 +276,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
 
                     boolean drop = this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS);
                     if (drop) {
-                        this.level.dropItem(this, Item.get(Item.ARMOR_STAND));
+                        this.level.dropItem(this, Item.get(ItemNamespaceId.ARMOR_STAND));
                     }
                     if (this.equipmentInventory != null) {
                         if (drop) {

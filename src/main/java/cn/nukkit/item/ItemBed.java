@@ -1,7 +1,7 @@
 package cn.nukkit.item;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * @author MagicDroidX

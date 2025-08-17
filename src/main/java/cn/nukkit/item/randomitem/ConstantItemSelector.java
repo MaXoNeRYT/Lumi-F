@@ -39,6 +39,11 @@ public class ConstantItemSelector extends Selector {
         this(Item.get(id, meta, count), parent, randomDurability);
     }
 
+    public ConstantItemSelector(Item item, int count, Selector parent) {
+        this(item, parent, false);
+        item.setCount(count);
+    }
+
     public ConstantItemSelector(Item item, Selector parent, boolean randomDurability) {
         super(parent);
         this.item = item;

@@ -8,6 +8,7 @@ import cn.nukkit.inventory.transaction.action.EnchantingAction;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemLapisLazuli;
 import cn.nukkit.network.protocol.types.NetworkInventoryAction;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +40,7 @@ public class EnchantTransaction extends InventoryTransaction {
         if (inv == null) return false;
         EnchantInventory eInv = (EnchantInventory) inv;
         if (!getSource().isCreative()) {
-            if (cost == -1 || !eInv.getReagentSlot().equals(Item.get(Item.DYE, 4), true, false) || eInv.getReagentSlot().count < cost)
+            if (cost == -1 || !eInv.getReagentSlot().equals(new ItemLapisLazuli(), true, false) || eInv.getReagentSlot().count < cost)
                 return false;
         }
         return inputItem != null && outputItem != null

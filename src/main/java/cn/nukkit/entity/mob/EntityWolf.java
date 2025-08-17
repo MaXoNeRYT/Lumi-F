@@ -21,7 +21,7 @@ import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.utils.Utils;
 
 import java.util.HashMap;
@@ -187,9 +187,9 @@ public class EntityWolf extends EntityTameableMob {
 
                 return true;
             }
-        } else if (item.getId() == Item.DYE) {
+        } else if (item instanceof ItemDye dye) {
             if (this.hasOwner() && player.equals(this.getOwner())) {
-                this.setCollarColor(((ItemDye) item).getDyeColor());
+                this.setCollarColor(dye.getDyeColor());
                 return true;
             }
         } else if (this.isBreedingItem(item)) {

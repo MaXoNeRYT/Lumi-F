@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.ItemWarpedSign;
 
 public class BlockWarpedWallSign extends BlockWallSign {
@@ -30,6 +31,6 @@ public class BlockWarpedWallSign extends BlockWallSign {
 
     @Override
     public Item toItem() {
-        return new ItemWarpedSign();
+        return Item.get(ItemNamespaceId.WARPED_SIGN);
     }
 }

@@ -7,6 +7,7 @@ import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.block.BlockSpreadEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
@@ -49,7 +50,7 @@ public class BlockSeaPickle extends BlockFlowable {
 
     @Override
     public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL){
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
             Block down = this.down();
             if (!down.isSolid() || down.getId() == MAGMA) {
                 this.getLevel().useBreakOn(this, null, null, true);
@@ -83,7 +84,7 @@ public class BlockSeaPickle extends BlockFlowable {
             return true;
         }
 
-        if (target.isSolid() && target.getId() != MAGMA){
+        if (target.isSolid() && target.getId() != MAGMA) {
             Block layer1 = block.getLevelBlockAtLayer(1);
             if (layer1 instanceof BlockWater) {
                 if (layer1.getDamage() != 0 && layer1.getDamage() != 8) {
@@ -110,19 +111,19 @@ public class BlockSeaPickle extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() != Item.DYE || item.getDamage() != 0x0f){ //Bone meal
+        if (!(item instanceof ItemBoneMeal)) {
             return super.onActivate(item, player);
         }
 
         BlockSeaPickle block = (BlockSeaPickle) this.clone();
-        if (!block.isDead()){
+        if (!block.isDead()) {
             block.setDamage(3);
         }
 
         BlockGrowEvent blockGrowEvent = new BlockGrowEvent(this, block);
         Server.getInstance().getPluginManager().callEvent(blockGrowEvent);
 
-        if (blockGrowEvent.isCancelled()){
+        if (blockGrowEvent.isCancelled()) {
             return false;
         }
 
@@ -171,7 +172,7 @@ public class BlockSeaPickle extends BlockFlowable {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[]{ new ItemBlock(new BlockSeaPickle(), 0, (this.getDamage() & 0x3) + 1) };
+        return new Item[]{new ItemBlock(new BlockSeaPickle(), 0, (this.getDamage() & 0x3) + 1)};
     }
 
     @Override

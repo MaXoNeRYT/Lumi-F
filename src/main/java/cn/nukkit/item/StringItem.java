@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-public interface StringItem {
+public interface StringItem extends ItemNamespaceId {
 
     String getNamespaceId();
 

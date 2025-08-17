@@ -72,10 +72,15 @@ public class VibrationManagerImpl implements VibrationManager {
                 .putCompound("target", listener.isEntity() ? createEntityTargetTag(listener.asEntity()) : createVec3fTag(listenerPos))
                 .putFloat("timeToLive", (float) (listenerPos.distance(sourcePos) / 20.0));
 
-        LevelEventGenericPacket packet = new LevelEventGenericPacket();
-        packet.eventId = LevelEventPacket.EVENT_PARTICLE_VIBRATION_SIGNAL;
-        packet.tag = tag;
-        Server.broadcastPacket(level.getPlayers().values(), packet);
+        level.getPlayers().forEach(((uuid, player) -> {
+            LevelEventGenericPacket packet = new LevelEventGenericPacket();
+            packet.eventId = LevelEventPacket.EVENT_PARTICLE_VIBRATION_SIGNAL;
+            packet.tag = tag;
+            packet.protocol = player.protocol;
+            packet.tryEncode();
+            player.dataPacket(packet);
+        }));
+
     }
 
     protected CompoundTag createVec3fTag(Vector3f vector3f) {

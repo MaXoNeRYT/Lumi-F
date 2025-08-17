@@ -13,18 +13,10 @@ import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.LevelEventPacket;
 
-public class ItemArmorStand extends Item {
+public class ItemArmorStand extends StringItemBase {
 
     public ItemArmorStand() {
-        this(0);
-    }
-
-    public ItemArmorStand(Integer meta) {
-        this(meta, 1);
-    }
-
-    public ItemArmorStand(Integer meta, int count) {
-        super(ARMOR_STAND, meta, count, "Armor Stand");
+        super(ItemNamespaceId.ARMOR_STAND, "Armor Stand");
     }
 
     @Override

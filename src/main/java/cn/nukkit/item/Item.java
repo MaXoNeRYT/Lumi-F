@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * Nukkit Project
  */
 @Log4j2
-public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, ProtocolInfo {
+public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static final Item AIR_ITEM = new ItemBlock(Block.get(BlockID.AIR), null, 0);
 
@@ -197,7 +197,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[COOKED_PORKCHOP] = ItemPorkchopCooked.class; //320
             list[PAINTING] = ItemPainting.class; //321
             list[GOLDEN_APPLE] = ItemAppleGold.class; //322
-            list[SIGN] = ItemSign.class; //323
             list[WOODEN_DOOR] = ItemDoorWood.class; //324
             list[BUCKET] = ItemBucket.class; //325
             list[MINECART] = ItemMinecart.class; //328
@@ -222,7 +221,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[GLOWSTONE_DUST] = ItemGlowstoneDust.class; //348
             list[RAW_FISH] = ItemFish.class; //349
             list[COOKED_FISH] = ItemFishCooked.class; //350
-            list[DYE] = ItemDye.class; //351
             list[BONE] = ItemBone.class; //352
             list[SUGAR] = ItemSugar.class; //353
             list[CAKE] = ItemCake.class; //354
@@ -268,7 +266,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[POISONOUS_POTATO] = ItemPotatoPoisonous.class; //394
             list[EMPTY_MAP] = ItemEmptyMap.class; //395
             list[GOLDEN_CARROT] = ItemCarrotGolden.class; //396
-            list[SKULL] = ItemSkull.class; //397
             list[CARROT_ON_A_STICK] = ItemCarrotOnAStick.class; //398
             list[NETHER_STAR] = ItemNetherStar.class; //399
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
@@ -296,7 +293,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[PRISMARINE_CRYSTALS] = ItemPrismarineCrystals.class; //422
             list[RAW_MUTTON] = ItemMuttonRaw.class; //423
             list[COOKED_MUTTON] = ItemMuttonCooked.class; //424
-            list[ARMOR_STAND] = ItemArmorStand.class; //425
             list[END_CRYSTAL] = ItemEndCrystal.class; //426
             list[SPRUCE_DOOR] = ItemDoorSpruce.class; //427
             list[BIRCH_DOOR] = ItemDoorBirch.class; //428
@@ -330,11 +326,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[TURTLE_SHELL] = ItemTurtleShell.class; //469
             list[PHANTOM_MEMBRANE] = ItemPhantomMembrane.class; //470
             list[CROSSBOW] = ItemCrossbow.class; //471
-            list[SPRUCE_SIGN] = ItemSpruceSign.class; //472
-            list[BIRCH_SIGN] = ItemBirchSign.class; //473
-            list[JUNGLE_SIGN] = ItemJungleSign.class; //474
-            list[ACACIA_SIGN] = ItemAcaciaSign.class; //475
-            list[DARKOAK_SIGN] = ItemDarkOakSign.class; //476
             list[SWEET_BERRIES] = ItemSweetBerries.class; //477
             list[RECORD_11] = ItemRecord11.class; //510
             list[RECORD_CAT] = ItemRecordCat.class; //501
@@ -381,8 +372,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[NETHERITE_LEGGINGS] = ItemLeggingsNetherite.class; //750
             list[NETHERITE_BOOTS] = ItemBootsNetherite.class; //751
             list[NETHERITE_SCRAP] = ItemScrapNetherite.class; //752
-            list[CRIMSON_SIGN] = ItemCrimsonSign.class; //753
-            list[WARPED_SIGN] = ItemWarpedSign.class; //754
             list[CRIMSON_DOOR] = ItemDoorCrimson.class; //755
             list[WARPED_DOOR] = ItemDoorWarped.class; //756
             list[WARPED_FUNGUS_ON_A_STICK] = ItemWarpedFungusOnAStick.class; //757
@@ -390,7 +379,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[RECORD_PIGSTEP] = ItemRecordPigstep.class; //759
             list[NETHER_SPROUTS] = ItemNetherSprouts.class; //760
 
-            list[AMETHYST_SHARD] = ItemAmethystShard.class; //771
             list[SPYGLASS] = ItemSpyglass.class; //772
             list[RECORD_OTHERSIDE] = ItemRecordOtherside.class; //773
 
@@ -398,16 +386,47 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
             list[GLOW_ITEM_FRAME] = ItemItemFrameGlow.class; //850
 
-            list[MANGROVE_SIGN] = ItemMangroveSign.class; //1005
-            list[BAMBOO_SIGN] = ItemBambooSign.class; //1006
-            list[CHERRY_SIGN] = ItemCherrySign.class; //1007
+
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
                     list[i] = Block.list[i];
                 }
             }
-
+            registerNamespacedIdItem(ItemArmorStand.class);
+            registerNamespacedIdItem(ItemAcaciaSign.class);
+            registerNamespacedIdItem(ItemOakSign.class);
+            registerNamespacedIdItem(ItemBirchSign.class);
+            registerNamespacedIdItem(ItemJungleSign.class);
+            registerNamespacedIdItem(ItemSpruceSign.class);
+            registerNamespacedIdItem(ItemDarkOakSign.class);
+            registerNamespacedIdItem(ItemCrimsonSign.class);
+            registerNamespacedIdItem(ItemWarpedSign.class);
+            registerNamespacedIdItem(ItemMangroveSign.class);
+            registerNamespacedIdItem(ItemBambooSign.class);
+            registerNamespacedIdItem(ItemCherrySign.class);
+            registerNamespacedIdItem(ItemAmethystShard.class);
+            registerNamespacedIdItem(ItemDyeBlack.class);
+            registerNamespacedIdItem(ItemDyeBlue.class);
+            registerNamespacedIdItem(ItemDyeBrown.class);
+            registerNamespacedIdItem(ItemDyeCyan.class);
+            registerNamespacedIdItem(ItemDyeGray.class);
+            registerNamespacedIdItem(ItemDyeGreen.class);
+            registerNamespacedIdItem(ItemDyeLightBlue.class);
+            registerNamespacedIdItem(ItemDyeLightGray.class);
+            registerNamespacedIdItem(ItemDyeLime.class);
+            registerNamespacedIdItem(ItemDyeMagenta.class);
+            registerNamespacedIdItem(ItemDyeOrange.class);
+            registerNamespacedIdItem(ItemDyePink.class);
+            registerNamespacedIdItem(ItemDyePurple.class);
+            registerNamespacedIdItem(ItemDyeRed.class);
+            registerNamespacedIdItem(ItemDyeWhite.class);
+            registerNamespacedIdItem(ItemDyeYellow.class);
+            registerNamespacedIdItem(ItemLapisLazuli.class);
+            registerNamespacedIdItem(ItemBoneMeal.class);
+            registerNamespacedIdItem(ItemCocoaBeans.class);
+            registerNamespacedIdItem(ItemInkSac.class);
+            registerNamespacedIdItem(ItemGlowInkSac.class);
             registerNamespacedIdItem(ItemIngotCopper.class);
             registerNamespacedIdItem(ItemRawIron.class);
             registerNamespacedIdItem(ItemRawGold.class);
@@ -1009,6 +1028,10 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         }
     }
 
+    public static void addItemToCustomItems(String namespace, Item item) {
+        CUSTOM_ITEMS.put(namespace, () -> item);
+    }
+
     public static void deleteCustomItem(String namespaceId) {
         if (CUSTOM_ITEMS.containsKey(namespaceId)) {
             Item customItem = fromString(namespaceId);
@@ -1080,7 +1103,7 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static Item get(int id, Integer meta, int count, byte[] tags) {
         try {
-            Class<?> c;
+            Class<?> clazz;
             if (id < 255 - Block.MAX_BLOCK_ID) {
                 var customBlockItem = Block.get(255 - id).toItem();
                 customBlockItem.setCount(count);
@@ -1089,13 +1112,13 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
                 return customBlockItem;
             } else if (id < 0) {
                 int blockId = 255 - id;
-                c = Block.list[blockId];
+                clazz = Block.list[blockId];
             } else {
-                c = list[id];
+                clazz = list[id];
             }
-            Item item;
 
-            if (c == null) {
+            Item item;
+            if (clazz == null) {
                 item = new Item(id, meta, count);
             } else if (id < 256 && id != 166) {
                 if (meta >= 0) {
@@ -1104,7 +1127,7 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
                     item = new ItemBlock(Block.get(id), meta, count);
                 }
             } else {
-                item = ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count));
+                item = (Item) clazz.getConstructor(Integer.class, int.class).newInstance(meta, count);
             }
 
             if (tags.length != 0) {
@@ -1117,6 +1140,39 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         }
     }
 
+    public static Item get(String id) {
+        return get(id, 0);
+    }
+
+    public static Item get(String id, Integer meta) {
+        return get(id, meta, 1);
+    }
+
+    public static Item get(String id, Integer meta, int count) {
+        return get(id, meta, count, new byte[0]);
+    }
+
+    public static Item get(String id, Integer meta, int count, byte[] tags) {
+        id = id.toLowerCase();
+        if (!id.contains(":")) id = "minecraft:" + id;
+
+        Item item = NAMESPACED_ID_ITEM.getOrDefault(id, CUSTOM_ITEMS.getOrDefault(id, Item.AIR_ITEM::clone)).get();
+        if (meta != null) {
+            item.setDamage(meta);
+        }
+        item.setCount(count);
+
+        if (tags.length != 0) {
+            item.setCompoundTag(tags);
+        }
+
+        return item.clone();
+    }
+
+    /**
+     * Deprecated. Use Item.get() instead
+     */
+    @Deprecated
     public static Item fromString(String str) {
         String normalized = str.trim().replace(' ', '_').toLowerCase(Locale.ROOT);
         Matcher matcher = ITEM_STRING_PATTERN.matcher(normalized);
@@ -1199,10 +1255,18 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return get(id, meta.orElse(0));
     }
 
+    @Deprecated
+    public static Item[] fromStringMultiple(String str) {
+        String[] b = str.split(",");
+        Item[] items = new Item[b.length - 1];
+        for (int i = 0; i < b.length; i++) {
+            items[i] = fromString(b[i]);
+        }
+        return items;
+    }
+
     private String idConvertToName() {
-        if (this.name != null) {
-            return this.name;
-        } else {
+        if (this.name == null) {
             var path = this.getNamespaceId().split(":")[1];
             StringBuilder result = new StringBuilder();
             String[] parts = path.split("_");
@@ -1212,8 +1276,8 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
                 }
             }
             this.name = result.toString().trim().intern();
-            return name;
         }
+        return this.name;
     }
 
     public static Item fromJson(Map<String, Object> data) {
@@ -1247,15 +1311,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     public static Item fromJsonOld(Map<String, Object> data) {
         String nbt = (String) data.getOrDefault("nbt_hex", "");
         return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] : Utils.parseHexBinary(nbt));
-    }
-
-    public static Item[] fromStringMultiple(String str) {
-        String[] b = str.split(",");
-        Item[] items = new Item[b.length - 1];
-        for (int i = 0; i < b.length; i++) {
-            items[i] = fromString(b[i]);
-        }
-        return items;
     }
 
     public Item setCompoundTag(CompoundTag tag) {

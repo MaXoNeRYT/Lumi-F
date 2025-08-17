@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
@@ -83,24 +84,15 @@ public class BlockTallGrass extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
+        if (item instanceof ItemBoneMeal) {
             Block up = this.up();
 
             if (up.getId() == AIR) {
-                int meta;
-
-                switch (this.getDamage()) {
-                    case 0:
-                    case 1:
-                        meta = BlockDoublePlant.TALL_GRASS;
-                        break;
-                    case 2:
-                    case 3:
-                        meta = BlockDoublePlant.LARGE_FERN;
-                        break;
-                    default:
-                        meta = -1;
-                }
+                int meta = switch (this.getDamage()) {
+                    case 0, 1 -> BlockDoublePlant.TALL_GRASS;
+                    case 2, 3 -> BlockDoublePlant.LARGE_FERN;
+                    default -> -1;
+                };
 
                 if (meta != -1) {
                     if (player != null && !player.isCreative()) {

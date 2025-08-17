@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.event.block.BlockSpreadEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
@@ -50,7 +51,7 @@ public class BlockGrass extends BlockDirt {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0F) {
+        if (item instanceof ItemBoneMeal) {
             ObjectTallGrass.growGrass(this.getLevel(), this, Utils.nukkitRandom);
             this.level.addParticle(new BoneMealParticle(this));
             if (player != null) {

@@ -71,12 +71,12 @@ public class NBTIO {
             try {
                 item = Item.get((short) tag.getShort("id"), damage, count);
             } catch (Exception e) {
-                item = Item.fromString(tag.getString("id"));
+                item = Item.get(tag.getString("id"));
                 item.setDamage(damage);
                 item.setCount(count);
             }
         } else {
-            item = Item.fromString(tag.getString("Name"));
+            item = Item.get(tag.getString("Name"));
             if (item.getDamage() == 0) {
                 item.setDamage(damage);
             }

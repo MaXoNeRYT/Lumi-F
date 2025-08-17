@@ -408,7 +408,7 @@ public class RuntimeItemMapping {
         if (legacyEntry != null) {
             return Item.get(legacyId, damage, count, nbtBytes);
         } else {
-            Item item = Item.fromString(identifier);
+            Item item = Item.get(identifier);
             item.setDamage(damage);
             item.setCount(count);
             item.setCompoundTag(nbtBytes);

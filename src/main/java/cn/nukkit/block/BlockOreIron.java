@@ -72,7 +72,7 @@ public class BlockOreIron extends BlockSolid {
                 count = i + 1;
             }
 
-            Item rawIron = Item.fromString("minecraft:raw_iron");
+            Item rawIron = Item.get("minecraft:raw_iron");
             rawIron.setCount(count);
             return new Item[]{
                     rawIron

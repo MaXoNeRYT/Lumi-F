@@ -97,4 +97,9 @@ public abstract class BlockCopperDoorBase extends BlockDoor implements Oxidizabl
             case OXIDIZED -> waxed ? WAXED_OXIDIZED_COPPER_DOOR : OXIDIZED_COPPER_DOOR;
         };
     }
+
+    @Override
+    public Item[] getDrops(@Nullable Player player, Item item) {
+        return new Item[]{Item.get(this.getIdentifier(), 0, 1)};
+    }
 }

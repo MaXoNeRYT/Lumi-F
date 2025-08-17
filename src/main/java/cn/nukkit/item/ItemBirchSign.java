@@ -1,18 +1,10 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockBirchSignPost;
+import cn.nukkit.block.BlockID;
 
 public class ItemBirchSign extends ItemSign {
 
     public ItemBirchSign() {
-        this(0, 1);
-    }
-
-    public ItemBirchSign(Integer meta) {
-        this(meta, 1);
-    }
-
-    public ItemBirchSign(Integer meta, int count) {
-        super(BIRCH_SIGN, meta, count, "Birch Sign", new BlockBirchSignPost());
+        super(ItemNamespaceId.BIRCH_SIGN, "Birch Sign",  BlockID.BIRCH_STANDING_SIGN);
     }
 }

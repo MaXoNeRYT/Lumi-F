@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBirchSign;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockBirchSignPost extends BlockSignPost {
 
@@ -29,7 +30,7 @@ public class BlockBirchSignPost extends BlockSignPost {
 
     @Override
     public Item toItem() {
-        return new ItemBirchSign();
+        return Item.get(ItemNamespaceId.BIRCH_SIGN);
     }
 
 }

@@ -3,10 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySign;
-import cn.nukkit.event.block.SignColorChangeEvent;
-import cn.nukkit.event.block.SignGlowEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.ItemSign;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
@@ -14,11 +12,7 @@ import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
-import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.network.protocol.OpenSignPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Faceable;
 import org.jetbrains.annotations.NotNull;
 
@@ -140,7 +134,7 @@ public class BlockSignPost extends BlockSignBase implements Faceable, BlockEntit
 
     @Override
     public Item toItem() {
-        return new ItemSign();
+        return Item.get(ItemNamespaceId.OAK_SIGN);
     }
 
     @Override

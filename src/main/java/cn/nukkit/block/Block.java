@@ -1614,6 +1614,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                             final int itemId = 255 - id;
                             for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
                                 mapping.registerCustomBlockItem(customBlock.getIdentifier(), itemId, meta);
+                                Item.addItemToCustomItems(customBlock.getIdentifier(), Item.get(itemId, meta));
                             }
 
                             CustomBlockState state;

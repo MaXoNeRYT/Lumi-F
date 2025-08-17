@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public class BlockShortDryGrass extends BlockFlowable {
 
     @Override
     public boolean onActivate(@NotNull Item item, @Nullable Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
+        if (item instanceof ItemBoneMeal) {
             BlockTallDryGrass tallDryGrass = new BlockTallDryGrass();
 
             this.level.addParticle(new BoneMealParticle(this));

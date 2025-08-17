@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.NukkitMath;
 import java.util.concurrent.ThreadLocalRandom;
@@ -48,11 +49,14 @@ public class BlockAmethystCluster extends BlockAmethystBud {
     @Override
     public Item[] getDrops(Item item) {
         if (!item.isPickaxe()) {
-            return new Item[]{Item.get(ItemID.AMETHYST_SHARD, 0, 2)};
+            Item shard = Item.get(ItemNamespaceId.AMETHYST_SHARD, 0, 2);
+            return new Item[]{shard};
         }
+
         if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
             return new Item[]{this.toItem()};
         }
+
         int amount = 4;
         int fortuneLevel = NukkitMath.clamp(item.getEnchantmentLevel(Enchantment.ID_FORTUNE_DIGGING), 0, 3);
         if (fortuneLevel > 0) {
@@ -71,6 +75,9 @@ public class BlockAmethystCluster extends BlockAmethystBud {
                 }
             }
         }
-        return new Item[]{Item.get(ItemID.AMETHYST_SHARD, 0, amount)};
+
+        Item shard = Item.get(ItemNamespaceId.AMETHYST_SHARD, 0, amount);
+        return new Item[]{shard};
     }
+
 }

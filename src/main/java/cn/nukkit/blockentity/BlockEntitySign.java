@@ -6,11 +6,10 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.utils.StringUtils;
 import cn.nukkit.utils.TextFormat;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**

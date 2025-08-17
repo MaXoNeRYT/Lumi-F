@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemCrimsonSign;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockCrimsonSignPost extends BlockSignPost {
 
@@ -30,7 +31,7 @@ public class BlockCrimsonSignPost extends BlockSignPost {
 
     @Override
     public Item toItem() {
-        return new ItemCrimsonSign();
+        return Item.get(ItemNamespaceId.CRIMSON_SIGN);
     }
 
     @Override

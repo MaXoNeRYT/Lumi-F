@@ -7,7 +7,7 @@ public class ItemPitcherPod extends StringItemBase {
 
     public ItemPitcherPod() {
         super(PITCHER_POD, "Pitcher Pod");
-        block = Block.get(PITCHER_CROP);
+        this.block = Block.get(Block.PITCHER_CROP);
     }
 
     @Override

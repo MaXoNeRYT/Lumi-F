@@ -27,7 +27,7 @@ public class BlockDoorCherry extends BlockDoorWood {
 
     @Override
     public Item toItem() {
-        return Item.fromString(ItemNamespaceId.CHERRY_DOOR);
+        return Item.get(ItemNamespaceId.CHERRY_DOOR);
     }
 
     @Override

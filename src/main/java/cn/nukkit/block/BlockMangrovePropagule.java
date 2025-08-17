@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.generator.object.tree.ObjectMangroveTree;
 import cn.nukkit.level.particle.BoneMealParticle;
@@ -76,7 +77,7 @@ public class BlockMangrovePropagule extends BlockSapling {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0F) { // Bone meal
+        if (item instanceof ItemBoneMeal) {
             if (!isHanging()) {
                 if (player != null && !player.isCreative()) {
                     item.count--;

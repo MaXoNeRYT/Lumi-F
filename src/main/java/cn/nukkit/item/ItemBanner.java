@@ -4,7 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BannerPattern;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created by PetteriM1

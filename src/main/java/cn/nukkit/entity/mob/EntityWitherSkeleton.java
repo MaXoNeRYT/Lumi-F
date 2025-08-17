@@ -1,6 +1,7 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.entity.effect.Effect;
@@ -94,7 +95,7 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
         }
 
         if (Utils.rand(1, 40) == 1) {
-            drops.add(Item.get(Item.SKULL, 1, 1));
+            drops.add(Item.get(255 - Block.WITHER_SKELETON_SKULL, 0, 1));
         }
 
         if (Utils.rand(1, 200) <= 17) {

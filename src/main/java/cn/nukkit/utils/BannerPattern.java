@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.util.HashMap;

@@ -25,8 +25,6 @@ import java.util.Set;
 
 public class BlockEnderChest extends BlockTransparentMeta implements Faceable, BlockEntityHolder<BlockEntityEnderChest> {
 
-    private static final int[] FACES = {2, 5, 3, 4};
-
     private final Set<Player> viewers = new HashSet<>();
 
     public BlockEnderChest() {
@@ -108,7 +106,7 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable, B
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(FACES[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
 
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = new CompoundTag("")
@@ -222,7 +220,7 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable, B
     @Override
     public void setBlockFace(BlockFace face) {
         if (face.getIndex() > 1) {
-            this.setDamage(FACES[face.getHorizontalIndex()]);
+            this.setDamage(face.getHorizontalIndex());
         }
     }
 }

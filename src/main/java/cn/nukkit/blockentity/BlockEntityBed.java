@@ -2,7 +2,7 @@ package cn.nukkit.blockentity;
 
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created by CreeperFace on 2.6.2017.

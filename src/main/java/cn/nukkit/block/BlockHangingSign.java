@@ -6,6 +6,7 @@ import cn.nukkit.blockentity.BlockEntityHangingSign;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.CompassRoseDirection;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -18,10 +19,6 @@ public abstract class BlockHangingSign extends BlockSignBase implements BlockEnt
     private static final int FACING_MASK    = 0b0000_0000_0000_1110; // Bits 1-3 (3 bits)
     private static final int DIRECTION_MASK = 0b0000_0000_1111_0000; // Bits 4-7 (4 bits)
     private static final int HANGING_MASK   = 0b0000_0001_0000_0000; // Bit 8 (1 bit)
-    private static final int MAX_ATTACHED = 1;
-    private static final int MAX_FACING = 5;
-    private static final int MAX_DIRECTION = 15;
-    private static final int MAX_HANGING = 1;
 
     public BlockHangingSign() {
         super(0);
@@ -93,6 +90,24 @@ public abstract class BlockHangingSign extends BlockSignBase implements BlockEnt
         }
     }
 
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (isHanging()) {
+                if (up().isAir()) {
+                    getLevel().useBreakOn(this);
+                    return Level.BLOCK_UPDATE_NORMAL;
+                }
+            } else {
+                if (checkGroundBlock() == null) {
+                    getLevel().useBreakOn(this);
+                    return Level.BLOCK_UPDATE_NORMAL;
+                }
+            }
+        }
+        return 0;
+    }
+
     private BlockFace checkGroundBlock() {
         if (getSide(BlockFace.NORTH, 1).canBePlaced()) return BlockFace.NORTH;
         if (getSide(BlockFace.SOUTH, 1).canBePlaced()) return BlockFace.SOUTH;
@@ -103,12 +118,14 @@ public abstract class BlockHangingSign extends BlockSignBase implements BlockEnt
 
     public CompassRoseDirection getSignDirection() {
         if (isHanging() && isAttached()) {
-            System.out.println("hanging and attached" + CompassRoseDirection.from(getDamage()));
-            return CompassRoseDirection.from(getDamage());
+            return CompassRoseDirection.from(getDirection());
         } else {
-            System.out.println("a hui tam " + CompassRoseDirection.from(getFacing()));
             return CompassRoseDirection.from(getFacing());
         }
+    }
+
+    public int getDirection() {
+        return getPropertyValue(DIRECTION_MASK);
     }
 
     public int getFacing() {
@@ -135,41 +152,6 @@ public abstract class BlockHangingSign extends BlockSignBase implements BlockEnt
         int maxValue = mask >>> shift;
         int clampedValue = value & maxValue;
         setDamage((data & ~mask) | (clampedValue << shift));
-    }
-
-    @Override
-    public double getHardness() {
-        return 1;
-    }
-
-    @Override
-    public double getResistance() {
-        return 5;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
-    public boolean isSolid(BlockFace side) {
-        return false;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public boolean breaksWhenMoved() {
-        return true;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
     }
 
     @Override

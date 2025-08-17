@@ -2,6 +2,7 @@ package cn.nukkit.block.material.tags;
 
 import cn.nukkit.block.material.BlockTypes;
 import cn.nukkit.block.material.tags.impl.SimpleBlockTag;
+import cn.nukkit.command.selector.args.impl.L;
 
 public interface BlockInternalTags {
     BlockTag VIBRATION_DAMPER = BlockTags.register("lumi:vibration_damper", new SimpleBlockTag(
@@ -46,4 +47,67 @@ public interface BlockInternalTags {
             BlockTypes.STRIPPED_JUNGLE_WOOD,
             BlockTypes.STRIPPED_JUNGLE_LOG
     ));
+
+    BlockTag POTTABLE = BlockTags.register("lumi:pottable", new SimpleBlockTag(
+            BlockTypes.DANDELION,
+            BlockTypes.POPPY,
+            BlockTypes.BLUE_ORCHID,
+            BlockTypes.ALLIUM,
+            BlockTypes.AZURE_BLUET,
+            BlockTypes.RED_TULIP,
+            BlockTypes.ORANGE_TULIP,
+            BlockTypes.WHITE_TULIP,
+            BlockTypes.PINK_TULIP,
+            BlockTypes.OXEYE_DAISY,
+            BlockTypes.CORNFLOWER,
+            BlockTypes.LILY_OF_THE_VALLEY,
+            BlockTypes.WITHER_ROSE,
+            BlockTypes.TORCHFLOWER,
+            BlockTypes.OAK_SAPLING,
+            BlockTypes.SPRUCE_SAPLING,
+            BlockTypes.BIRCH_SAPLING,
+            BlockTypes.JUNGLE_SAPLING,
+            BlockTypes.ACACIA_SAPLING,
+            BlockTypes.DARK_OAK_SAPLING,
+            BlockTypes.CHERRY_SAPLING,
+            BlockTypes.RED_MUSHROOM,
+            BlockTypes.BROWN_MUSHROOM,
+            BlockTypes.FERN,
+            BlockTypes.DEADBUSH,
+            BlockTypes.CACTUS,
+            BlockTypes.BAMBOO,
+            BlockTypes.AZALEA,
+            BlockTypes.FLOWERING_AZALEA,
+            BlockTypes.CRIMSON_FUNGUS,
+            BlockTypes.WARPED_FUNGUS,
+            BlockTypes.WARPED_ROOTS,
+            BlockTypes.CRIMSON_ROOTS,
+            BlockTypes.MANGROVE_PROPAGULE,
+            BlockTypes.PALE_OAK_SAPLING,
+            BlockTypes.OPEN_EYEBLOSSOM,
+            BlockTypes.CLOSED_EYEBLOSSOM
+    ));
+
+    BlockTag DYED_SHULKER_BOX = BlockTags.register("lumi:dyed_shulker_box", new SimpleBlockTag(
+            BlockTypes.WHITE_SHULKER_BOX,
+            BlockTypes.LIGHT_GRAY_SHULKER_BOX,
+            BlockTypes.GRAY_SHULKER_BOX,
+            BlockTypes.BLACK_SHULKER_BOX,
+            BlockTypes.BROWN_SHULKER_BOX,
+            BlockTypes.RED_SHULKER_BOX,
+            BlockTypes.ORANGE_SHULKER_BOX,
+            BlockTypes.YELLOW_SHULKER_BOX,
+            BlockTypes.LIME_SHULKER_BOX,
+            BlockTypes.GREEN_SHULKER_BOX,
+            BlockTypes.CYAN_SHULKER_BOX,
+            BlockTypes.LIGHT_BLUE_SHULKER_BOX,
+            BlockTypes.BLUE_SHULKER_BOX,
+            BlockTypes.PURPLE_SHULKER_BOX,
+            BlockTypes.MAGENTA_SHULKER_BOX,
+            BlockTypes.PINK_SHULKER_BOX
+    ));
+
+    BlockTag SHULKER_BOX = BlockTags.register("lumi:shulker_box",
+            DYED_SHULKER_BOX.copyWith(BlockTypes.UNDYED_SHULKER_BOX)
+    );
 }

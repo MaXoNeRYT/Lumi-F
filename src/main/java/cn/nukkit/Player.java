@@ -2813,7 +2813,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (this.server.getSettings().features().enableExperimentMode() && !itemDefinitions.isEmpty()) {
                         for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
                             try {
-                                Item item = Item.fromString(entry.getKey());
+                                Item item = Item.get(entry.getKey());
                                 entries.add(new ItemComponentPacket.ItemDefinition(
                                         entry.getKey(),
                                         item.getNetworkId(this.protocol),
@@ -2834,7 +2834,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         int i = 0;
                         for (var entry : itemDefinition.entrySet()) {
                             try {
-                                Item item = Item.fromString(entry.getKey());
+                                Item item = Item.get(entry.getKey());
                                 entries.add(new ItemComponentPacket.ItemDefinition(
                                         entry.getKey(),
                                         item.getNetworkId(this.protocol),

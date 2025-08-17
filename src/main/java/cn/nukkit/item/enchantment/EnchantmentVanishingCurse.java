@@ -1,5 +1,6 @@
 package cn.nukkit.item.enchantment;
 
+import cn.nukkit.block.BlockSkull;
 import cn.nukkit.item.Item;
 
 public class EnchantmentVanishingCurse extends Enchantment {
@@ -15,6 +16,6 @@ public class EnchantmentVanishingCurse extends Enchantment {
 
     @Override
     public boolean canEnchant(Item item) {
-        return item.getId() == Item.SKULL || item.getId() == Item.COMPASS || super.canEnchant(item);
+        return item.getBlock() instanceof BlockSkull || item.getId() == Item.COMPASS || super.canEnchant(item);
     }
 }

@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySkull;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemSkull;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -77,14 +77,7 @@ public abstract class BlockSkull extends BlockTransparentMeta implements Faceabl
 
     @Override
     public String getName() {
-        int itemMeta = 0;
-
-        if (this.level != null) {
-            BlockEntity blockEntity = getLevel().getBlockEntity(this);
-            if (blockEntity != null) itemMeta = blockEntity.namedTag.getByte("SkullType");
-        }
-
-        return ItemSkull.getItemSkullName(itemMeta);
+        return "Skull";
     }
 
     @Override
@@ -128,20 +121,9 @@ public abstract class BlockSkull extends BlockTransparentMeta implements Faceabl
 
     @Override
     public Item[] getDrops(Item item) {
-        BlockEntity blockEntity = getLevel().getBlockEntity(this);
-        int dropMeta = 0;
-        if (blockEntity != null) dropMeta = blockEntity.namedTag.getByte("SkullType");
         return new Item[]{
-                new ItemSkull(dropMeta)
+                new ItemBlock(this, 0, 1)
         };
-    }
-
-    @Override
-    public Item toItem() {
-        BlockEntity blockEntity = getLevel().getBlockEntity(this);
-        int itemMeta = 0;
-        if (blockEntity != null) itemMeta = blockEntity.namedTag.getByte("SkullType");
-        return Item.get(Item.SKULL, itemMeta);
     }
 
     @Override

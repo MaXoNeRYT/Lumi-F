@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemJungleSign;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockJungleWallSign extends BlockWallSign {
 
@@ -30,6 +31,6 @@ public class BlockJungleWallSign extends BlockWallSign {
 
     @Override
     public Item toItem() {
-        return new ItemJungleSign();
+        return Item.get(ItemNamespaceId.JUNGLE_SIGN);
     }
 }

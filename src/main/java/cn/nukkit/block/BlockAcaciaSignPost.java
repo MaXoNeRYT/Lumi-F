@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemAcaciaSign;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockAcaciaSignPost extends BlockSignPost {
 
@@ -29,6 +30,6 @@ public class BlockAcaciaSignPost extends BlockSignPost {
 
     @Override
     public Item toItem() {
-        return new ItemAcaciaSign();
+        return Item.get(ItemNamespaceId.ACACIA_SIGN);
     }
 }

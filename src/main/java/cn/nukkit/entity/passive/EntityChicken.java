@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.EntityClimateVariant;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.Vector3;
@@ -102,8 +103,8 @@ public class EntityChicken extends EntityWalkingAnimal implements EntityClimateV
 
     private Item getEgg() {
         if (Server.getInstance().getSettings().features().enableNewChickenEggsLaying()) {
-            if (getVariant() == Variant.COLD) return Item.fromString(Item.BLUE_EGG);
-            if (getVariant() == Variant.WARM) return Item.fromString(Item.BROWN_EGG);
+            if (getVariant() == Variant.COLD) return Item.get(ItemNamespaceId.BLUE_EGG);
+            if (getVariant() == Variant.WARM) return Item.get(ItemNamespaceId.BROWN_EGG);
         }
         return Item.get(Item.EGG, 0, 1);
     }

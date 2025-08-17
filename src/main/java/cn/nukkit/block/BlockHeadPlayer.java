@@ -23,11 +23,6 @@ public class BlockHeadPlayer extends BlockSkull {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.SKULL, 3);
-    }
-
-    @Override
     public SkullType getSkullType() {
         return SkullType.PLAYER;
     }

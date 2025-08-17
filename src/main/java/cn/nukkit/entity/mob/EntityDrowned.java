@@ -12,6 +12,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
@@ -151,7 +152,7 @@ public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
             drops.add(Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 2)));
 
             if (Utils.rand(1, 100) <= 11) {
-                drops.add(Item.fromString(Item.COPPER_INGOT));
+                drops.add(Item.get(ItemNamespaceId.COPPER_INGOT));
             }
 
             if (tool != null && Utils.rand(1, 4) == 1) {

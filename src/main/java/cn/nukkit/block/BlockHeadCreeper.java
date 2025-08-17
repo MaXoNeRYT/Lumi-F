@@ -23,11 +23,6 @@ public class BlockHeadCreeper extends BlockSkull {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.SKULL, 4);
-    }
-
-    @Override
     public SkullType getSkullType() {
         return SkullType.CREEPER;
     }

@@ -14,7 +14,7 @@ import cn.nukkit.nbt.tag.IntTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.utils.Faceable;
 import org.jetbrains.annotations.NotNull;
 
@@ -163,7 +163,7 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable, Block
 
     @Override
     public BlockColor getColor() {
-        return this.getDyeColor().getColor();
+        return this.getDyeColor().getBlockColor();
     }
 
     public DyeColor getDyeColor() {

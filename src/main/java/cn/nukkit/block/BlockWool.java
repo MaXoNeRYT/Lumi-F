@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created on 2015/12/2 by xtypr.
@@ -59,7 +59,7 @@ public class BlockWool extends BlockSolidMeta {
 
     @Override
     public BlockColor getColor() {
-        return DyeColor.getByWoolData(getDamage()).getColor();
+        return DyeColor.getByWoolData(getDamage()).getBlockColor();
     }
 
     public DyeColor getDyeColor() {

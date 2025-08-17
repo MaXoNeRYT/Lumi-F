@@ -14,7 +14,7 @@ import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.Sound;
@@ -164,7 +164,7 @@ public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesH
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() != Item.DYE || item.getDamage() != ItemDye.BONE_MEAL) {
+        if (!(item instanceof ItemBoneMeal)) {
             return false;
         }
 

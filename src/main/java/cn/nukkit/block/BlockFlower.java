@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
@@ -13,43 +14,7 @@ import cn.nukkit.utils.Utils;
  * Created on 2015/11/23 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockFlower extends BlockFlowable {
-
-    public static final int TYPE_POPPY = 0;
-    public static final int TYPE_BLUE_ORCHID = 1;
-    public static final int TYPE_ALLIUM = 2;
-    public static final int TYPE_AZURE_BLUET = 3;
-    public static final int TYPE_RED_TULIP = 4;
-    public static final int TYPE_ORANGE_TULIP = 5;
-    public static final int TYPE_WHITE_TULIP = 6;
-    public static final int TYPE_PINK_TULIP = 7;
-    public static final int TYPE_OXEYE_DAISY = 8;
-    public static final int TYPE_CORNFLOWER = 9;
-    public static final int TYPE_LILY_OF_THE_VALLEY = 10;
-
-    @Deprecated
-    public static final int CORNFLOWER = TYPE_CORNFLOWER;
-    @Deprecated
-    public static final int LILY_OF_THE_VALLEY = TYPE_LILY_OF_THE_VALLEY;
-
-    private static final String[] names = new String[]{
-            "Poppy",
-            "Blue Orchid",
-            "Allium",
-            "Azure Bluet",
-            "Red Tulip",
-            "Orange Tulip",
-            "White Tulip",
-            "Pink Tulip",
-            "Oxeye Daisy",
-            "Cornflower",
-            "Lily of the Valley",
-            "Unknown",
-            "Unknown",
-            "Unknown",
-            "Unknown",
-            "Unknown"
-    };
+public abstract class BlockFlower extends BlockFlowable {
 
     public BlockFlower() {
         this(0);
@@ -57,16 +22,6 @@ public class BlockFlower extends BlockFlowable {
 
     public BlockFlower(int meta) {
         super(meta);
-    }
-
-    @Override
-    public int getId() {
-        return FLOWER;
-    }
-
-    @Override
-    public String getName() {
-        return names[this.getDamage() & 0x0f];
     }
 
     @Override
@@ -106,7 +61,7 @@ public class BlockFlower extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0f) { // Bone meal
+        if (item instanceof ItemBoneMeal) {
             if (player != null && !player.isCreative()) {
                 item.count--;
             }

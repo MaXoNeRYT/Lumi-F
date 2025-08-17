@@ -20,7 +20,7 @@ public class StrongholdCrossingChest extends RandomizableContainer {
             .register(new ItemEntry(Item.APPLE, 0, 3, 75))
             .register(new ItemEntry(Item.IRON_PICKAXE, 5))
             .register(new ItemEntry(Item.ENCHANTED_BOOK, 6))
-            .register(new ItemEntry(Item.DYE, 0, 3, 75));
+        ;
         pools.put(pool1.build(), new RollEntry(4, 1, pool1.getTotalWeight()));
     }
 

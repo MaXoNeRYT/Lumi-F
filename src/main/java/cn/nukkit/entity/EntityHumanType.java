@@ -1,6 +1,7 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockSkull;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -9,7 +10,6 @@ import cn.nukkit.inventory.PlayerEnderChestInventory;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.inventory.PlayerOffhandInventory;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemSkull;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.NukkitMath;
@@ -218,7 +218,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
                 cause != DamageCause.FIRE_TICK &&
                 cause != DamageCause.FALL) { // No armor damage
 
-            if (armor.isUnbreakable() || armor instanceof ItemSkull) {
+            if (armor.isUnbreakable() || armor.getBlock() instanceof BlockSkull) {
                 return armor;
             }
 

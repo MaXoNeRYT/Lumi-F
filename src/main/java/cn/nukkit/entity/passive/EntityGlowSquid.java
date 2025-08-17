@@ -1,7 +1,7 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemGlowInkSac;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
@@ -21,6 +21,8 @@ public class EntityGlowSquid extends EntitySquid {
 
     @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.DYE, ItemDye.GLOW_INK_SAC, Utils.rand(1, 3))};
+        ItemGlowInkSac item = new ItemGlowInkSac();
+        item.setCount(Utils.rand(1, 3));
+        return new Item[]{item};
     }
 }

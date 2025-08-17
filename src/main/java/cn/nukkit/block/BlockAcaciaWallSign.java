@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockAcaciaWallSign extends BlockWallSign {
 
@@ -25,7 +26,7 @@ public class BlockAcaciaWallSign extends BlockWallSign {
 
     @Override
     public Item toItem() {
-        return Item.get(ItemID.ACACIA_SIGN);
+        return Item.get(ItemNamespaceId.ACACIA_SIGN);
     }
 
     @Override

@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBambooSign;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockBambooWallSign extends BlockWallSign {
 
@@ -30,6 +31,6 @@ public class BlockBambooWallSign extends BlockWallSign {
 
     @Override
     public Item toItem() {
-        return new ItemBambooSign();
+        return Item.get(ItemNamespaceId.BAMBOO_SIGN);
     }
 }

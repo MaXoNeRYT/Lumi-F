@@ -1,5 +1,7 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.item.data.DyeColor;
+
 /**
  * Block color
  *
@@ -169,6 +171,6 @@ public class BlockColor  {
      * @return BlockColor
      */
     public static BlockColor getDyeColor(int dyeColorMeta) {
-        return DyeColor.getByDyeData(dyeColorMeta).getColor();
+        return DyeColor.getByDyeData(dyeColorMeta).getBlockColor();
     }
 }

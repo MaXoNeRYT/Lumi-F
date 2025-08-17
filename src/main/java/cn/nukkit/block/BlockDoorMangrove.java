@@ -26,7 +26,7 @@ public class BlockDoorMangrove extends BlockDoorWood {
 
     @Override
     public Item toItem() {
-        return Item.fromString(ItemNamespaceId.MANGROVE_DOOR);
+        return Item.get(ItemNamespaceId.MANGROVE_DOOR);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cn.nukkit.item.enchantment;
 
+import cn.nukkit.block.BlockSkull;
 import cn.nukkit.item.*;
 
 /**
@@ -60,7 +61,7 @@ public enum EnchantmentType {
                 case FISHING_ROD:
                     return item instanceof ItemFishingRod;
                 case WEARABLE:
-                    return item instanceof ItemSkull;
+                    return item.getBlock() instanceof BlockSkull;
                 case TRIDENT:
                     return item instanceof ItemTrident;
                 case CROSSBOW:

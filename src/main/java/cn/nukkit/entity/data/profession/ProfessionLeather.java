@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemColorArmor;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.utils.RecipeBuildUtils;
 
 public class ProfessionLeather extends Profession {

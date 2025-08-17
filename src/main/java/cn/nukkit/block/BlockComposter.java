@@ -5,7 +5,7 @@ import cn.nukkit.event.block.ComposterEmptyEvent;
 import cn.nukkit.event.block.ComposterFillEvent;
 import cn.nukkit.item.*;
 import cn.nukkit.level.Sound;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 import javax.annotation.Nonnull;
@@ -157,7 +157,7 @@ public class BlockComposter extends BlockSolidMeta implements ItemID {
         if (isEmpty()) {
             return null;
         }
-        ComposterEmptyEvent event = new ComposterEmptyEvent(this, player, item, new ItemDye(DyeColor.WHITE), 0);
+        ComposterEmptyEvent event = new ComposterEmptyEvent(this, player, item, new ItemBoneMeal(), 0);
         this.level.getServer().getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             this.setDamage(event.getNewLevel());

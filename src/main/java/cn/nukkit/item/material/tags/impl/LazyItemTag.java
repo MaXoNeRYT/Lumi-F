@@ -20,7 +20,7 @@ import java.util.Set;
 @ToString
 public class LazyItemTag implements ItemTag {
 
-    public static final Map<String, Set<String>> VANILLA_DEFINITIONS;
+    private static final Map<String, Set<String>> VANILLA_DEFINITIONS;
 
     private final String tag;
     private Set<ItemType> itemTypes;
@@ -43,7 +43,7 @@ public class LazyItemTag implements ItemTag {
             }
         }
 
-        return itemTypes;
+        return Collections.unmodifiableSet(itemTypes);
     }
 
     public Set<ItemType> getItemTypes() {
@@ -62,7 +62,7 @@ public class LazyItemTag implements ItemTag {
                 }.getType();
                 parsed = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                log.error("Failed to load vanilla block tags", e);
+                log.error("Failed to load vanilla item tags", e);
             }
         }
         VANILLA_DEFINITIONS = parsed;

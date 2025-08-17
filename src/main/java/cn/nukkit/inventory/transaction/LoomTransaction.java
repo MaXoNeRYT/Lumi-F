@@ -7,7 +7,9 @@ import cn.nukkit.inventory.LoomInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.LoomItemAction;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemNamespaceId;
 
 import java.util.List;
 
@@ -46,7 +48,7 @@ public class LoomTransaction extends InventoryTransaction {
         LoomInventory loomInventory = (LoomInventory) inventory;
         Item banner = loomInventory.getBanner();
         Item dye = loomInventory.getDye();
-        if (banner.getId() != Item.BANNER || dye.getId() != Item.DYE || banner.getDamage() != outputItem.getDamage()) {
+        if (banner.getId() != Item.BANNER || !(dye instanceof ItemDye) || banner.getDamage() != outputItem.getDamage()) {
             return false;
         }
 
@@ -64,7 +66,7 @@ public class LoomTransaction extends InventoryTransaction {
         }
 
         Item pattern = loomInventory.getPattern();
-        if (pattern.getId() != 0 && (pattern.getId() != ItemID.BANNER_PATTERN && !pattern.getNamespaceId().equals(Item.GUSTER_BANNER_PATTERN) && !pattern.getNamespaceId().equals(Item.FLOW_BANNER_PATTERN))) {
+        if (pattern.getId() != 0 && (pattern.getId() != ItemID.BANNER_PATTERN && !pattern.getNamespaceId().equals(ItemNamespaceId.GUSTER_BANNER_PATTERN) && !pattern.getNamespaceId().equals(ItemNamespaceId.FLOW_BANNER_PATTERN))) {
             return false;
         }
 

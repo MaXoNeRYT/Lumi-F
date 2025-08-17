@@ -1,6 +1,7 @@
 package cn.nukkit.blockentity;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.ItemRecord;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
@@ -59,21 +60,15 @@ public class BlockEntityJukebox extends BlockEntitySpawnable {
                 case Item.RECORD_OTHERSIDE -> LevelSoundEventPacket.SOUND_RECORD_OTHERSIDE;
                 case Item.RECORD_5 -> LevelSoundEventPacket.SOUND_RECORD_5;
                 case Item.RECORD_RELIC -> LevelSoundEventPacket.SOUND_RECORD_RELIC;
-                case Item.STRING_IDENTIFIED_ITEM -> {
-                    switch (this.recordItem.getNamespaceId()) {
-                        case Item.MUSIC_DISC_CREATOR:
-                            yield LevelSoundEventPacket.SOUND_RECORD_CREATOR;
-                        case Item.MUSIC_DISC_CREATOR_BOX:
-                            yield LevelSoundEventPacket.SOUND_RECORD_CREATOR_MUSIC_BOX;
-                        case Item.MUSIC_DISC_PRECIPICE:
-                            yield LevelSoundEventPacket.SOUND_RECORD_PRECIPICE;
-                        case Item.MUSIC_DISC_LAVA_CHICKEN:
-                            yield LevelSoundEventPacket.SOUND_RECORD_LAVA_CHICKEN;
-                        case Item.MUSIC_DISC_TEARS:
-                            yield LevelSoundEventPacket.SOUND_RECORD_TEARS;
-                    }
-                    throw new IllegalStateException("Sound is not implemented for item: " + this.recordItem.getNamespaceId());
-                }
+                case Item.STRING_IDENTIFIED_ITEM -> switch (this.recordItem.getNamespaceId()) {
+                    case ItemNamespaceId.MUSIC_DISC_CREATOR -> LevelSoundEventPacket.SOUND_RECORD_CREATOR;
+                    case ItemNamespaceId.MUSIC_DISC_CREATOR_MUSIC_BOX -> LevelSoundEventPacket.SOUND_RECORD_CREATOR_MUSIC_BOX;
+                    case ItemNamespaceId.MUSIC_DISC_PRECIPICE -> LevelSoundEventPacket.SOUND_RECORD_PRECIPICE;
+                    case ItemNamespaceId.MUSIC_DISC_LAVA_CHICKEN -> LevelSoundEventPacket.SOUND_RECORD_LAVA_CHICKEN;
+                    case ItemNamespaceId.MUSIC_DISC_TEARS -> LevelSoundEventPacket.SOUND_RECORD_TEARS;
+                    default ->
+                            throw new IllegalStateException("Sound is not implemented for item: " + this.recordItem.getNamespaceId());
+                };
                 default ->
                         throw new IllegalStateException("Sound is not implemented for item: " + this.recordItem.getId());
             });
@@ -122,39 +117,24 @@ public class BlockEntityJukebox extends BlockEntitySpawnable {
      */
     public int getComparatorSignal() {
         if (this.recordItem instanceof ItemRecord) {
-            switch (this.recordItem.getId()) {
-                case Item.RECORD_13:
-                    return 1;
-                case Item.RECORD_CAT:
-                    return 2;
-                case Item.RECORD_BLOCKS:
-                    return 3;
-                case Item.RECORD_CHIRP:
-                    return 4;
-                case Item.RECORD_FAR:
-                    return 5;
-                case Item.RECORD_MALL:
-                    return 6;
-                case Item.RECORD_MELLOHI:
-                    return 7;
-                case Item.RECORD_STAL:
-                    return 8;
-                case Item.RECORD_STRAD:
-                    return 9;
-                case Item.RECORD_WARD:
-                    return 10;
-                case Item.RECORD_11:
-                    return 11;
-                case Item.RECORD_WAIT:
-                    return 12;
-                case Item.RECORD_PIGSTEP:
-                    return 13;
-                case Item.RECORD_OTHERSIDE:
-                    return 14;
-                case Item.RECORD_5:
-                case Item.RECORD_RELIC:
-                    return 15;
-            }
+            return switch (this.recordItem.getId()) {
+                case Item.RECORD_13 -> 1;
+                case Item.RECORD_CAT -> 2;
+                case Item.RECORD_BLOCKS -> 3;
+                case Item.RECORD_CHIRP -> 4;
+                case Item.RECORD_FAR -> 5;
+                case Item.RECORD_MALL -> 6;
+                case Item.RECORD_MELLOHI -> 7;
+                case Item.RECORD_STAL -> 8;
+                case Item.RECORD_STRAD -> 9;
+                case Item.RECORD_WARD -> 10;
+                case Item.RECORD_11 -> 11;
+                case Item.RECORD_WAIT -> 12;
+                case Item.RECORD_PIGSTEP -> 13;
+                case Item.RECORD_OTHERSIDE -> 14;
+                case Item.RECORD_5, Item.RECORD_RELIC -> 15;
+                default -> 0;
+            };
         }
         return 0;
     }

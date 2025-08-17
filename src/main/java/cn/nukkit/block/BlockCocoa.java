@@ -4,14 +4,14 @@ import cn.nukkit.Player;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemBoneMeal;
+import cn.nukkit.item.ItemCocoaBeans;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Faceable;
 import cn.nukkit.utils.Utils;
 
@@ -130,7 +130,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
+        if (item instanceof ItemBoneMeal) {
             Block block = this.clone();
             if (this.getDamage() >> 2 < 2) {
                 block.setDamage(block.getDamage() + 4);
@@ -186,16 +186,18 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
 
     @Override
     public Item toItem() {
-        return new ItemDye(DyeColor.BROWN.getDyeData());
+        return new ItemCocoaBeans();
     }
 
     @Override
     public Item[] getDrops(Item item) {
+        ItemCocoaBeans beans = new ItemCocoaBeans();
         if (this.getDamage() >= 8) {
-            return new Item[]{new ItemDye(3, Utils.rand(2, 3))};
+            beans.setCount(Utils.rand(2, 3));
         } else {
-            return new Item[]{new ItemDye(3, 1)};
+            beans.setCount(1);
         }
+        return new Item[]{beans};
     }
 
     @Override

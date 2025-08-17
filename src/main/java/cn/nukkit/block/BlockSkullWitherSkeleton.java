@@ -23,11 +23,6 @@ public class BlockSkullWitherSkeleton extends BlockSkull {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.SKULL, 1);
-    }
-
-    @Override
     public SkullType getSkullType() {
         return SkullType.WITHER_SKELETON;
     }

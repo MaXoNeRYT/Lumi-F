@@ -1,6 +1,6 @@
 package cn.nukkit.block;
 
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created by CreeperFace on 2.6.2017.

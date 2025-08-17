@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
@@ -35,7 +36,7 @@ public abstract class BlockFungus extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.isNull() || !(item.getId() == Item.DYE && item.getDamage() == 0x0F)) {
+        if (item.isNull() || !(item instanceof ItemBoneMeal)) {
             return false;
         }
 

@@ -59,7 +59,7 @@ public class BlockOreCopper extends BlockSolid {
                 count = i + 1;
             }
 
-            Item rawCopper = Item.fromString("minecraft:raw_copper");
+            Item rawCopper = Item.get("minecraft:raw_copper");
             rawCopper.setCount(count);
             return new Item[]{
                     rawCopper

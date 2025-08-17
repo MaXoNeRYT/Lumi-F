@@ -72,7 +72,7 @@ public class BlockOreGold extends BlockSolid {
                 count = i + 1;
             }
 
-            Item rawGold = Item.fromString("minecraft:raw_gold");
+            Item rawGold = Item.get("minecraft:raw_gold");
             rawGold.setCount(count);
             return new Item[]{
                     rawGold
