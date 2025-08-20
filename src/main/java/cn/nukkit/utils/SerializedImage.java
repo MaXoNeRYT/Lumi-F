@@ -4,7 +4,7 @@ import lombok.ToString;
 
 import java.util.Objects;
 
-import static cn.nukkit.entity.data.Skin.*;
+import static cn.nukkit.entity.data.skin.Skin.*;
 
 /**
  * Serialized image

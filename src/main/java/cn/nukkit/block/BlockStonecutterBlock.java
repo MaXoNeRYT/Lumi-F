@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 
 public class BlockStonecutterBlock extends BlockSolidMeta implements Faceable {
 

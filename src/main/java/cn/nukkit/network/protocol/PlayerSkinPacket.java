@@ -1,6 +1,6 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.entity.data.Skin;
+import cn.nukkit.entity.data.skin.Skin;
 import lombok.ToString;
 
 import java.util.UUID;

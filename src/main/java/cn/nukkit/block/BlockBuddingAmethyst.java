@@ -6,7 +6,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockBuddingAmethyst extends BlockSolid {

@@ -1,7 +1,7 @@
 package cn.nukkit.event.player;
 
 import cn.nukkit.Server;
-import cn.nukkit.entity.data.Skin;
+import cn.nukkit.entity.data.skin.Skin;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.utils.LoginChainData;
 

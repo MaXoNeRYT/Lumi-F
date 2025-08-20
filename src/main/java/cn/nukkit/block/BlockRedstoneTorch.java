@@ -6,8 +6,8 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 
 /**
  * @author Angelic47

@@ -8,8 +8,8 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 
 /**
  * Created on 2015/12/8 by xtypr.

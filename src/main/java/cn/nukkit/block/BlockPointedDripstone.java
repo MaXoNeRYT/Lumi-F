@@ -12,8 +12,8 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 
 import java.util.Objects;
 import java.util.Random;
@@ -364,7 +364,7 @@ public class BlockPointedDripstone extends BlockFallable implements BlockPropert
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.BROWN_TERRACOTA_BLOCK_COLOR;
+        return BlockColor.BROWN_TERRACOTTA_BLOCK_COLOR;
     }
 
     @Override

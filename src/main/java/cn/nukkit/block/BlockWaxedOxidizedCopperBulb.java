@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.block.properties.enums.OxidizationLevel;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 
 public class BlockWaxedOxidizedCopperBulb extends BlockCopperBulbBase {

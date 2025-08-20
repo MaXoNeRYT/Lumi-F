@@ -1,6 +1,6 @@
 package cn.nukkit.block;
 
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 public abstract class BlockSolidMeta extends BlockMeta {
 

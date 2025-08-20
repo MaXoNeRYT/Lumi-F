@@ -8,7 +8,7 @@ import cn.nukkit.level.sound.ButtonClickSound;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
 import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.Nullable;
 
 /**

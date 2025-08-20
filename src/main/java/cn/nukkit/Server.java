@@ -8,7 +8,7 @@ import cn.nukkit.dispenser.DispenseBehaviorRegister;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
-import cn.nukkit.entity.data.Skin;
+import cn.nukkit.entity.data.skin.Skin;
 import cn.nukkit.entity.data.profession.Profession;
 import cn.nukkit.entity.data.property.EntityProperty;
 import cn.nukkit.entity.effect.EffectRegistry;
@@ -31,10 +31,7 @@ import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
-import cn.nukkit.level.EnumLevel;
-import cn.nukkit.level.GlobalBlockPalette;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.*;
 import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
@@ -83,6 +80,8 @@ import cn.nukkit.settings.ServerSettings;
 import cn.nukkit.settings.converter.LegacyPropertiesConverter;
 import cn.nukkit.settings.initializer.ServerSettingsConfigInitializer;
 import cn.nukkit.utils.*;
+import cn.nukkit.utils.compression.Zlib;
+import cn.nukkit.utils.spawner.EntitySpawnerTask;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import eu.okaeri.configs.ConfigManager;
@@ -216,7 +215,7 @@ public class Server {
     private Watchdog watchdog;
     private final DB nameLookup;
     private PlayerDataSerializer playerDataSerializer;
-    private SpawnerTask spawnerTask;
+    private EntitySpawnerTask spawnerTask;
     private final BatchingHelper batchingHelper;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
@@ -441,11 +440,12 @@ public class Server {
                         this.loadLevel(fs.getName());
                     }
                 }
-                EnumLevel.initLevels();
             } catch (Exception e) {
                 this.getLogger().error("Unable to load levels", e);
             }
         }
+
+        EnumLevel.initLevels();
 
         if (loadPlugins) {
             this.enablePlugins(PluginLoadOrder.POSTWORLD);
@@ -461,7 +461,7 @@ public class Server {
         }
 
         if (this.settings.world().entity().entityAutoSpawnTask()) {
-            this.spawnerTask = new SpawnerTask();
+            this.spawnerTask = new EntitySpawnerTask();
             int spawnerTicks = Math.max(this.settings.world().entity().ticksPerEntitySpawns(), 2) >> 1; // Run the spawner on 2x speed but spawn only either monsters or animals
             this.scheduler.scheduleDelayedRepeatingTask(InternalPlugin.INSTANCE, this.spawnerTask, spawnerTicks, spawnerTicks);
         }
@@ -2346,7 +2346,7 @@ public class Server {
      *
      * @return spawner task
      */
-    public SpawnerTask getSpawnerTask() {
+    public EntitySpawnerTask getSpawnerTask() {
         return this.spawnerTask;
     }
 

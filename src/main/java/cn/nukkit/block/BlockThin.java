@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.utils.LevelException;
+import cn.nukkit.level.LevelException;
 
 /**
  * Created on 2015/12/6 by xtypr.

@@ -8,7 +8,7 @@ import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.MinecartType;
+import cn.nukkit.entity.data.MinecartType;
 
 /**
  * Created by Snake1999 on 2016/1/30.

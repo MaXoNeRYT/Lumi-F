@@ -23,9 +23,9 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.MinecartType;
-import cn.nukkit.utils.Rail;
-import cn.nukkit.utils.Rail.Orientation;
+import cn.nukkit.entity.data.MinecartType;
+import cn.nukkit.block.data.Rail;
+import cn.nukkit.block.data.Rail.Orientation;
 import org.apache.commons.math3.util.FastMath;
 
 import java.util.ArrayList;

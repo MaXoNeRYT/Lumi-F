@@ -9,7 +9,7 @@ import cn.nukkit.level.format.generic.serializer.NetworkChunkSerializer;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.ChunkException;
+import cn.nukkit.level.ChunkException;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.io.File;

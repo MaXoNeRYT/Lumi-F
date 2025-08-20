@@ -1,7 +1,6 @@
 package cn.nukkit.level;
 
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.LevelException;
 
 /**
  * @author MagicDroidX

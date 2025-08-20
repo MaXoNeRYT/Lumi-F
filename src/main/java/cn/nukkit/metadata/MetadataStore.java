@@ -1,7 +1,7 @@
 package cn.nukkit.metadata;
 
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.utils.PluginException;
+import cn.nukkit.plugin.PluginException;
 import cn.nukkit.utils.ServerException;
 
 import java.util.*;

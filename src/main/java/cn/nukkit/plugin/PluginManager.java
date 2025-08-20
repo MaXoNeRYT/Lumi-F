@@ -7,7 +7,6 @@ import cn.nukkit.event.*;
 import cn.nukkit.permission.Permissible;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.MainLogger;
-import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.Utils;
 import io.netty.util.internal.ConcurrentSet;
 import lombok.extern.log4j.Log4j2;

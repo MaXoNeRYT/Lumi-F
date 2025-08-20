@@ -1,9 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.data.DyeColor;
-import cn.nukkit.utils.TerracottaColor;
+import cn.nukkit.block.data.TerracottaColor;
 
 /**
  * Created on 2015/11/24 by xtypr.
@@ -59,7 +59,7 @@ public class BlockTerracotta extends BlockSolidMeta {
 
     @Override
     public BlockColor getColor() {
-        return TerracottaColor.getByTerracottaData(getDamage()).getColor();
+        return TerracottaColor.getByTerracottaData(getDamage()).getBlockColor();
     }
 
     public TerracottaColor getDyeColor() {

@@ -4,7 +4,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
-import cn.nukkit.utils.EventException;
+import cn.nukkit.event.EventException;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.EnumMap;

@@ -2,7 +2,7 @@ package cn.nukkit.permission;
 
 import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.utils.PluginException;
+import cn.nukkit.plugin.PluginException;
 import cn.nukkit.utils.ServerException;
 import io.netty.util.internal.ConcurrentSet;
 

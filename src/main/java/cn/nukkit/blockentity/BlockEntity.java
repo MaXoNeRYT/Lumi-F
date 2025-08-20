@@ -9,7 +9,7 @@ import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.level.persistence.impl.PersistentDataContainerBlockWrapper;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.ChunkException;
+import cn.nukkit.level.ChunkException;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 

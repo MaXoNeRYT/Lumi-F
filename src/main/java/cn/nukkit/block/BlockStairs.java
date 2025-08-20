@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 
 /**
  * @author MagicDroidX

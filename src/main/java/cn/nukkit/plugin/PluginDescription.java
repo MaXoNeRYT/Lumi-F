@@ -1,7 +1,6 @@
 package cn.nukkit.plugin;
 
 import cn.nukkit.permission.Permission;
-import cn.nukkit.utils.PluginException;
 import org.snakeyaml.engine.v2.api.Load;
 import org.snakeyaml.engine.v2.api.LoadSettings;
 

@@ -1,7 +1,7 @@
 package cn.nukkit.permission;
 
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.utils.PluginException;
+import cn.nukkit.plugin.PluginException;
 
 import java.util.HashMap;
 import java.util.List;

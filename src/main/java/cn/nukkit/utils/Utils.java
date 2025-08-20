@@ -506,40 +506,24 @@ public class Utils {
      * @return operating system/device name
      */
     public static String getOS(Player player) {
-        switch(player.getLoginChainData().getDeviceOS()) {
-            case 1:
-                return "Android";
-            case 2:
-                return "iOS";
-            case 3:
-                return "macOS";
-            case 4:
-                return "Fire";
-            case 5:
-                return "Gear VR";
-            case 6:
-                return "HoloLens";
-            case 7:
-                return "Windows";
-            case 8:
-                return "Windows x86";
-            case 9:
-                return "Dedicated";
-            case 10:
-                return "tvOS";
-            case 11:
-                return "PlayStation";
-            case 12:
-                return "Switch";
-            case 13:
-                return "Xbox";
-            case 14:
-                return "Windows Phone";
-            case 15:
-                return "Linux";
-            default:
-                return "Unknown";
-        }
+        return switch (player.getLoginChainData().getDeviceOS()) {
+            case 1 -> "Android";
+            case 2 -> "iOS";
+            case 3 -> "macOS";
+            case 4 -> "Fire";
+            case 5 -> "Gear VR";
+            case 6 -> "HoloLens";
+            case 7 -> "Windows";
+            case 8 -> "Windows x86";
+            case 9 -> "Dedicated";
+            case 10 -> "tvOS";
+            case 11 -> "PlayStation";
+            case 12 -> "Switch";
+            case 13 -> "Xbox";
+            case 14 -> "Windows Phone";
+            case 15 -> "Linux";
+            default -> "Unknown";
+        };
     }
 
     public static <T> T sumObjectsAndGet(Class<? extends T> clazz1, Class<? extends T> clazz2) {

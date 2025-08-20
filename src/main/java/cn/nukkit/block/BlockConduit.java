@@ -6,7 +6,7 @@ import cn.nukkit.blockentity.BlockEntityConduit;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 
 public class BlockConduit extends BlockSolidMeta implements BlockEntityHolder {

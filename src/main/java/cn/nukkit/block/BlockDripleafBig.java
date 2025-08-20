@@ -22,7 +22,7 @@ import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 
 public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesHelper, Faceable {
 

@@ -29,7 +29,7 @@ import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
-import cn.nukkit.utils.BlockIterator;
+import cn.nukkit.entity.util.BlockIterator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;

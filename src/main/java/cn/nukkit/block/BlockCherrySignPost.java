@@ -1,9 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemCherrySign;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.ItemNamespaceId;
-import cn.nukkit.utils.BlockColor;
 
 public class BlockCherrySignPost extends BlockSignPost {
     public BlockCherrySignPost() {

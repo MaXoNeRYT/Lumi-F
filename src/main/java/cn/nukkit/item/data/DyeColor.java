@@ -1,7 +1,7 @@
 package cn.nukkit.item.data;
 
 import cn.nukkit.block.data.SignColor;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 import java.util.HashMap;
 import java.util.Map;

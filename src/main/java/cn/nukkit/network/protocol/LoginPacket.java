@@ -1,7 +1,10 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.Server;
-import cn.nukkit.entity.data.Skin;
+import cn.nukkit.entity.data.skin.PersonaPiece;
+import cn.nukkit.entity.data.skin.PersonaPieceTint;
+import cn.nukkit.entity.data.skin.Skin;
+import cn.nukkit.entity.data.skin.SkinAnimation;
 import cn.nukkit.utils.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

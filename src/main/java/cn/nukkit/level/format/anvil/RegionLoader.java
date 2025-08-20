@@ -5,8 +5,8 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseRegionLoader;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.utils.ChunkException;
-import cn.nukkit.utils.Zlib;
+import cn.nukkit.level.ChunkException;
+import cn.nukkit.utils.compression.Zlib;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.EOFException;

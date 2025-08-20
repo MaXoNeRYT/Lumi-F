@@ -12,9 +12,9 @@ import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.utils.BlockUpdateEntry;
-import cn.nukkit.utils.ChunkException;
-import cn.nukkit.utils.Zlib;
+import cn.nukkit.level.util.BlockUpdateEntry;
+import cn.nukkit.level.ChunkException;
+import cn.nukkit.utils.compression.Zlib;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 

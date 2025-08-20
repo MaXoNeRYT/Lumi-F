@@ -1,7 +1,5 @@
 package cn.nukkit.block.data;
 
-import cn.nukkit.utils.BlockColor;
-
 /**
  * Interface with sign color constants.
  */

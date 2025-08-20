@@ -1,8 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.block.properties.enums.OxidizationLevel;
-import cn.nukkit.item.ItemTool;
-import cn.nukkit.utils.BlockColor;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -1,7 +1,6 @@
 package cn.nukkit.event;
 
 import cn.nukkit.Server;
-import cn.nukkit.utils.EventException;
 
 /**
  * 描述服务器中可能发生的事情的类。<br>

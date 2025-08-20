@@ -5,7 +5,7 @@ import cn.nukkit.event.player.CraftingTableOpenEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.network.protocol.ContainerOpenPacket;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 /**
  * Created on 2015/12/5 by xtypr.

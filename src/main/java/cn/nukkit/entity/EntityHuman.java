@@ -2,7 +2,10 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.data.IntPositionEntityData;
-import cn.nukkit.entity.data.Skin;
+import cn.nukkit.entity.data.skin.PersonaPiece;
+import cn.nukkit.entity.data.skin.PersonaPieceTint;
+import cn.nukkit.entity.data.skin.Skin;
+import cn.nukkit.entity.data.skin.SkinAnimation;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;

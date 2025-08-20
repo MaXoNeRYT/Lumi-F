@@ -10,7 +10,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -2,7 +2,7 @@ package cn.nukkit.plugin;
 
 import cn.nukkit.event.Event;
 import cn.nukkit.event.Listener;
-import cn.nukkit.utils.EventException;
+import cn.nukkit.event.EventException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

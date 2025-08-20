@@ -14,7 +14,7 @@ import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 
 import java.util.ArrayList;
 import java.util.List;

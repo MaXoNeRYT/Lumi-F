@@ -4,7 +4,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.Rail;
+import cn.nukkit.block.data.Rail;
 
 /**
  * @author Nukkit Project Team

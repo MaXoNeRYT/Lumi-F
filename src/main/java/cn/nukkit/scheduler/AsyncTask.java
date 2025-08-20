@@ -50,15 +50,15 @@ public abstract class AsyncTask implements Runnable {
     }
 
     public Object getFromThreadStore(String identifier) {
-        return this.finished ? null : ThreadStore.store.get(identifier);
+        return this.finished ? null : ThreadStore.STORE.get(identifier);
     }
 
     public void saveToThreadStore(String identifier, Object value) {
         if (!this.finished) {
             if (value == null) {
-                ThreadStore.store.remove(identifier);
+                ThreadStore.STORE.remove(identifier);
             } else {
-                ThreadStore.store.put(identifier, value);
+                ThreadStore.STORE.put(identifier, value);
             }
         }
     }

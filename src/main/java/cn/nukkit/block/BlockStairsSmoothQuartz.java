@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 public class BlockStairsSmoothQuartz extends BlockStairs {
     public BlockStairsSmoothQuartz() {

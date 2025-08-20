@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.block.properties.enums.OxidizationLevel;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 
 public class BlockWaxedExposedCopperBulb extends BlockCopperBulbBase {
@@ -26,7 +26,7 @@ public class BlockWaxedExposedCopperBulb extends BlockCopperBulbBase {
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
+        return BlockColor.LIGHT_GRAY_TERRACOTTA_BLOCK_COLOR;
     }
 
     @Override

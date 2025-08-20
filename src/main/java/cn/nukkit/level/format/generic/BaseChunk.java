@@ -6,7 +6,7 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
-import cn.nukkit.utils.ChunkException;
+import cn.nukkit.level.ChunkException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

@@ -18,7 +18,7 @@ import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 

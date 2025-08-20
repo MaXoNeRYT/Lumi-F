@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.inventory.SmithingInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 import javax.annotation.Nullable;
 
