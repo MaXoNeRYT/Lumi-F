@@ -20,7 +20,7 @@ public abstract class TreeGenerator extends cn.nukkit.level.generator.object.Bas
         return switch (id) {
             case Item.AIR, Item.LEAVES, Item.GRASS, Item.DIRT, Item.LOG, Item.LOG2, Item.SAPLING, Item.VINE,
                     Item.DIRT_WITH_ROOTS, Item.AZALEA_LEAVES, Item.AZALEA_LEAVES_FLOWERED,
-                    Item.CHERRY_LEAVES, Item.CHERRY_LOG, Item.CHERRY_SAPLING -> true;
+                 Item.CHERRY_LEAVES, Item.CHERRY_LOG, Item.CHERRY_SAPLING, BlockID.PALE_OAK_SAPLING, BlockID.PALE_OAK_LEAVES -> true;
             default -> false;
         };
     }

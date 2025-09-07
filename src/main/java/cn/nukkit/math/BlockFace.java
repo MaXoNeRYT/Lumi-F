@@ -2,8 +2,7 @@ package cn.nukkit.math;
 
 import com.google.common.collect.Iterators;
 
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
@@ -145,6 +144,52 @@ public enum BlockFace {
     }
 
     /**
+     * Get the index of this BlockFace (0-5). The order is D-U-N-E-S-W
+     *
+     * @return index
+     */
+    public int getDUNESWIndex() {
+        switch (getIndex()) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 4;
+            case 4:
+                return 5;
+            case 5:
+                return 3;
+            case 0:
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * Get the index of this BlockFace (0-5). The order is D-U-S-W-N-E
+     *
+     * @return index
+     */
+    public int getDUSWNEIndex() {
+        switch (getIndex()) {
+            case 1:
+                return 1;
+            case 2:
+                return 4;
+            case 3:
+                return 2;
+            case 4:
+                return 3;
+            case 5:
+                return 5;
+            case 0:
+            default:
+                return 0;
+        }
+    }
+
+    /**
      * Get the horizontal index of this BlockFace (0-3). The order is S-W-N-E
      *
      * @return horizontal index
@@ -277,6 +322,20 @@ public enum BlockFace {
                 throw new RuntimeException("Unable to get counter-clockwise Y-rotated face of " + this);
         }
     }
+
+    public Set<BlockFace> getEdges() {
+        EnumSet<BlockFace> blockFaces = EnumSet.noneOf(BlockFace.class);
+        if (axis.isVertical()) {
+            Collections.addAll(blockFaces, Plane.HORIZONTAL.faces);
+            return blockFaces;
+        }
+        Collections.addAll(blockFaces, Plane.VERTICAL.faces);
+        Axis edgeAxis = axis == Axis.X ? Axis.Z : Axis.X;
+        blockFaces.add(fromAxis(AxisDirection.NEGATIVE, edgeAxis));
+        blockFaces.add(fromAxis(AxisDirection.POSITIVE, edgeAxis));
+        return blockFaces;
+    }
+
 
     public String toString() {
         return name;

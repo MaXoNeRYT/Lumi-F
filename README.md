@@ -17,7 +17,7 @@ Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTim
 ### How to install?
 1. Install java 21 or higher
 2. Download the .jar file from the links below
-3. Write a command to run: `java -jar Lumi-1.1.0-SNAPSHOT.jar`
+3. Write a command to run: `java -jar Lumi-1.2.0-SNAPSHOT.jar`
 
 ### Need support?
 Go to our **[Discord Server](https://discord.gg/HkTnrkUySJ)**!
@@ -38,7 +38,7 @@ Adding dependency:
 <dependency>
     <groupId>com.koshakmine</groupId>
     <artifactId>Lumi</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -53,7 +53,7 @@ maven {
 
 Adding dependency:
 ```kts
-compileOnly("com.koshakmine:Lumi:1.1.0-SNAPSHOT")
+compileOnly("com.koshakmine:Lumi:1.2.0-SNAPSHOT")
 ```
 
 ## Credits

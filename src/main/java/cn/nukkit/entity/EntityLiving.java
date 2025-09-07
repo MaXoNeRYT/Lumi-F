@@ -30,7 +30,6 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
 import cn.nukkit.entity.util.BlockIterator;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
@@ -38,7 +37,6 @@ import java.util.*;
  * @author MagicDroidX
  * Nukkit Project
  */
-@Slf4j
 public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public EntityLiving(FullChunk chunk, CompoundTag nbt) {
@@ -130,10 +128,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             if (event.getDamager() instanceof Player damager && damager.attackCooldown > 0) {
                 return false;
             }
-        }
-
-        if (this.attackCooldown > 0) {
-            return false;
         }
 
         if (this.blockedByShield(source)) {

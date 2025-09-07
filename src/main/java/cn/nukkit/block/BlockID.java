@@ -10,7 +10,9 @@ public interface BlockID {
     int GRASS_BLOCK = 2;
     int DIRT = 3;
     int COBBLESTONE = 4;
+    @Deprecated
     int COBBLE = 4;
+    @Deprecated
     int PLANK = 5;
     @Deprecated
     int PLANKS = 5;
@@ -29,9 +31,7 @@ public interface BlockID {
     int COAL_ORE = 16;
     int LOG = 17;
     int WOOD = 17;
-    int TRUNK = 17;
     int LEAVES = 18;
-    int LEAVE = 18;
     int SPONGE = 19;
     int GLASS = 20;
     int LAPIS_ORE = 21;
@@ -446,7 +446,6 @@ public interface BlockID {
     int SOUL_SOIL = 491;
     int SOUL_FIRE = 492;
     int NETHER_SPROUTS_BLOCK = 493;
-    int BLOCK_NETHER_SPROUTS = 493;
     int TARGET = 494;
     int STRIPPED_CRIMSON_STEM = 495;
     int STRIPPED_WARPED_STEM = 496;
@@ -892,12 +891,13 @@ public interface BlockID {
     int CLOSED_EYEBLOSSOM = 1274;
     int CHISELED_RESIN_BRICKS = 1275;
     int RESIN_BLOCK = 1276;
+    int RESIN_CLUMP = 1277;
 
     int BUSH = 1278;
     int WILDFLOWERS = 1279;
     int FIREFLY_BUSH = 1280;
     int LEAF_LITTER = 1281;
-
+    int DRIED_GHAST = 1282;
     int SHORT_DRY_GRASS = 1283;
     int TALL_DRY_GRASS = 1284;
     int CACTUS_FLOWER = 1285;

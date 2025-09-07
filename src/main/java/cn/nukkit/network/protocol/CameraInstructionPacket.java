@@ -332,13 +332,15 @@ public class CameraInstructionPacket extends DataPacket {
         return new CameraFadeInstruction.TimeData(fadeIn, wait, fadeOut);
     }
 
-    protected void putColor(Color color) {
+    @Override
+    public void putColor(Color color) {
         this.putLFloat(color.getRed() / 255F);
         this.putLFloat(color.getGreen() / 255F);
         this.putLFloat(color.getBlue() / 255F);
     }
 
-    protected Color getColor() {
+    @Override
+    public Color getColor() {
         return new Color(
                 (int) (this.getLFloat() * 255),
                 (int) (this.getLFloat() * 255),

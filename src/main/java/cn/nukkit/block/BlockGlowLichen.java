@@ -1,34 +1,13 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.customblock.properties.BlockProperties;
-import cn.nukkit.block.customblock.properties.IntBlockProperty;
-import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.level.Level;
-import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.block.data.BlockColor;
 
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
-public class BlockGlowLichen extends BlockTransparentMeta implements BlockPropertiesHelper {
-
-    // Currently multi_face_direction_bits: 0x01 - down, 0x02 - up, 0x04 - north, 0x08 - south, 0x10 - west, 0x20 - east
-    private static final IntBlockProperty MULTI_FACE_DIRECTION = new IntBlockProperty("multi_face_direction_bits", false,  63);
-
-    //TODO check
-    public static final int DOWN_BIT = 0x01;
-    public static final int UP_BIT = 0x02;
-    public static final int NORTH_BIT = 0x10;
-    public static final int SOUTH_BIT = 0x04;
-    public static final int WEST_BIT = 0x08;
-    public static final int EAST_BIT = 0x20;
-
-    private static final BlockProperties PROPERTIES = new BlockProperties(MULTI_FACE_DIRECTION);
-
+public class BlockGlowLichen extends BlockLichen {
     public BlockGlowLichen() {
         this(0);
     }
@@ -38,88 +17,85 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
     }
 
     @Override
-    public int getId() {
-        return GLOW_LICHEN;
-    }
-
-    @Override
     public String getName() {
         return "Glow Lichen";
     }
 
     @Override
-    public String getIdentifier() {
-        return "minecraft:glow_lichen";
+    public int getId() {
+        return GLOW_LICHEN;
     }
 
     @Override
-    public BlockProperties getBlockProperties() {
-        return PROPERTIES;
-    }
+    public boolean onActivate(Item item, Player player) {
 
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!this.canPlaceOn(block.down(), target) || !target.isSolid()) {
+        if (!item.getIdentifier().equals(ItemNamespaceId.BONE_MEAL)) {
             return false;
         }
 
-        if (block.getId() == GLOW_LICHEN) {
-            this.setDamage(block.getDamage());
-        } else {
-            this.setDamage(0);
+        Map<Block, BlockFace> candidates = getCandidates();
+
+        item.decrement(1);
+
+        if (candidates.isEmpty()) {
+            return true;
         }
 
-        this.setBlockFace(face.getOpposite(), true);
-        this.getLevel().setBlock(this, this, false, true);
+        Set<Block> keySet = candidates.keySet();
+        List<Block> keyList = new ArrayList<>(keySet);
+
+        int rand = RANDOM.nextRange(0, candidates.size() - 1);
+
+        Block random = keyList.get(rand);
+        Block newLichen;
+
+        if (random.getId() == BlockID.GLOW_LICHEN) {
+            newLichen = random;
+        } else {
+            newLichen = Block.get(GLOW_LICHEN);
+        }
+
+        newLichen.setDamage(newLichen.getDamage() | (0b000001 << candidates.get(random).getDUSWNEIndex()));
+
+        getLevel().setBlock(random, newLichen, true, true);
+
         return true;
     }
 
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isShears()) {
-            return new Item[] { this.toItem() };
-        }
-        return Item.EMPTY_ARRAY;
-    }
+    private Map<Block, BlockFace> getCandidates() {
+        Map<Block, BlockFace> candidates = new HashMap<>();
+        for (BlockFace side : BlockFace.values()) {
+            Block support = this.getSide(side);
 
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            this.getLevel().useBreakOn(this, null, null, true);
-        } else if (type != Level.BLOCK_UPDATE_NORMAL) {
-            return type;
-        }
+            if (isGrowthToSide(side)) {
+                BlockFace[] supportSides = side.getEdges().toArray(new BlockFace[0]);
 
-        boolean update = false;
-        boolean support = false;
+                for (BlockFace supportSide : supportSides) {
+                    Block supportNeighbor = support.getSide(supportSide);
 
-        Set<BlockFace> faces = this.getSupportedFaces();
-        for (BlockFace face : faces) {
-            Block block = this.getLevel().getBlock(this.getSide(face));
-            if (block.isSolid()) {
-                support = true;
+                    if (!isSupportNeighborAdded(candidates, supportSide.getOpposite(), supportNeighbor)) {
+                        continue;
+                    }
+
+                    Block supportNeighborOppositeSide = supportNeighbor.getSide(side.getOpposite());
+                    if (shouldAddSupportNeighborOppositeSide(side, supportNeighborOppositeSide)) {
+                        candidates.put(supportNeighborOppositeSide, side);
+                    }
+
+                }
+
             } else {
-                update = true;
-                this.setBlockFace(face, false);
+                if (support.isSolid()) {
+                    candidates.put(this, side);
+                }
             }
         }
-
-        if (!support) {
-            this.getLevel().scheduleUpdate(this, 1);
-        } else if (update) {
-            this.getLevel().setBlock(this, this, false, true);
-        }
-        return type;
+        return candidates;
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.2;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -127,77 +103,23 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
         return 7;
     }
 
-    @Override
-    public boolean canPassThrough() {
-        return true;
+    private boolean isSupportNeighborAdded(Map<Block, BlockFace> candidates, BlockFace side, Block supportNeighbor) {
+        // Air is a valid candidate!
+        if (supportNeighbor.getId() == BlockID.AIR) {
+            candidates.put(supportNeighbor, side);
+        }
+
+        // Other non solid blocks isn't a valid candidates
+        return supportNeighbor.isSolid(side);
     }
 
-    @Override
-    public boolean canBeReplaced() {
-        return true;
-    }
-
-    @Override
-    public boolean isSolid() {
+    private boolean shouldAddSupportNeighborOppositeSide(BlockFace side, Block supportNeighborOppositeSide) {
+        if (supportNeighborOppositeSide.getId() == BlockID.AIR || supportNeighborOppositeSide.getId() == BlockID.GLOW_LICHEN) {
+            return supportNeighborOppositeSide.getId() != BlockID.GLOW_LICHEN ||
+                    (!((BlockGlowLichen) supportNeighborOppositeSide).isGrowthToSide(side) &&
+                            supportNeighborOppositeSide.getSide(side).getId() != BlockID.AIR);
+        }
         return false;
     }
 
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return null;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GRAY_BLOCK_COLOR;
-    }
-
-    public void setBlockFace(BlockFace face, boolean value) {
-        switch (face) {
-            case UP:
-                this.setIntValue(MULTI_FACE_DIRECTION, value ? this.getIntValue(MULTI_FACE_DIRECTION) | UP_BIT : this.getIntValue(MULTI_FACE_DIRECTION) & ~UP_BIT);
-                break;
-            case DOWN:
-                this.setIntValue(MULTI_FACE_DIRECTION, value ? this.getIntValue(MULTI_FACE_DIRECTION) | DOWN_BIT : this.getIntValue(MULTI_FACE_DIRECTION) & ~DOWN_BIT);
-                break;
-            case NORTH:
-                this.setIntValue(MULTI_FACE_DIRECTION, value ? this.getIntValue(MULTI_FACE_DIRECTION) | NORTH_BIT : this.getIntValue(MULTI_FACE_DIRECTION) & ~NORTH_BIT);
-                break;
-            case SOUTH:
-                this.setIntValue(MULTI_FACE_DIRECTION, value ? this.getIntValue(MULTI_FACE_DIRECTION) | SOUTH_BIT : this.getIntValue(MULTI_FACE_DIRECTION) & ~SOUTH_BIT);
-                break;
-            case WEST:
-                this.setIntValue(MULTI_FACE_DIRECTION, value ? this.getIntValue(MULTI_FACE_DIRECTION) | WEST_BIT : this.getIntValue(MULTI_FACE_DIRECTION) & ~WEST_BIT);
-                break;
-            case EAST:
-                this.setIntValue(MULTI_FACE_DIRECTION, value ? this.getIntValue(MULTI_FACE_DIRECTION) | EAST_BIT : this.getIntValue(MULTI_FACE_DIRECTION) & ~EAST_BIT);
-                break;
-        }
-    }
-
-    public boolean hasBlockFace(BlockFace face) {
-        return switch (face) {
-            case UP -> (this.getIntValue(MULTI_FACE_DIRECTION) & UP_BIT) != 0;
-            case DOWN -> (this.getIntValue(MULTI_FACE_DIRECTION) & DOWN_BIT) != 0;
-            case NORTH -> (this.getIntValue(MULTI_FACE_DIRECTION) & NORTH_BIT) != 0;
-            case SOUTH -> (this.getIntValue(MULTI_FACE_DIRECTION) & SOUTH_BIT) != 0;
-            case WEST -> (this.getIntValue(MULTI_FACE_DIRECTION) & WEST_BIT) != 0;
-            case EAST -> (this.getIntValue(MULTI_FACE_DIRECTION) & EAST_BIT) != 0;
-        };
-    }
-
-    public Set<BlockFace> getSupportedFaces() {
-        EnumSet<BlockFace> faces = EnumSet.noneOf(BlockFace.class);
-        for (BlockFace face : BlockFace.values()) {
-            if (this.hasBlockFace(face)) {
-                faces.add(face);
-            }
-        }
-        return faces;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
 }

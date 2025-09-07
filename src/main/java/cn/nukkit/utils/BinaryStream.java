@@ -26,6 +26,7 @@ import cn.nukkit.network.LittleEndianByteBufInputStream;
 import cn.nukkit.network.LittleEndianByteBufOutputStream;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.EntityLink;
+import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
 import cn.nukkit.network.protocol.types.inventory.ContainerSlotType;
 import cn.nukkit.network.protocol.types.inventory.FullContainerName;
 import cn.nukkit.network.protocol.types.inventory.itemstack.request.ItemStackRequest;
@@ -42,6 +43,7 @@ import org.cloudburstmc.nbt.NBTOutputStream;
 import org.cloudburstmc.nbt.NbtUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,6 +51,7 @@ import java.lang.reflect.Array;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
 import java.util.function.*;
 
 import static org.cloudburstmc.protocol.common.util.Preconditions.checkArgument;
@@ -1451,6 +1454,22 @@ public class BinaryStream {
                 getBoolean(), //1.16+
                 getLFloat() //1.21.20+
         );
+    }
+
+    public void putColor(Color color) {
+       this.putLInt(color.getRGB());
+    }
+
+    public Color getColor() {
+        return new Color(this.getLInt());
+    }
+
+    public void writeScriptDebugShapeType(ScriptDebugShapeType type) {
+        this.putByte((byte) type.ordinal());
+    }
+
+    public ScriptDebugShapeType getScriptDebugShapeType() {
+        return ScriptDebugShapeType.values()[getByte()];
     }
 
     @SuppressWarnings("unchecked")

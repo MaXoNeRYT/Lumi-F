@@ -509,6 +509,7 @@ public class Network {
                 .registerPacket(ProtocolInfo.MOVEMENT_EFFECT_PACKET, MovementEffectPacket.class)
                 .registerPacket(ProtocolInfo.SET_MOVEMENT_AUTHORITY_PACKET, SetMovementAuthorityPacket.class)
                 .registerPacket(ProtocolInfo.CAMERA_AIM_ASSIST_PRESETS_PACKET, CameraAimAssistPresetsPacket.class)
+                .registerPacket(ProtocolInfo.SERVER_SCRIPT_DEBUG_DRAWER_PACKET, ServerScriptDebugDrawerPacket.class)
                 .build();
 
         this.packetPoolCurrent = this.packetPool137.toBuilder()

@@ -336,6 +336,8 @@ public interface ProtocolInfo {
      * @since v800
      */
     int PLAYER_LOCATIONS_PACKET = 326;
+    int CLIENTBOUND_CONTROL_SCHEME_SET_PACKET = 327;
+    int SERVER_SCRIPT_DEBUG_DRAWER_PACKET = 328;
 
     static int toNewProtocolID(byte oldProtocolID) {
         return oldProtocolID & 0xff;
