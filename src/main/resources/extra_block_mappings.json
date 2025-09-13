@@ -1,0 +1,88 @@
+{
+  "-212": {
+    "18": "minecraft:birch_wood",
+    "19": "minecraft:jungle_wood",
+    "16": "minecraft:oak_wood",
+    "17": "minecraft:stripped_spruce_wood",
+    "29": "minecraft:stripped_dark_oak_wood",
+    "27": "minecraft:stripped_jungle_wood",
+    "28": "minecraft:stripped_acacia_wood",
+    "25": "minecraft:stripped_spruce_wood",
+    "26": "minecraft:stripped_birch_wood",
+    "24": "minecraft:stripped_oak_wood",
+    "21": "minecraft:dark_oak_wood",
+    "20": "minecraft:acacia_wood",
+    "36": "minecraft:acacia_wood",
+    "37": "minecraft:dark_oak_wood",
+    "34": "minecraft:birch_wood",
+    "35": "minecraft:jungle_wood",
+    "32": "minecraft:oak_wood",
+    "33": "minecraft:spruce_wood",
+    "45": "minecraft:stripped_dark_oak_wood",
+    "43": "minecraft:stripped_jungle_wood",
+    "44": "minecraft:stripped_acacia_wood",
+    "41": "minecraft:stripped_spruce_wood",
+    "42": "minecraft:stripped_birch_wood",
+    "40": "minecraft:stripped_oak_wood"
+  },
+  "-166": {
+    "8": "minecraft:mossy_stone_brick_slab",
+    "9": "minecraft:smooth_quartz_slab",
+    "11": "minecraft:cut_sandstone_slab",
+    "10": "minecraft:normal_stone_slab",
+    "12": "minecraft:cut_red_sandstone_slab"
+  },
+  "158": {
+    "9": "minecraft:spruce_slab",
+    "8": "minecraft:oak_slab",
+    "11": "minecraft:jungle_slab",
+    "12": "minecraft:acacia_slab",
+    "10": "minecraft:birch_slab",
+    "13": "minecraft:dark_oak_slab"
+  },
+  "182": {
+    "8": "minecraft:red_sandstone_slab",
+    "9": "minecraft:purpur_slab",
+    "10": "minecraft:prismarine_slab",
+    "11": "minecraft:dark_prismarine_slab",
+    "14": "minecraft:smooth_sandstone_slab",
+    "15": "minecraft:red_nether_brick_slab",
+    "12": "minecraft:prismarine_brick_slab",
+    "13": "minecraft:mossy_cobblestone_slab"
+  },
+  "44": {
+    "8": "minecraft:smooth_stone_slab",
+    "9": "minecraft:sandstone_slab",
+    "14": "minecraft:quartz_slab",
+    "13": "minecraft:stone_brick_slab",
+    "15": "minecraft:nether_brick_slab",
+    "12": "minecraft:brick_slab",
+    "11": "minecraft:cobblestone_slab"
+  },
+  "-162": {
+    "10": "minecraft:polished_andesite_slab",
+    "11": "minecraft:andesite_slab",
+    "12": "minecraft:diorite_slab",
+    "13": "minecraft:polished_diorite_slab",
+    "14": "minecraft:granite_slab",
+    "15": "minecraft:polished_granite_slab",
+    "9": "minecraft:smooth_red_sandstone_slab",
+    "8": "minecraft:end_stone_brick_slab"
+  },
+  "17": {
+    "11": "minecraft:jungle_log",
+    "10": "minecraft:birch_log",
+    "9": "minecraft:spruce_log",
+    "8": "minecraft:oak_log",
+    "7": "minecraft:jungle_log",
+    "6": "minecraft:birch_log",
+    "5": "minecraft:spruce_log",
+    "4": "minecraft:oak_log"
+  },
+  "162": {
+    "8": "minecraft:acacia_log",
+    "5": "minecraft:acacia_log",
+    "9": "minecraft:acacia_log",
+    "4": "minecraft:acacia_log"
+  }
+}
