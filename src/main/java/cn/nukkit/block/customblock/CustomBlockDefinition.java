@@ -39,6 +39,14 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
         return builder(customBlock, materials, CreativeItemCategory.CONSTRUCTION);
     }
 
+    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock) {
+        return new CustomBlockDefinition.Builder(customBlock, null, CreativeItemCategory.CONSTRUCTION);
+    }
+
+    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, CreativeItemCategory blockCreativeCategory) {
+        return new CustomBlockDefinition.Builder(customBlock, null, blockCreativeCategory);
+    }
+
     /**
      * Builder custom block definition.
      *
@@ -76,16 +84,19 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
                     .putCompound("minecraft:destructible_by_mining", new CompoundTag()
                             .putFloat("value", 99999f));//default server-side mining time calculate
             //设置材质
-            components.putCompound("minecraft:material_instances", new CompoundTag()
-                    .putCompound("mappings", new CompoundTag())
-                    .putCompound("materials", materials.toCompoundTag()));
-            //默认单位立方体方块
-            components.putCompound("minecraft:unit_cube", new CompoundTag());
-            components.putCompound("minecraft:geometry", new CompoundTag()
-                    .putString("identifier", "minecraft:geometry.full_block")
-                    .putString("culling", "")
-                    .putCompound("bone_visibility", new CompoundTag())
-            );
+            if(materials != null) {
+                components.putCompound("minecraft:material_instances", new CompoundTag()
+                        .putCompound("mappings", new CompoundTag())
+                        .putCompound("materials", materials.toCompoundTag()));
+
+                //默认单位立方体方块
+                components.putCompound("minecraft:unit_cube", new CompoundTag());
+                components.putCompound("minecraft:geometry", new CompoundTag()
+                        .putString("identifier", "minecraft:geometry.full_block")
+                        .putString("culling", "")
+                        .putCompound("bone_visibility", new CompoundTag())
+                );
+            }
             //设置方块在创造栏的分类
             this.nbt.putCompound("menu_category", new CompoundTag()
                     .putString("category", blockCreativeCategory.name().toLowerCase(Locale.ENGLISH))
