@@ -1,5 +1,6 @@
 package cn.nukkit.nbt;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
@@ -39,7 +40,7 @@ public class NBTIO {
                 .putShort("Damage", item.getDamage());
 
         int id = item.getId();
-        if (id == ItemID.STRING_IDENTIFIED_ITEM) {
+        if (id == ItemID.STRING_IDENTIFIED_ITEM || id <= 255 - Block.LOWEST_CUSTOM_BLOCK_ID) {
             tag.putString("Name", item.getNamespaceId(protocol));
         } else {
             tag.putShort("id", item.getId() & 0xFFFF);

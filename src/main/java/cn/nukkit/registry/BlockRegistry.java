@@ -1042,7 +1042,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
                 BlockTypes.register(new CustomBlockType(block));
 
                 if (block.shouldBeRegisteredInCreative()) {
-                    Registries.CREATIVE_ITEM.register(block.toItem());
+                    Registries.CREATIVE_ITEM.register(Item.get(block.getIdentifier()));
                 }
             });
         }

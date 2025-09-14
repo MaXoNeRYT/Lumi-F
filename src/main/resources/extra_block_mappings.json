@@ -69,6 +69,51 @@
     "9": "minecraft:smooth_red_sandstone_slab",
     "8": "minecraft:end_stone_brick_slab"
   },
+  "-137": {
+    "10": "minecraft:dead_horn_coral_wall_fan",
+    "12": "minecraft:horn_coral_wall_fan",
+    "14": "minecraft:dead_horn_coral_wall_fan",
+    "8": "minecraft:horn_coral_wall_fan",
+    "0": "minecraft:horn_coral_wall_fan",
+    "2": "minecraft:dead_horn_coral_wall_fan",
+    "4": "minecraft:horn_coral_wall_fan"
+  },
+  "-135": {
+    "10": "minecraft:dead_tube_coral_wall_fan",
+    "12": "minecraft:tube_coral_wall_fan",
+    "14": "minecraft:dead_tube_coral_wall_fan",
+    "13": "minecraft:brain_coral_wall_fan",
+    "9": "minecraft:brain_coral_wall_fan",
+    "8": "minecraft:tube_coral_wall_fan",
+    "3": "minecraft:dead_brain_coral_wall_fan",
+    "2": "minecraft:dead_tube_coral_wall_fan",
+    "4": "minecraft:tube_coral_wall_fan",
+    "7": "minecraft:dead_brain_coral_wall_fan",
+    "6": "minecraft:dead_tube_coral_wall_fan"
+  },
+  "-134": {
+    "9": "minecraft:dead_brain_coral_wall_fan"
+  },
+  "-136": {
+    "8": "minecraft:bubble_coral_wall_fan",
+    "7": "minecraft:dead_fire_coral_wall_fan",
+    "9": "minecraft:fire_coral_wall_fan",
+    "0": "minecraft:bubble_coral_wall_fan",
+    "2": "minecraft:dead_bubble_coral_wall_fan",
+    "1": "minecraft:fire_coral_wall_fan",
+    "4": "minecraft:bubble_coral_wall_fan",
+    "3": "minecraft:dead_fire_coral_wall_fan",
+    "6": "minecraft:dead_bubble_coral_wall_fan",
+    "11": "minecraft:dead_fire_coral_wall_fan",
+    "10": "minecraft:dead_bubble_coral_wall_fan",
+    "13": "minecraft:fire_coral_wall_fan",
+    "12": "minecraft:bubble_coral_wall_fan",
+    "15": "minecraft:dead_fire_coral_wall_fan",
+    "14": "minecraft:dead_bubble_coral_wall_fan"
+  },
+  "-133": {
+    "12": "minecraft:horn_coral_fan"
+  },
   "17": {
     "11": "minecraft:jungle_log",
     "10": "minecraft:birch_log",
@@ -84,5 +129,8 @@
     "5": "minecraft:acacia_log",
     "9": "minecraft:acacia_log",
     "4": "minecraft:acacia_log"
+  },
+  "31": {
+    "0": "minecraft:tall_grass"
   }
 }

@@ -2403,14 +2403,6 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             double breakTime = target.calculateBreakTimeNotInAir(item, player);
-            //对于自定义方块，由于用户可以自由设置客户端侧的挖掘时间，拿服务端硬度计算出来的挖掘时间来判断是否为fastBreak是不准确的。
-            if (target instanceof CustomBlock customBlock) {
-                var comp = customBlock.getDefinition().nbt().getCompound("components");
-                if (comp.containsCompound("minecraft:destructible_by_mining")) {
-                    var clientBreakTime = comp.getCompound("minecraft:destructible_by_mining").getFloat("value");
-                    breakTime = Math.min(breakTime, clientBreakTime);
-                }
-            }
 
             if (player.isCreative() && breakTime > 0.15) {
                 breakTime = 0.15;

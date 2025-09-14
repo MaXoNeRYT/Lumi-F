@@ -105,29 +105,6 @@ public interface CustomBlock extends BlockPropertiesHelper {
     }
 
     /**
-     * 获取自定义方块的挖掘时间，它是服务端侧和客户端侧挖掘时间的最小值。
-     *
-     * @param item   the item
-     * @param player the player
-     * @return the break time
-     */
-    default double breakTime(@NotNull Item item, @Nullable Player player) {
-        var block = this.toCustomBlock();
-        double breakTime = block.calculateBreakTime(item, player);
-        var comp = this.getDefinition().nbt().getCompound("components");
-        if (comp.containsCompound("minecraft:destructible_by_mining")) {
-            var clientBreakTime = comp.getCompound("minecraft:destructible_by_mining").getFloat("value");
-            if (player != null) {
-                if (player.getServer().getTick() - player.getLastInAirTick() < 5) {
-                    clientBreakTime *= 6;
-                }
-            }
-            breakTime = Math.min(breakTime, clientBreakTime);
-        }
-        return breakTime;
-    }
-
-    /**
      * 定义这个方块是否需要被注册到创造栏中
      * 当你对这个方块有其他的物品想作为其展示时推荐关闭
      */

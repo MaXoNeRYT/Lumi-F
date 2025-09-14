@@ -159,22 +159,6 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
         }
 
         /**
-         * 控制自定义方块客户端侧的挖掘时间(单位秒)
-         * <p>
-         * 自定义方块的挖掘时间取决于服务端侧和客户端侧中最小的一个
-         * <p>
-         * Control the digging time (in seconds) on the client side of the custom block
-         * <p>
-         * The digging time of a custom cube depends on the smallest of the server-side and client-side
-         */
-        public Builder breakTime(double second) {
-            this.nbt.getCompound("components")
-                    .putCompound("minecraft:destructible_by_mining", new CompoundTag()
-                            .putFloat("value", (float) second));
-            return this;
-        }
-
-        /**
          * 控制自定义方块在创造栏中的组。
          * <p>
          * Control the grouping of custom blocks in the creation inventory.

@@ -210,6 +210,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
 
     public void addToCustom(String namespace, Item item) {
         CUSTOM_ITEMS.put(namespace, () -> item);
+        register(namespace, () -> item);
     }
 
     public void deleteCustom(String namespaceId) {

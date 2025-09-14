@@ -2,6 +2,7 @@ package cn.nukkit;
 
 import cn.nukkit.AdventureSettings.Type;
 import cn.nukkit.block.*;
+import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.blockentity.*;
 import cn.nukkit.blockentity.impl.BlockEntityCampfire;
@@ -338,6 +339,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public Block breakingBlock = null;
     private PlayerBlockActionData lastBlockAction;
+    protected long breakingBlockTime = 0;
+    protected double blockBreakProgress = 0;
+    public BlockFace breakingBlockFace = null;
 
     private static final int NO_SHIELD_DELAY = 10;
     private int noShieldTicks;
@@ -2476,6 +2480,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 hasUpdated = true;
             }
         }
+
+        if(this.isMovementServerAuthoritative()) {
+            onBlockBreakContinue(breakingBlock, breakingBlockFace);
+        }
+
         return super.entityBaseTick(tickDiff) || hasUpdated;
     }
 
@@ -4812,8 +4821,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private void onBlockBreakContinue(Vector3 pos, BlockFace face) {
         if (this.isBreakingBlock()) {
+            var time = System.currentTimeMillis();
             Block block = this.level.getBlock(pos, false);
-            this.level.addParticle(new PunchBlockParticle(pos, block, face));
+
+            double miningTimeRequired = this.breakingBlock.calculateBreakTime(this.inventory.getItemInHand(), this);
+
+            if (miningTimeRequired > 0) {
+                int breakTick = (int) Math.ceil(miningTimeRequired * 20);
+                LevelEventPacket pk = new LevelEventPacket();
+                pk.evid = LevelEventPacket.EVENT_BLOCK_UPDATE_BREAK;
+                pk.x = (float) this.breakingBlock.x;
+                pk.y = (float) this.breakingBlock.y;
+                pk.z = (float) this.breakingBlock.z;
+                pk.data = 65535 / breakTick;
+                this.getLevel().addChunkPacket(this.breakingBlock.getFloorX() >> 4, this.breakingBlock.getFloorZ() >> 4, pk);
+                this.level.addParticle(new PunchBlockParticle(pos, block, face));
+                if (this.breakingBlock instanceof CustomBlock) {
+                    var timeDiff = time - breakingBlockTime;
+                    blockBreakProgress += timeDiff / (miningTimeRequired * 1000);
+                    if (blockBreakProgress > 0.999999999999999999999) {
+                        this.onBlockBreakAbort(pos, face);
+                        this.onBlockBreakComplete(pos.asBlockVector3(), face);
+                    }
+                    breakingBlockTime = time;
+                }
+            }
         }
     }
 
@@ -4862,7 +4894,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.getLevel().getAntiXraySystem().deObfuscateBlock(this, face, target);
         }
 
+        this.breakingBlockTime = System.currentTimeMillis();
         this.breakingBlock = target;
+        this.breakingBlockFace = face;
         this.lastBreak = currentBreak;
         this.lastBreakPosition = blockPos;
     }
@@ -4877,7 +4911,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.data = 0;
             this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
         }
+        this.blockBreakProgress = 0;
         this.breakingBlock = null;
+        this.breakingBlockFace = null;
     }
 
     private void onBlockBreakComplete(BlockVector3 blockPos, BlockFace face) {
