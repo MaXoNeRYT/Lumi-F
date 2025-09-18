@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.api.NonComputationAtomic;
 import cn.nukkit.block.*;
-import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
@@ -131,91 +130,92 @@ public class Level implements ChunkManager, Metadatable {
     public static final int MAX_BLOCK_CACHE = 512;
 
     // The blocks that can randomly tick
-    private static final boolean[] randomTickBlocks = new boolean[Block.MAX_BLOCK_ID];
+    public static final List<Integer> RANDOM_TICK_BLOCKS = new ArrayList<>();
 
     static {
-        randomTickBlocks[Block.GRASS] = true;
-        randomTickBlocks[Block.FARMLAND] = true;
-        randomTickBlocks[Block.MYCELIUM] = true;
-        randomTickBlocks[Block.SAPLING] = true;
-        randomTickBlocks[Block.LEAVES] = true;
-        randomTickBlocks[Block.LEAVES2] = true;
-        randomTickBlocks[Block.SNOW_LAYER] = true;
-        randomTickBlocks[Block.ICE] = true;
-        randomTickBlocks[Block.LAVA] = true;
-        randomTickBlocks[Block.STILL_LAVA] = true;
-        randomTickBlocks[Block.CACTUS] = true;
-        randomTickBlocks[Block.BEETROOT_BLOCK] = true;
-        randomTickBlocks[Block.CARROT_BLOCK] = true;
-        randomTickBlocks[Block.POTATO_BLOCK] = true;
-        randomTickBlocks[Block.MELON_STEM] = true;
-        randomTickBlocks[Block.PUMPKIN_STEM] = true;
-        randomTickBlocks[Block.WHEAT_BLOCK] = true;
-        randomTickBlocks[Block.SUGARCANE_BLOCK] = true;
-        randomTickBlocks[Block.NETHER_WART_BLOCK] = true;
-        randomTickBlocks[Block.FIRE] = true;
-        randomTickBlocks[Block.GLOWING_REDSTONE_ORE] = true;
-        randomTickBlocks[Block.COCOA_BLOCK] = true;
-        randomTickBlocks[Block.ICE_FROSTED] = true;
-        randomTickBlocks[Block.VINE] = true;
-        randomTickBlocks[Block.WATER] = true;
-        randomTickBlocks[Block.CAULDRON_BLOCK] = true;
+        RANDOM_TICK_BLOCKS.add(Block.GRASS);
+        RANDOM_TICK_BLOCKS.add(Block.FARMLAND);
+        RANDOM_TICK_BLOCKS.add(Block.MYCELIUM);
+        RANDOM_TICK_BLOCKS.add(Block.SAPLING);
+        RANDOM_TICK_BLOCKS.add(Block.LEAVES);
+        RANDOM_TICK_BLOCKS.add(Block.LEAVES2);
+        RANDOM_TICK_BLOCKS.add(Block.SNOW_LAYER);
+        RANDOM_TICK_BLOCKS.add(Block.SNOW_LAYER);
+        RANDOM_TICK_BLOCKS.add(Block.ICE);
+        RANDOM_TICK_BLOCKS.add(Block.LAVA);
+        RANDOM_TICK_BLOCKS.add(Block.STILL_LAVA);
+        RANDOM_TICK_BLOCKS.add(Block.CACTUS);
+        RANDOM_TICK_BLOCKS.add(Block.BEETROOT_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.CARROT_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.POTATO_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.MELON_STEM);
+        RANDOM_TICK_BLOCKS.add(Block.PUMPKIN_STEM);
+        RANDOM_TICK_BLOCKS.add(Block.WHEAT_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.SUGARCANE_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.NETHER_WART_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.FIRE);
+        RANDOM_TICK_BLOCKS.add(Block.GLOWING_REDSTONE_ORE);
+        RANDOM_TICK_BLOCKS.add(Block.COCOA_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.ICE_FROSTED);
+        RANDOM_TICK_BLOCKS.add(Block.VINE);
+        RANDOM_TICK_BLOCKS.add(Block.WATER);
+        RANDOM_TICK_BLOCKS.add(Block.CAULDRON_BLOCK);
 
-        randomTickBlocks[Block.BAMBOO] = true;
-        randomTickBlocks[Block.BAMBOO_SAPLING] = true;
-        randomTickBlocks[Block.CORAL_FAN] = true;
-        randomTickBlocks[Block.CORAL_FAN_DEAD] = true;
-        randomTickBlocks[Block.BLOCK_KELP] = true;
-        randomTickBlocks[Block.SWEET_BERRY_BUSH] = true;
+        RANDOM_TICK_BLOCKS.add(Block.BAMBOO);
+        RANDOM_TICK_BLOCKS.add(Block.BAMBOO_SAPLING);
+        RANDOM_TICK_BLOCKS.add(Block.CORAL_FAN);
+        RANDOM_TICK_BLOCKS.add(Block.CORAL_FAN_DEAD);
+        RANDOM_TICK_BLOCKS.add(Block.BLOCK_KELP);
+        RANDOM_TICK_BLOCKS.add(Block.SWEET_BERRY_BUSH);
 
-        randomTickBlocks[Block.CAVE_VINES] = true;
-        randomTickBlocks[Block.CAVE_VINES_BODY_WITH_BERRIES] = true;
-        randomTickBlocks[Block.CAVE_VINES_HEAD_WITH_BERRIES] = true;
-        randomTickBlocks[Block.AZALEA_LEAVES] = true;
-        randomTickBlocks[Block.AZALEA_LEAVES_FLOWERED] = true;
-        randomTickBlocks[Block.AZALEA] = true;
-        randomTickBlocks[Block.FLOWERING_AZALEA] = true;
+        RANDOM_TICK_BLOCKS.add(Block.CAVE_VINES);
+        RANDOM_TICK_BLOCKS.add(Block.CAVE_VINES_BODY_WITH_BERRIES);
+        RANDOM_TICK_BLOCKS.add(Block.CAVE_VINES_HEAD_WITH_BERRIES);
+        RANDOM_TICK_BLOCKS.add(Block.AZALEA_LEAVES);
+        RANDOM_TICK_BLOCKS.add(Block.AZALEA_LEAVES_FLOWERED);
+        RANDOM_TICK_BLOCKS.add(Block.AZALEA);
+        RANDOM_TICK_BLOCKS.add(Block.FLOWERING_AZALEA);
 
-        randomTickBlocks[Block.MANGROVE_PROPAGULE] = true;
-        randomTickBlocks[Block.MANGROVE_LEAVES] = true;
+        RANDOM_TICK_BLOCKS.add(Block.MANGROVE_PROPAGULE);
+        RANDOM_TICK_BLOCKS.add(Block.MANGROVE_LEAVES);
 
-        randomTickBlocks[Block.CHERRY_SAPLING] = true;
-        randomTickBlocks[Block.CHERRY_LEAVES] = true;
+        RANDOM_TICK_BLOCKS.add(Block.CHERRY_SAPLING);
+        RANDOM_TICK_BLOCKS.add(Block.CHERRY_LEAVES);
 
-        randomTickBlocks[Block.COPPER_BLOCK] = true;
-        randomTickBlocks[Block.EXPOSED_COPPER] = true;
-        randomTickBlocks[Block.WEATHERED_COPPER] = true;
-        randomTickBlocks[Block.OXIDIZED_COPPER] = true;
-        randomTickBlocks[Block.CUT_COPPER] = true;
-        randomTickBlocks[Block.EXPOSED_CUT_COPPER] = true;
-        randomTickBlocks[Block.WEATHERED_CUT_COPPER] = true;
-        randomTickBlocks[Block.OXIDIZED_CUT_COPPER] = true;
-        randomTickBlocks[Block.CUT_COPPER_STAIRS] = true;
-        randomTickBlocks[Block.EXPOSED_CUT_COPPER_STAIRS] = true;
-        randomTickBlocks[Block.WEATHERED_CUT_COPPER_STAIRS] = true;
-        randomTickBlocks[Block.OXIDIZED_CUT_COPPER_STAIRS] = true;
-        randomTickBlocks[Block.CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.EXPOSED_CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.WEATHERED_CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.OXIDIZED_CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.DOUBLE_CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.EXPOSED_DOUBLE_CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.WEATHERED_DOUBLE_CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.OXIDIZED_DOUBLE_CUT_COPPER_SLAB] = true;
-        randomTickBlocks[Block.COPPER_BULB] = true;
-        randomTickBlocks[Block.EXPOSED_COPPER_BULB] = true;
-        randomTickBlocks[Block.WEATHERED_COPPER_BULB] = true;
-        randomTickBlocks[Block.OXIDIZED_COPPER_BULB] = true;
-        randomTickBlocks[Block.CHISELED_COPPER] = true;
-        randomTickBlocks[Block.EXPOSED_CHISELED_COPPER] = true;
-        randomTickBlocks[Block.WEATHERED_CHISELED_COPPER] = true;
-        randomTickBlocks[Block.OXIDIZED_CHISELED_COPPER] = true;
-        randomTickBlocks[Block.COPPER_GRATE] = true;
-        randomTickBlocks[Block.EXPOSED_COPPER_GRATE] = true;
-        randomTickBlocks[Block.WEATHERED_COPPER_GRATE] = true;
-        randomTickBlocks[Block.OXIDIZED_COPPER_GRATE] = true;
-        
-        randomTickBlocks[Block.BUDDING_AMETHYST] = true;
+        RANDOM_TICK_BLOCKS.add(Block.COPPER_BLOCK);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.CUT_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_CUT_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_CUT_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_CUT_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.CUT_COPPER_STAIRS);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_CUT_COPPER_STAIRS);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_CUT_COPPER_STAIRS);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_CUT_COPPER_STAIRS);
+        RANDOM_TICK_BLOCKS.add(Block.CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.DOUBLE_CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_DOUBLE_CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_DOUBLE_CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_DOUBLE_CUT_COPPER_SLAB);
+        RANDOM_TICK_BLOCKS.add(Block.COPPER_BULB);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_COPPER_BULB);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_COPPER_BULB);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_COPPER_BULB);
+        RANDOM_TICK_BLOCKS.add(Block.CHISELED_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_CHISELED_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_CHISELED_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_CHISELED_COPPER);
+        RANDOM_TICK_BLOCKS.add(Block.COPPER_GRATE);
+        RANDOM_TICK_BLOCKS.add(Block.EXPOSED_COPPER_GRATE);
+        RANDOM_TICK_BLOCKS.add(Block.WEATHERED_COPPER_GRATE);
+        RANDOM_TICK_BLOCKS.add(Block.OXIDIZED_COPPER_GRATE);
+
+        RANDOM_TICK_BLOCKS.add(Block.BUDDING_AMETHYST);
     }
 
     @NonComputationAtomic
@@ -1474,7 +1474,7 @@ public class Level implements ChunkManager, Metadatable {
                                     int y = n >> 16 & 0xF;
 
                                     int blockId = section.getBlockId(x, y, z);
-                                    if (blockId >= 0 && blockId <= Block.MAX_BLOCK_ID && randomTickBlocks[blockId]) {
+                                    if (blockId >= 0 && blockId <= Block.MAX_BLOCK_ID && RANDOM_TICK_BLOCKS.contains(blockId)) {
                                         Block block = Block.get(blockId, section.getBlockData(x, y, z), this, chunkX * 16 + x, (Y << 4) + y, chunkZ * 16 + z);
                                         block.onUpdate(BLOCK_UPDATE_RANDOM);
                                     }
@@ -1493,7 +1493,7 @@ public class Level implements ChunkManager, Metadatable {
                                 int[] state = chunk.getBlockState(x, y + (Y << 4), z);
                                 int blockId = state[0];
                                 blockTest |= blockId != 0 && state[1] != 0;
-                                if (blockId <= Block.MAX_BLOCK_ID && Level.randomTickBlocks[blockId]) {
+                                if (blockId <= Block.MAX_BLOCK_ID && RANDOM_TICK_BLOCKS.contains(blockId)) {
                                     Block block = Block.get(blockId, state[1], this, x, y + (Y << 4), z);
                                     block.onUpdate(BLOCK_UPDATE_RANDOM);
                                 }
