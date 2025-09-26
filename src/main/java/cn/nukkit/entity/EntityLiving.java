@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockCactus;
 import cn.nukkit.block.BlockMagma;
+import cn.nukkit.entity.data.attribute.EntityMovementSpeedModifier;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.mob.EntityWolf;
@@ -30,6 +31,7 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
 import cn.nukkit.entity.util.BlockIterator;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 
@@ -53,11 +55,14 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return 0.02f;
     }
 
+    public static final float DEFAULT_SPEED = 0.1f;
+
     protected int attackTime = 0;
     protected int attackCooldown = 0;
     protected int knockBackTime = 0;
 
-    protected float movementSpeed = 0.1f;
+    private float movementSpeed = 0.1f;
+    private final Map<String, EntityMovementSpeedModifier> movementSpeedModifiers = new HashMap<>();
 
     protected int turtleTicks = 0;
 
@@ -510,12 +515,52 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return null;
     }
 
-    public void setMovementSpeed(float speed) {
+    public Map<String, EntityMovementSpeedModifier> getMovementSpeedModifiers() {
+        return movementSpeedModifiers;
+    }
+
+    public void addMovementSpeedModifier(EntityMovementSpeedModifier modifier) {
+        this.movementSpeedModifiers.put(modifier.getIdentifier(), modifier);
+        this.recalculateMovementSpeed();
+    }
+
+    public void removeMovementSpeedModifier(EntityMovementSpeedModifier modifier) {
+        this.removeMovementSpeedModifier(modifier.getIdentifier());
+    }
+
+    public boolean removeMovementSpeedModifier(String identifier) {
+        Object result = this.movementSpeedModifiers.remove(identifier);
+
+        if(result != null) {
+            this.recalculateMovementSpeed();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void setMovementSpeed(float speed) {
         this.movementSpeed = speed;
     }
 
     public float getMovementSpeed() {
         return this.movementSpeed;
+    }
+
+    public void recalculateMovementSpeed() {
+        float newMovementSpeed = DEFAULT_SPEED;
+        for (EntityMovementSpeedModifier modifier : this.movementSpeedModifiers.values()) {
+            float value = modifier.getValue();
+            if (modifier.getOperation() == EntityMovementSpeedModifier.Operation.MULTIPLY) {
+                if (value != 0) {
+                    newMovementSpeed *= value;
+                }
+            } else {
+                newMovementSpeed += value;
+            }
+        }
+
+        this.setMovementSpeed(newMovementSpeed);
     }
 
     public int getAirTicks() {

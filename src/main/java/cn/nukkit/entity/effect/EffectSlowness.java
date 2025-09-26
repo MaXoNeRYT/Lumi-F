@@ -2,6 +2,7 @@ package cn.nukkit.entity.effect;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.data.attribute.EntityMovementSpeedModifier;
 
 import java.awt.*;
 
@@ -14,20 +15,14 @@ public class EffectSlowness extends Effect {
     @Override
     public void onAdd(Entity entity) {
         if (entity instanceof EntityLiving living) {
-
-            Effect oldEffect = living.getEffect(this.getType());
-            if (oldEffect != null) {
-                living.setMovementSpeed(living.getMovementSpeed() / (1 - 0.15f * oldEffect.getLevel()));
-            }
-
-            living.setMovementSpeed(living.getMovementSpeed() * (1 - 0.15f * this.getLevel()));
+            living.addMovementSpeedModifier(new EntityMovementSpeedModifier("minecraft:slowness_effect", 1 - 0.15f * this.getLevel(), EntityMovementSpeedModifier.Operation.MULTIPLY));
         }
     }
 
     @Override
     public void onRemove(Entity entity) {
         if (entity instanceof EntityLiving living) {
-            living.setMovementSpeed(living.getMovementSpeed() / (1 - 0.15f * this.getLevel()));
+            living.removeMovementSpeedModifier("minecraft:slowness_effect");
         }
     }
 }

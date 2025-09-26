@@ -838,6 +838,10 @@ public interface BlockID {
     int CORNFLOWER = 1093;
     int LILY_OF_THE_VALLEY = 1094;
 
+    int CHIPPED_ANVIL = 1214;
+    int DAMAGED_ANVIL = 1215;
+    int DEPRECATED_ANVIL = 1216;
+
     int WITHER_SKELETON_SKULL = 1220;
     int ZOMBIE_HEAD = 1221;
     int PLAYER_HEAD = 1222;
@@ -877,7 +881,7 @@ public interface BlockID {
     int PALE_OAK_WOOD = 1260;
     int PALE_OAK_SAPLING = 1261;
     int PALE_OAK_LEAVES = 1262;
-
+    int MUSHROOM_STEM = 1263;
     int PALE_MOSS_BLOCK = 1264;
     int PALE_MOSS_CARPET = 1265;
     int PALE_HANGING_MOSS = 1266;

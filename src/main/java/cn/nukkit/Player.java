@@ -18,6 +18,7 @@ import cn.nukkit.command.utils.RawText;
 import cn.nukkit.debugshape.DebugShape;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
+import cn.nukkit.entity.data.attribute.EntityMovementSpeedModifier;
 import cn.nukkit.entity.data.property.EntityProperty;
 import cn.nukkit.entity.data.skin.Skin;
 import cn.nukkit.entity.effect.EffectType;
@@ -154,8 +155,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int CRAFTING_LOOM = 1004;
 
     public static final int TRADE_WINDOW_ID = 500;
-
-    public static final float DEFAULT_SPEED = 0.1f;
     public static final float MAXIMUM_SPEED = 0.5f;
     public static final float DEFAULT_FLY_SPEED = 0.05f;
     public static final float DEFAULT_VERTICAL_FLY_SPEED = 1.0f;
@@ -317,6 +316,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Getter
     @Setter
     private float verticalFlySpeed = DEFAULT_VERTICAL_FLY_SPEED;
+
+    private float speedToSend = DEFAULT_SPEED;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -1879,12 +1880,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             EntityFreezeEvent event = new EntityFreezeEvent(this);
             this.server.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                this.setMovementSpeed((float) Math.max(0.05, getMovementSpeed() - 3.58e-4));
+                this.addMovementSpeedModifier(new EntityMovementSpeedModifier("minecraft:freezing", getFreezingTicks() * (float) -3.58e-4, EntityMovementSpeedModifier.Operation.ADD));
             }
         }
-        if (!powderSnow && this.getFreezingTicks() > 0) {
-            this.addFreezingTicks(-1);
-            this.setMovementSpeed((float) Math.min(Player.DEFAULT_SPEED, getMovementSpeed() + 3.58e-4));//This magic number is to change the player's 0.05 speed within 140tick
+        if (!powderSnow) {
+            if(this.getFreezingTicks() > 0) {
+                this.addFreezingTicks(-1);
+                this.addMovementSpeedModifier(new EntityMovementSpeedModifier("minecraft:freezing", getFreezingTicks() * (float) -3.58e-4, EntityMovementSpeedModifier.Operation.ADD));
+            } else {
+                this.removeMovementSpeedModifier("minecraft:freezing");
+            }
         }
 
         if (this.getFreezingTicks() == 140 && this.getServer().getTick() % 40 == 0) {
@@ -2161,11 +2166,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             int down = this.getLevel().getBlockIdAt(chunk, getFloorX(), getFloorY() - 1, getFloorZ());
             if (this.inSoulSand && down != BlockID.SOUL_SAND) {
                 this.inSoulSand = false;
-                this.setMovementSpeed(DEFAULT_SPEED, true);
+                this.removeMovementSpeedModifier("minecraft:soul_speed_enchantment");
             } else if (!this.inSoulSand && down == BlockID.SOUL_SAND) {
                 this.inSoulSand = true;
                 float soulSpeed = (soulSpeedEnchantment.getLevel() * 0.105f) + 1.3f;
-                this.setMovementSpeed(DEFAULT_SPEED * soulSpeed, true);
+                this.addMovementSpeedModifier(new EntityMovementSpeedModifier("minecraft:soul_speed_enchantment", soulSpeed, EntityMovementSpeedModifier.Operation.MULTIPLY));
             }
         }
     }
@@ -3311,7 +3316,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (playerToggleSprintEvent.isCancelled()) {
                         this.needSendData = true;
                     } else {
-                        this.setSprinting(true, false);
+                        this.setSprinting(true);
                     }
                     this.setUsingItem(false);
                 }
@@ -3325,7 +3330,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (playerToggleSneakEvent.isCancelled()) {
                         this.needSendData = true;
                     } else {
-                        this.setSprinting(false, false);
+                        this.setSprinting(false);
                     }
                 }
 
@@ -5849,7 +5854,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.sendData(this);
 
-        this.setMovementSpeed(DEFAULT_SPEED);
+        this.recalculateMovementSpeed();
 
         this.adventureSettings.update();
         this.inventory.sendContents(this);
@@ -5967,19 +5972,43 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    public void setMovementSpeed(float speed) {
-        setMovementSpeed(speed, true);
+    public void addMovementSpeedModifier(EntityMovementSpeedModifier modifier) {
+        super.addMovementSpeedModifier(modifier);
+        this.speedToSend = this.recalculateMovementSpeedToSend();
+        this.sendMovementSpeed();
     }
 
-    public void setMovementSpeed(float speed, boolean send) {
-        super.setMovementSpeed(speed);
-        if (this.spawned && send) {
-            this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed).setDefaultValue(speed));
+    @Override
+    public boolean removeMovementSpeedModifier(String identifier) {
+        boolean isRemoved = super.removeMovementSpeedModifier(identifier);
+
+        if(isRemoved) {
+            this.speedToSend = this.recalculateMovementSpeedToSend();
+            this.sendMovementSpeed();
         }
+
+        return isRemoved;
     }
 
-    public void sendMovementSpeed(float speed) {
-        Attribute attribute = Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed);
+    public float recalculateMovementSpeedToSend() {
+        float newMovementSpeed = DEFAULT_SPEED;
+        for (EntityMovementSpeedModifier modifier : this.getMovementSpeedModifiers().values()) {
+            float value = modifier.getValue();
+            if(modifier.isSend()) {
+                if (modifier.getOperation() == EntityMovementSpeedModifier.Operation.MULTIPLY) {
+                    if (value != 0) {
+                        newMovementSpeed *= value;
+                    }
+                } else {
+                    newMovementSpeed += value;
+                }
+            }
+        }
+        return Math.max(newMovementSpeed, 0.00f);
+    }
+
+    public void sendMovementSpeed() {
+        Attribute attribute = Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.speedToSend).setDefaultValue(this.speedToSend);
         this.setAttribute(attribute);
     }
 
@@ -6899,7 +6928,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setSprinting(boolean value, boolean send) {
         if (isSprinting() != value) {
             super.setSprinting(value);
-            this.setMovementSpeed(value ? getMovementSpeed() * 1.3f : getMovementSpeed() / 1.3f, send);
+            if(value) {
+                this.addMovementSpeedModifier(new EntityMovementSpeedModifier("minecraft:sprinting", 1.3f, EntityMovementSpeedModifier.Operation.MULTIPLY, send));
+            } else {
+                this.removeMovementSpeedModifier("minecraft:sprinting");
+            }
         }
     }
 
@@ -6912,7 +6945,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setSneaking(boolean value) {
         if (isSneaking() != value) {
             super.setSneaking(value);
-            this.setMovementSpeed(value ? getMovementSpeed() * 0.3f : getMovementSpeed() / 0.3f, false);
+            if(value) {
+                this.addMovementSpeedModifier(new EntityMovementSpeedModifier("minecraft:sneaking", 0.3f, EntityMovementSpeedModifier.Operation.MULTIPLY, false));
+            } else {
+                this.removeMovementSpeedModifier("minecraft:sneaking");
+            }
         }
     }
 
@@ -6920,7 +6957,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setCrawling(boolean value) {
         if (isCrawling() != value) {
             super.setCrawling(value);
-            this.setMovementSpeed(value ? getMovementSpeed() * 0.3f : getMovementSpeed() / 0.3f, false);
+            if(value) {
+                this.addMovementSpeedModifier(new EntityMovementSpeedModifier("minecraft:crawling", 0.3f, EntityMovementSpeedModifier.Operation.MULTIPLY, false));
+            } else {
+                this.removeMovementSpeedModifier("minecraft:crawling");
+            }
         }
     }
 

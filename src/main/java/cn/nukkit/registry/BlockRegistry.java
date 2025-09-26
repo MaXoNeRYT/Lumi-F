@@ -506,7 +506,9 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
         register(COPPER_ORE, BlockOreCopper.class); //566
         register(LIGHTNING_ROD, BlockLightningRod.class); //567
-
+        register(CRAFTER, BlockCrafter.class); //568
+        register(VAULT, BlockVault.class); //569
+        register(TRIAL_SPAWNER, BlockTrialSpawner.class); //570
         register(HEAVY_CORE, BlockHeavyCore.class); //571
         register(DRIPSTONE_BLOCK, BlockDripstone.class); //572
         register(ROOTED_DIRT, BlockDirtRooted.class); //573
@@ -827,6 +829,10 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(CORNFLOWER, BlockCornflower.class); //1093
         register(LILY_OF_THE_VALLEY, BlockLilyOfTheValley.class); //1094
 
+        register(CHIPPED_ANVIL, BlockChippedAnvil.class); //1214
+        register(DAMAGED_ANVIL, BlockDamagedAnvil.class); //1215
+        register(DEPRECATED_ANVIL, BlockDeprecatedAnvil.class); //1216
+
         register(WITHER_SKELETON_SKULL, BlockSkullWitherSkeleton.class); //1220
         register(ZOMBIE_HEAD, BlockHeadZombie.class); //1221
         register(PLAYER_HEAD, BlockHeadPlayer.class); //1222
@@ -866,7 +872,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_WOOD, BlockWoodPaleOak.class); //1260
         register(PALE_OAK_SAPLING, BlockPaleOakSapling.class); //1261
         register(PALE_OAK_LEAVES, BlockLeavesPaleOak.class); //1262
-
+        register(MUSHROOM_STEM, BlockMushroomStem.class); //1263
         register(PALE_MOSS_BLOCK, BlockPaleMoss.class); //1264
         register(PALE_MOSS_CARPET, BlockPaleMossCarpet.class); //1265
         register(PALE_HANGING_MOSS, BlockPaleHangingMoss.class); //1266

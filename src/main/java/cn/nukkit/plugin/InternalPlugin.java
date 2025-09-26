@@ -1,5 +1,7 @@
 package cn.nukkit.plugin;
 
+import cn.nukkit.Player;
+import cn.nukkit.event.player.PlayerChatEvent;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
