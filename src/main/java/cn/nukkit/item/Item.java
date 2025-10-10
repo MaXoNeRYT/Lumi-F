@@ -25,7 +25,6 @@ import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.function.Supplier;
@@ -145,7 +144,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public static Item get(String id) {
-        return get(id, 0);
+        return get(id, null);
     }
 
     public static Item get(String id, Integer meta) {
@@ -160,7 +159,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         id = id.toLowerCase();
         if (!id.contains(":")) id = "minecraft:" + id;
 
-        Item item = Registries.ITEM.get(id);
+        Item item = Registries.ITEM.get(id).clone();
         if (meta != null) {
             item.setDamage(meta);
         }
@@ -170,7 +169,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             item.setCompoundTag(tags);
         }
 
-        return item.clone();
+        return item;
     }
 
     /**

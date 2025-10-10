@@ -11,8 +11,15 @@ import cn.nukkit.network.protocol.ContainerClosePacket;
 import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.network.protocol.types.inventory.ContainerType;
 import cn.nukkit.plugin.InternalPlugin;
+import cn.nukkit.recipe.*;
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
+import cn.nukkit.recipe.impl.MultiRecipe;
+import cn.nukkit.recipe.impl.SmithingRecipe;
+import cn.nukkit.registry.Registries;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,7 +55,7 @@ public class CraftingTransaction extends InventoryTransaction {
     public void setInput(Item item) {
         if (inputs.size() < gridSize * gridSize) {
             for (Item existingInput : this.inputs) {
-                if (existingInput.equals(item, item.hasMeta(), item.hasCompoundTag())) {
+                if (new DefaultDescriptor(existingInput).equals(new DefaultDescriptor(item))) {
                     existingInput.setCount(existingInput.getCount() + item.getCount());
                     return;
                 }
@@ -59,8 +66,12 @@ public class CraftingTransaction extends InventoryTransaction {
         }
     }
 
-    public List<Item> getInputList() {
-        return inputs;
+    public Collection<ItemDescriptor> getInputList() {
+        Collection<ItemDescriptor> list = new ArrayList<>();
+        for(Item item : inputs) {
+            list.add(new DefaultDescriptor(item));
+        }
+        return list;
     }
 
     public void setExtraOutput(Item item) {
@@ -98,7 +109,6 @@ public class CraftingTransaction extends InventoryTransaction {
 
     @Override
     public boolean canExecute() {
-        CraftingManager craftingManager = source.getServer().getCraftingManager();
         Inventory inventory;
         if (craftingType == Player.CRAFTING_SMITHING) {
             inventory = source.getWindowById(Player.SMITHING_WINDOW_ID);
@@ -110,11 +120,11 @@ public class CraftingTransaction extends InventoryTransaction {
                 }
             }
         } else {
-            MultiRecipe multiRecipe = craftingManager.getMultiRecipe(this.source, this.getPrimaryOutput(), this.getInputList());
+            MultiRecipe multiRecipe = Registries.RECIPE.getMultiRecipe(this.source, this.getPrimaryOutput(), this.getInputList());
             if (multiRecipe != null) {
                 setTransactionRecipe(multiRecipe.toRecipe(this.getPrimaryOutput(), this.getInputList()));
             } else {
-                setTransactionRecipe(craftingManager.matchRecipe(source.protocol, inputs, this.primaryOutput, this.secondaryOutputs));
+                setTransactionRecipe(Registries.RECIPE.matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs));
             }
         }
         return this.getTransactionRecipe() != null && super.canExecute();

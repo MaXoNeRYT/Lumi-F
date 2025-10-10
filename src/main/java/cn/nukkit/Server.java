@@ -1,32 +1,18 @@
 package cn.nukkit;
 
-import cn.nukkit.block.Block;
-import cn.nukkit.blockentity.*;
-import cn.nukkit.blockentity.impl.*;
 import cn.nukkit.command.*;
 import cn.nukkit.console.NukkitConsole;
 import cn.nukkit.entity.Attribute;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.skin.Skin;
 import cn.nukkit.entity.data.profession.Profession;
 import cn.nukkit.entity.data.property.EntityProperty;
-import cn.nukkit.entity.item.*;
-import cn.nukkit.entity.mob.*;
-import cn.nukkit.entity.passive.*;
-import cn.nukkit.entity.projectile.*;
-import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.server.PlayerDataSerializeEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.event.server.ServerStopEvent;
-import cn.nukkit.inventory.CraftingManager;
-import cn.nukkit.inventory.Recipe;
-import cn.nukkit.item.Item;
 import cn.nukkit.item.RuntimeItems;
-import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.level.*;
@@ -53,7 +39,6 @@ import cn.nukkit.network.BatchingHelper;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.PlayerListPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -66,6 +51,7 @@ import cn.nukkit.permission.Permissible;
 import cn.nukkit.plugin.*;
 import cn.nukkit.plugin.service.NKServiceManager;
 import cn.nukkit.plugin.service.ServiceManager;
+import cn.nukkit.recipe.parser.RecipeParser;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePackManager;
 import cn.nukkit.resourcepacks.loader.JarPluginResourcePackLoader;
@@ -152,7 +138,6 @@ public class Server {
     private final ConsoleThread consoleThread;
 
     private final SimpleCommandMap commandMap;
-    private final CraftingManager craftingManager;
     private final ResourcePackManager resourcePackManager;
     private final ConsoleCommandSender consoleSender;
     private final IScoreboardManager scoreboardManager;
@@ -345,6 +330,8 @@ public class Server {
 
         this.commandMap = new SimpleCommandMap(this);
 
+        Registries.RECIPE.init();
+
         // Convert legacy data before plugins get the chance to mess with it
         try {
             nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"), new Options()
@@ -360,7 +347,6 @@ public class Server {
 
         this.serverID = UUID.randomUUID();
 
-        this.craftingManager = new CraftingManager();
         this.resourcePackManager = new ResourcePackManager(
                 new ZippedResourcePackLoader(new File(Nukkit.DATA_PATH, "resource_packs")),
                 new JarPluginResourcePackLoader(new File(this.pluginPath))
@@ -923,13 +909,6 @@ public class Server {
         }
     }
 
-    public void sendRecipeList(Player player) {
-        BatchPacket cachedPacket = this.craftingManager.getCachedPacket(player.protocol);
-        if (cachedPacket != null) { // Don't send recipes if they wouldn't work anyways
-            player.dataPacket(cachedPacket);
-        }
-    }
-
     private void checkTickUpdates(int currentTick) {
         if (this.settings.performance().alwaysTickPlayers()) {
             for (Player p : new ArrayList<>(this.players.values())) {
@@ -1241,10 +1220,6 @@ public class Server {
         return this.pluginManager;
     }
 
-    public CraftingManager getCraftingManager() {
-        return craftingManager;
-    }
-
     public ResourcePackManager getResourcePackManager() {
         return resourcePackManager;
     }
@@ -1307,10 +1282,6 @@ public class Server {
 
     public int getOnlinePlayersCount() {
         return this.playerList.size();
-    }
-
-    public void addRecipe(Recipe recipe) {
-        this.craftingManager.registerRecipe(recipe);
     }
 
     public Optional<Player> getPlayer(UUID uuid) {

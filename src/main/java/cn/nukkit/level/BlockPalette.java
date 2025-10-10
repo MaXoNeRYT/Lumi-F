@@ -184,7 +184,7 @@ public class BlockPalette {
             if (runtimeId == -1) {
                 Integer cache = legacyToRuntimeIdCache.getIfPresent(legacyId);
                 if (cache == null) {
-                    log.info("(" + protocol + ") Missing block runtime id mappings for " + id + ':' + meta);
+                    Server.getInstance().getLogger().debug("(" + protocol + ") Missing block runtime id mappings for " + id + ':' + meta);
                     runtimeId = legacyToRuntimeId.get(BlockID.INFO_UPDATE << Block.DATA_BITS);
                     legacyToRuntimeIdCache.put(legacyId, runtimeId);
                 } else {

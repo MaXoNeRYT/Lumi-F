@@ -19,10 +19,10 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.item.*;
 import cn.nukkit.level.Position;
-import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.recipe.impl.SmithingRecipe;
+import cn.nukkit.registry.Registries;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -79,7 +79,7 @@ public class SmithingInventory extends FakeBlockUIComponent {
 
     @Nullable
     public SmithingRecipe matchRecipe() {
-        return Server.getInstance().getCraftingManager().matchSmithingRecipe(ProtocolInfo.CURRENT_PROTOCOL, Arrays.asList(getEquipment(), getIngredient(), getTemplate()));
+        return Registries.RECIPE.matchSmithingRecipe(Arrays.asList(getEquipment(), getIngredient(), getTemplate()));
     }
 
     @Override

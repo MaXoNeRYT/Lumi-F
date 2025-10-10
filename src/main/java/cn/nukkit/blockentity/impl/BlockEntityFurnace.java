@@ -20,6 +20,8 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.ContainerSetDataPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.recipe.SmeltingRecipe;
+import cn.nukkit.registry.Registries;
 
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -268,7 +270,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     }
 
     protected SmeltingRecipe matchRecipe(int protocol, Item raw) {
-        return this.server.getCraftingManager().matchFurnaceRecipe(protocol, raw);
+        return Registries.RECIPE.matchFurnaceRecipe(raw);
     }
 
     protected int getSpeedMultiplier() {
@@ -311,7 +313,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
                     newProduct.setCount(product.getCount() + 1);
                     product = newProduct;
 
-                    FurnaceSmeltEvent ev = new FurnaceSmeltEvent(this, raw, product, (float) this.server.getCraftingManager().getRecipeXp(smelt));
+                    FurnaceSmeltEvent ev = new FurnaceSmeltEvent(this, raw, product, (float) Registries.RECIPE.getRecipeXp(smelt));
                     this.server.getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
                         this.inventory.setResult(ev.getResult());
