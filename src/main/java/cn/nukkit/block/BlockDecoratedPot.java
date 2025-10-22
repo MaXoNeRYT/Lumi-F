@@ -6,6 +6,7 @@ import cn.nukkit.blockentity.impl.BlockEntityDecoratedPot;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.GenericParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.math.BlockFace;
@@ -134,8 +135,14 @@ public class BlockDecoratedPot extends BlockTransparentMeta implements Faceable,
 
     @Override
     public Item[] getDrops(Item item) {
-        return super.getDrops(item);
-        //TODO 调整掉落
+        Item drop = new ItemBlock(this, 0);
+
+        CompoundTag nbt = getBlockEntity().getCleanedNBT();
+        nbt.remove("isMovable");
+        nbt.remove("item");
+        drop.setCompoundTag(nbt);
+
+        return new Item[]{drop};
     }
 
     @Override

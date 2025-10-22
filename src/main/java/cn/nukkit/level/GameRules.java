@@ -49,10 +49,12 @@ public class GameRules {
         gameRules.gameRules.put(RANDOM_TICK_SPEED, new Value<>(Type.INTEGER, 3, 313)); // Vanilla: default 1
         gameRules.gameRules.put(SEND_COMMAND_FEEDBACK, new Value<>(Type.BOOLEAN, true, 361));
         gameRules.gameRules.put(SHOW_COORDINATES, new Value<>(Type.BOOLEAN, false));
+        gameRules.gameRules.put(SHOW_DAYS_PLAYED, new Value<>(Type.BOOLEAN, false, 685));
         gameRules.gameRules.put(SHOW_DEATH_MESSAGES, new Value<>(Type.BOOLEAN, true, 332));
         gameRules.gameRules.put(SHOW_TAGS, new Value<>(Type.BOOLEAN, true, 389));
-        gameRules.gameRules.put(SPAWN_RADIUS, new Value<>(Type.INTEGER, 5, 361));
+        gameRules.gameRules.put(SPAWN_RADIUS, new Value<>(Type.INTEGER, 10, 361));
         gameRules.gameRules.put(TNT_EXPLODES, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(TNT_EXPLOSION_DROP_DECAY, new Value<>(Type.BOOLEAN, false, 685));
         gameRules.gameRules.put(SHOW_BORDER_EFFECT, new Value<>(Type.BOOLEAN, true, 618));
         gameRules.gameRules.put(PLAYERS_SLEEPING_PERCENTAGE, new Value<>(Type.INTEGER, 100, 618));
         gameRules.gameRules.put(RECIPES_UNLOCK, new Value<>(Type.BOOLEAN, false, ProtocolInfo.v1_18_0));
@@ -251,29 +253,37 @@ public class GameRules {
     public enum Type {
         UNKNOWN {
             @Override
-            void write(BinaryStream pk, Value value) {
+            void write(int protocol, BinaryStream pk, Value value, boolean startGame) {
             }
         },
         BOOLEAN {
             @Override
-            void write(BinaryStream pk, Value value) {
+            void write(int protocol, BinaryStream pk, Value value, boolean startGame) {
                 pk.putBoolean(value.getValueAsBoolean());
             }
         },
         INTEGER {
             @Override
-            void write(BinaryStream pk, Value value) {
-                pk.putUnsignedVarInt(value.getValueAsInteger());
+            void write(int protocol, BinaryStream pk, Value value, boolean startGame) {
+                if (protocol >= ProtocolInfo.v1_21_110_26) {
+                    if (startGame) {
+                        pk.putVarInt(value.getValueAsInteger());
+                    } else {
+                        pk.putLInt(value.getValueAsInteger());
+                    }
+                } else {
+                    pk.putUnsignedVarInt(value.getValueAsInteger());
+                }
             }
         },
         FLOAT {
             @Override
-            void write(BinaryStream pk, Value value) {
+            void write(int protocol, BinaryStream pk, Value value, boolean startGame) {
                 pk.putLFloat(value.getValueAsFloat());
             }
         };
 
-        abstract void write(BinaryStream pk, Value value);
+        abstract void write(int protocol, BinaryStream pk, Value value, boolean startGame);
     }
 
     public static class Value<T> {
@@ -337,17 +347,15 @@ public class GameRules {
             return (Float) value;
         }
 
-        public void write(BinaryStream pk) {
-            Server.mvw("GameRules#write(BinaryStream)");
-            write(ProtocolInfo.CURRENT_PROTOCOL, pk);
+        public void write(BinaryStream pk, boolean startGame) {
+            Server.mvw("GameRules#write(BinaryStream, boolean)");
+            write(ProtocolInfo.CURRENT_PROTOCOL, pk, startGame);
         }
 
-        public void write(int protocol, BinaryStream pk) {
-            if (protocol >= ProtocolInfo.v1_17_0) {
-                pk.putBoolean(this.canBeChanged);
-            }
+        public void write(int protocol, BinaryStream pk, boolean startGame) {
+            pk.putBoolean(this.canBeChanged);
             pk.putUnsignedVarInt(type.ordinal());
-            type.write(pk, this);
+            type.write(protocol, pk, this, startGame);
         }
     }
 }

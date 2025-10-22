@@ -290,7 +290,7 @@ public class BlockEntityHopper extends BlockEntitySpawnableContainer implements 
                                 pushedItem = true;
                             }
                         }
-                    } else if (Registries.FUEL.hasBurningTime(itemToAdd.getIdentifier())) {
+                    } else if (Registries.FUEL.hasBurningTime(itemToAdd.getNamespaceId())) {
                         Item fuel = targetInv.getFuel();
                         if (fuel.isNull()) {
                             event = new InventoryMoveItemEvent(this.inventory, targetInv, this, itemToAdd, InventoryMoveItemEvent.Action.SLOT_CHANGE);

@@ -73,4 +73,9 @@ public class BarrelInventory extends ContainerInventory {
 
         this.getHolder().chunk.setChanged();
     }
+
+    @Override
+    public boolean canCauseVibration() {
+        return true;
+    }
 }

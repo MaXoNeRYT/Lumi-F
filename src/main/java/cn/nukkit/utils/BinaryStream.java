@@ -1309,12 +1309,12 @@ public class BinaryStream {
         this.putByte((byte) (rotation / (360d / 256d)));
     }
 
-    public void putGameRules(GameRules gameRules) {
-        Server.mvw("BinaryStream#putGameRules(GameRules)");
-        this.putGameRules(ProtocolInfo.CURRENT_PROTOCOL, gameRules);
+    public void putGameRules(GameRules gameRules, boolean startGame) {
+        Server.mvw("BinaryStream#putGameRules(GameRules, boolean)");
+        this.putGameRules(ProtocolInfo.CURRENT_PROTOCOL, gameRules, startGame);
     }
 
-    public void putGameRules(int protocol, GameRules gameRules) {
+    public void putGameRules(int protocol, GameRules gameRules, boolean startGame) {
         Map<GameRule, GameRules.Value> allGameRules = gameRules.getGameRules();
         Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>();
         allGameRules.forEach((gameRule, value) -> {
@@ -1325,11 +1325,11 @@ public class BinaryStream {
         this.putUnsignedVarInt(rulesToSend.size());
         rulesToSend.forEach((gameRule, value) -> {
             putString(gameRule.getName().toLowerCase(Locale.ROOT));
-            value.write(protocol, this);
+            value.write(protocol, this, startGame);
         });
     }
 
-    public void putGameRulesMap(int protocol, Map<GameRule, GameRules.Value> allGameRules) {
+    public void putGameRulesMap(int protocol, Map<GameRule, GameRules.Value> allGameRules, boolean startGame) {
         Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>();
         allGameRules.forEach((gameRule, value) -> {
             if (protocol > value.getMinProtocol()) {
@@ -1339,7 +1339,7 @@ public class BinaryStream {
         this.putUnsignedVarInt(rulesToSend.size());
         rulesToSend.forEach((gameRule, value) -> {
             putString(gameRule.getName().toLowerCase(Locale.ROOT));
-            value.write(protocol, this);
+            value.write(protocol, this, startGame);
         });
     }
 

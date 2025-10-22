@@ -228,7 +228,7 @@ public class Level implements ChunkManager, Metadatable {
     private final Long2ObjectNonBlockingMap<Player> players = new Long2ObjectNonBlockingMap<>();
 
     @NonComputationAtomic
-    public final Long2ObjectNonBlockingMap<Entity> entities = new Long2ObjectNonBlockingMap<>();
+    private final Long2ObjectNonBlockingMap<Entity> entities = new Long2ObjectNonBlockingMap<>();
 
     private final ConcurrentLinkedQueue<BlockEntity> updateBlockEntities = new ConcurrentLinkedQueue<>();
 
@@ -5033,7 +5033,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_21_100) {
+        if (protocol >= ProtocolInfo.v1_21_110_26) {
+            return ProtocolInfo.v1_21_111;
+        } else if (protocol >= ProtocolInfo.v1_21_100) {
             return ProtocolInfo.v1_21_100;
         } else if (protocol >= ProtocolInfo.v1_21_93) {
             return ProtocolInfo.v1_21_93;
@@ -5157,7 +5159,8 @@ public class Level implements ChunkManager, Metadatable {
             if (player >= ProtocolInfo.v1_21_70_24) if (player < ProtocolInfo.v1_21_80) return true;
         if (chunk == ProtocolInfo.v1_21_80) if (player < ProtocolInfo.v1_21_90) return true;
         if (chunk >= ProtocolInfo.v1_21_90) if (player < ProtocolInfo.v1_21_100) return true;
-        if(chunk >= ProtocolInfo.v1_21_100) return true;
+        if (chunk == ProtocolInfo.v1_21_100) if (player == ProtocolInfo.v1_21_100) return true;
+        if (chunk == ProtocolInfo.v1_21_111) if (player >= ProtocolInfo.v1_21_110_26) return true;
         return false; //TODO Multiversion  Remember to update when block palette changes
     }
 

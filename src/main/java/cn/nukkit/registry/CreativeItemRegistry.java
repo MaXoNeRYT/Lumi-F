@@ -48,7 +48,8 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
             ProtocolInfo.v1_21_80,
             ProtocolInfo.v1_21_90,
             ProtocolInfo.v1_21_93,
-            ProtocolInfo.v1_21_100
+            ProtocolInfo.v1_21_100,
+            ProtocolInfo.v1_21_111
     );
 
     @Override

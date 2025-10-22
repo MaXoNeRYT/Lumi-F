@@ -339,7 +339,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public double getFrictionFactor() {
-        return 0.6;
+        return DEFAULT_FRICTION_FACTOR;
     }
 
     public int getLightLevel() {

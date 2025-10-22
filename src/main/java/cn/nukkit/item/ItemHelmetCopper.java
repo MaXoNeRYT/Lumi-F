@@ -27,6 +27,11 @@ public class ItemHelmetCopper extends StringItemBase {
     }
 
     @Override
+    public boolean canBePutInHelmetSlot() {
+        return isHelmet();
+    }
+
+    @Override
     public int getArmorPoints() {
         return 2;
     }

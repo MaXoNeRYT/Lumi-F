@@ -72,7 +72,7 @@ public class StartGamePacket extends DataPacket {
     public int spawnY;
     public int spawnZ;
     public boolean hasAchievementsDisabled = true;
-    public boolean worldEditor;
+    public int editorWorldType;
     public int dayCycleStopTime = -1;
     public boolean eduMode = false;
     public int eduEditionOffer = 0;
@@ -203,7 +203,7 @@ public class StartGamePacket extends DataPacket {
         this.putBlockVector3(this.spawnX, this.spawnY, this.spawnZ);
         this.putBoolean(this.hasAchievementsDisabled);
         if (protocol >= ProtocolInfo.v1_19_10) {
-            this.putBoolean(this.worldEditor);
+            this.putVarInt(this.editorWorldType);
             if (protocol >= ProtocolInfo.v1_19_80) {
                 this.putBoolean(this.createdInEditor);
                 this.putBoolean(this.exportedFromEditor);
@@ -236,7 +236,7 @@ public class StartGamePacket extends DataPacket {
         }
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
-        this.putGameRules(protocol, gameRules);
+        this.putGameRules(protocol, gameRules, true);
         if (protocol >= ProtocolInfo.v1_16_100) {
             if (Server.getInstance().getSettings().features().enableExperimentMode() && !this.experiments.isEmpty()) {
                 this.putLInt(this.experiments.size()); // Experiment count

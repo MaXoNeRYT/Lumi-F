@@ -1,4 +1,8 @@
 {
+  "minecraft:chain": {
+    "protocol": 844,
+    "0": "minecraft:iron_chain"
+  },
   "minecraft:sponge": {
     "protocol": 729,
     "0": "minecraft:sponge",

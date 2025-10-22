@@ -172,12 +172,12 @@ public class BlockSapling extends BlockFlowable {
         Block air = Block.get(BlockID.AIR);
 
         if (bigTree) {
-            this.level.setBlock(this.add(x, 0, z), air, true, false);
-            this.level.setBlock(this.add(x + 1, 0, z), air, true, false);
-            this.level.setBlock(this.add(x, 0, z + 1), air, true, false);
-            this.level.setBlock(this.add(x + 1, 0, z + 1), air, true, false);
+            this.level.setBlock(this.add(x, 0, z), air, true, true);
+            this.level.setBlock(this.add(x + 1, 0, z), air, true, true);
+            this.level.setBlock(this.add(x, 0, z + 1), air, true, true);
+            this.level.setBlock(this.add(x + 1, 0, z + 1), air, true, true);
         } else {
-            this.level.setBlock(this, air, true, false);
+            this.level.setBlock(this, air, true, true);
         }
 
         if (!generator.generate(this.level, new NukkitRandom(), this.add(x, 0, z))) {

@@ -35,6 +35,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
     private static final BatchPacket CACHED_PACKET_544;
     private static final BatchPacket CACHED_PACKET_786;
     private static final BatchPacket CACHED_PACKET_800;
+    private static final BatchPacket CACHED_PACKET_827;
     private static final BatchPacket CACHED_PACKET;
 
     private static final byte[] TAG_361;
@@ -119,15 +120,28 @@ public class BiomeDefinitionListPacket extends DataPacket {
             }.getType());
             pk.protocol = ProtocolInfo.v1_21_100;
             pk.tryEncode();
-            CACHED_PACKET = pk.compress(Deflater.BEST_COMPRESSION);
+            CACHED_PACKET_827 = pk.compress(Deflater.BEST_COMPRESSION);
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading biome definitions 827", e);
+        }
+
+        try {
+            BiomeDefinitionListPacket pk = new BiomeDefinitionListPacket();
+            pk.biomeDefinitions = new GsonBuilder().registerTypeAdapter(Color.class, new ColorTypeAdapter()).create().fromJson(Utils.loadJsonResource("stripped_biome_definitions_844.json"), new TypeToken<LinkedHashMap<String, BiomeDefinitionData>>() {
+            }.getType());
+            pk.protocol = ProtocolInfo.v1_21_111;
+            pk.tryEncode();
+            CACHED_PACKET = pk.compress(Deflater.BEST_COMPRESSION);
+        } catch (Exception e) {
+            throw new AssertionError("Error whilst loading biome definitions 844", e);
         }
     }
 
     public static BatchPacket getCachedPacket(int protocol) {
-        if (protocol >= ProtocolInfo.v1_21_100) {
+        if (protocol >= ProtocolInfo.v1_21_110_26) {
             return CACHED_PACKET;
+        } else if (protocol >= ProtocolInfo.v1_21_100) {
+            return CACHED_PACKET_827;
         } else if (protocol >= ProtocolInfo.v1_21_80) {
             return CACHED_PACKET_800;
         } else if (protocol >= ProtocolInfo.v1_21_70_24) {
@@ -183,10 +197,14 @@ public class BiomeDefinitionListPacket extends DataPacket {
                 }
                 this.putLFloat(definition.getTemperature());
                 this.putLFloat(definition.getDownfall());
-                this.putLFloat(definition.getRedSporeDensity());
-                this.putLFloat(definition.getBlueSporeDensity());
-                this.putLFloat(definition.getAshDensity());
-                this.putLFloat(definition.getWhiteAshDensity());
+                if (protocol >= ProtocolInfo.v1_21_111) {
+                    this.putLFloat(definition.getFoliageSnow());
+                } else {
+                    this.putLFloat(definition.getRedSporeDensity());
+                    this.putLFloat(definition.getBlueSporeDensity());
+                    this.putLFloat(definition.getAshDensity());
+                    this.putLFloat(definition.getWhiteAshDensity());
+                }
                 this.putLFloat(definition.getDepth());
                 this.putLFloat(definition.getScale());
                 this.putLInt(definition.getMapWaterColor().getRGB());
@@ -219,6 +237,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
 
         public float temperature;
         public float downfall;
+        public float foliageSnow;
         public float redSporeDensity;
         public float blueSporeDensity;
         public float ashDensity;
@@ -229,11 +248,29 @@ public class BiomeDefinitionListPacket extends DataPacket {
         public boolean rain;
 
         @JsonCreator
+        public BiomeDefinitionData(float temperature, float downfall, float foliageSnow, float redSporeDensity,
+                                   float blueSporeDensity, float ashDensity, float whiteAshDensity, float depth,
+                                   float scale, Color mapWaterColor, boolean rain) {
+            this.temperature = temperature;
+            this.downfall = downfall;
+            this.foliageSnow = foliageSnow;
+            this.redSporeDensity = redSporeDensity;
+            this.blueSporeDensity = blueSporeDensity;
+            this.ashDensity = ashDensity;
+            this.whiteAshDensity = whiteAshDensity;
+            this.depth = depth;
+            this.scale = scale;
+            this.mapWaterColor = mapWaterColor;
+            this.rain = rain;
+        }
+
+        @JsonCreator
         public BiomeDefinitionData(float temperature, float downfall, float redSporeDensity,
                                    float blueSporeDensity, float ashDensity, float whiteAshDensity, float depth,
                                    float scale, Color mapWaterColor, boolean rain) {
             this.temperature = temperature;
             this.downfall = downfall;
+            this.foliageSnow = 0;
             this.redSporeDensity = redSporeDensity;
             this.blueSporeDensity = blueSporeDensity;
             this.ashDensity = ashDensity;

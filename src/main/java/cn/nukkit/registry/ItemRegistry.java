@@ -64,6 +64,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(COPPER_PICKAXE, ItemPickaxeCopper::new);
         register(COPPER_SHOVEL, ItemShovelCopper::new);
         register(COPPER_SWORD, ItemSwordCopper::new);
+        register(COPPER_HORSE_ARMOR, ItemHorseArmorCopper::new);
         register(CRIMSON_SIGN, ItemCrimsonSign::new);
         register(CYAN_DYE, ItemDyeCyan::new);
         register(DANGER_POTTERY_SHERD, ItemDangerPotterySherd::new);

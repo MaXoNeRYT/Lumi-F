@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.koshakmine"
-version = "1.2.0-SNAPSHOT"
+version = "1.3.0-SNAPSHOT"
 application.mainClass.set("cn.nukkit.Nukkit")
 
 java {
@@ -38,7 +38,7 @@ val log4j2Version = "2.17.1"
 val jlineVersion = "3.21.0"
 val leveldbMcpeJavaVersion = "1.0.1"
 val leveldbMcpeJniVersion = "0.0.10"
-val blockStateUpdaterVersion = "1.21.60-SNAPSHOT"
+val blockStateUpdaterVersion = "1.21.110-SNAPSHOT"
 
 dependencies {
     // Compile dependencies

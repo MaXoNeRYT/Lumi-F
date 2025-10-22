@@ -56,6 +56,7 @@ public class GlobalBlockPalette {
     private static BlockPalette blockPalette800;
     private static BlockPalette blockPalette818;
     private static BlockPalette blockPalette827;
+    private static BlockPalette blockPalette844;
 
     private static byte[] compiledTable407;
 
@@ -98,7 +99,12 @@ public class GlobalBlockPalette {
     }
 
     public static BlockPalette getPaletteByProtocol(int protocol) {
-        if(protocol >= ProtocolInfo.v1_21_100) {
+        if (protocol >= ProtocolInfo.v1_21_110_26) {
+            if (blockPalette844 == null) {
+                blockPalette844 = new BlockPalette(ProtocolInfo.v1_21_111);
+            }
+            return blockPalette844;
+        } else if (protocol >= ProtocolInfo.v1_21_100) {
             if (blockPalette827 == null) {
                 blockPalette827 = new BlockPalette(ProtocolInfo.v1_21_100);
             }
