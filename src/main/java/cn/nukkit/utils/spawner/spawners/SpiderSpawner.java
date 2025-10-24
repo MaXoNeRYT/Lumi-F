@@ -10,7 +10,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class SpiderSpawner extends AbstractEntitySpawner {
 
     public SpiderSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntitySpider.class, SpawnerType.MOB);
     }
 
     @Override
@@ -20,10 +20,5 @@ public class SpiderSpawner extends AbstractEntitySpawner {
                 this.spawnTask.createEntity("Spider", pos.add(0.5, 1, 0.5));
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntitySpider.NETWORK_ID;
     }
 }

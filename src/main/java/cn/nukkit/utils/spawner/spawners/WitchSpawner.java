@@ -11,7 +11,7 @@ import cn.nukkit.utils.Utils;
 public class WitchSpawner extends AbstractEntitySpawner {
 
     public WitchSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityWitch.class, SpawnerType.MOB);
     }
 
     @Override
@@ -25,10 +25,5 @@ public class WitchSpawner extends AbstractEntitySpawner {
                 this.spawnTask.createEntity("Witch", pos.add(0.5, 1, 0.5));
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityWitch.NETWORK_ID;
     }
 }

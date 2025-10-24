@@ -6,7 +6,6 @@ import cn.nukkit.entity.passive.EntityLlama;
 import cn.nukkit.entity.passive.EntityPig;
 import cn.nukkit.entity.passive.EntitySkeletonHorse;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
@@ -72,7 +71,6 @@ public abstract class EntityWalking extends BaseEntity {
                 return;
             }
 
-            // Random movement with better obstacle avoidance
             for (int attempts = 0; attempts < 10; attempts++) {
                 int x = Utils.rand(5, 15);
                 int z = Utils.rand(5, 15);
@@ -86,7 +84,6 @@ public abstract class EntityWalking extends BaseEntity {
                 }
             }
         } else if (Utils.rand(1, 100) == 1) {
-            // Random movement with better obstacle avoidance
             for (int attempts = 0; attempts < 10; attempts++) {
                 int x = Utils.rand(5, 15);
                 int z = Utils.rand(5, 15);
@@ -101,7 +98,6 @@ public abstract class EntityWalking extends BaseEntity {
                 }
             }
         } else if (this.moveTime <= 0 || this.target == null) {
-            // Random movement with better obstacle avoidance
             for (int attempts = 0; attempts < 10; attempts++) {
                 int x = Utils.rand(10, 20);
                 int z = Utils.rand(10, 20);
@@ -127,7 +123,6 @@ public abstract class EntityWalking extends BaseEntity {
         Block below = level.getBlock(x, y - 1, z);
         Block above = level.getBlock(x, y + 1, z);
 
-        // Поддержка ступеней и плит как проходимых поверхностей
         boolean isBelowWalkable = below.isSolid() || below instanceof BlockStairs || below instanceof BlockSlab;
         boolean isBlockPassable = block.canPassThrough() || block instanceof BlockStairs || block instanceof BlockSlab;
 
@@ -135,7 +130,6 @@ public abstract class EntityWalking extends BaseEntity {
             return true;
         }
 
-        // Проверка подъёма на 1 блок (ступени/плиты)
         if (level.getBlock(x, y + 1, z).canPassThrough() &&
                 level.getBlock(x, y + 2, z).canPassThrough() &&
                 (block.isSolid() || block instanceof BlockStairs || block instanceof BlockSlab)) {
@@ -178,7 +172,6 @@ public abstract class EntityWalking extends BaseEntity {
         Block block = that.getSide(this.getHorizontalFacing());
         Block down;
 
-        // Improved obstacle detection including stairs and 1-block steps
         if (block instanceof BlockStairs || block instanceof BlockSlab) {
             if (this.motionY <= this.getGravity() * 4) {
                 this.motionY = this.getGravity() * 4;
@@ -186,7 +179,6 @@ public abstract class EntityWalking extends BaseEntity {
             return true;
         }
 
-        // Check for 1-block step up
         if (!block.canPassThrough() && block.up().canPassThrough() && that.up(2).canPassThrough()) {
             if (this.motionY <= this.getGravity() * 4) {
                 this.motionY = this.getGravity() * 4;
@@ -196,9 +188,7 @@ public abstract class EntityWalking extends BaseEntity {
 
         down = block.down();
         if (this.followTarget == null && this.passengers.isEmpty()) {
-            // Check for 1-block drop
             if (!down.isSolid() && !block.isSolid() && down.down().isSolid()) {
-                // It's a 1-block drop, allow mob to walk off
                 return true;
             }
 
@@ -252,7 +242,6 @@ public abstract class EntityWalking extends BaseEntity {
 
             if (this.getServer().getSettings().world().entity().mobAi()) {
                 if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
-                    // Follow calculated path if available
                     if (!this.currentPath.isEmpty() && this.pathIndex < this.currentPath.size()) {
                         Vector3 nextPoint = this.currentPath.get(this.pathIndex);
                         if (this.distance(nextPoint) < 1.0) {
@@ -272,7 +261,6 @@ public abstract class EntityWalking extends BaseEntity {
                             }
                         }
                     } else {
-                        // Fall back to direct movement if no path
                         double x = this.followTarget.x - this.x;
                         double z = this.followTarget.z - this.z;
                         double diff = Math.abs(x) + Math.abs(z);

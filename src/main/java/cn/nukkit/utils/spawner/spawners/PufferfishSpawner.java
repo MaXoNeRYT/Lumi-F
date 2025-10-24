@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 public class PufferfishSpawner extends AbstractEntitySpawner {
 
     public PufferfishSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityPufferfish.class, SpawnerType.WATER);
     }
 
     @Override
@@ -32,11 +32,6 @@ public class PufferfishSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityPufferfish.NETWORK_ID;
     }
 
     @Override

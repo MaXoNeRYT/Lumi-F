@@ -47,7 +47,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
     private static boolean[] DIFFUSES_SKY_LIGHT = new boolean[65536];
 
     private static final List<CustomBlockDefinition> CUSTOM_BLOCK_DEFINITIONS = new ArrayList<>();
-    private static final Int2ObjectMap<CustomBlock> ID_TO_CUSTOM_BLOCK = new Int2ObjectOpenHashMap<>();
+    public static final Int2ObjectMap<CustomBlock> ID_TO_CUSTOM_BLOCK = new Int2ObjectOpenHashMap<>();
     private static final ConcurrentHashMap<String, Integer> CUSTOM_BLOCK_ID_MAP = new ConcurrentHashMap<>();
     private static final Map<String, List<CustomBlockUtil.CustomBlockState>> LEGACY_2_CUSTOM_STATE = new HashMap<>();
     private final static SortedMap<String, CustomBlock> HASHED_SORTED_CUSTOM_BLOCK = new TreeMap<>(HashedPaletteComparator.INSTANCE);

@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class DolphinSpawner extends AbstractEntitySpawner {
 
     public DolphinSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityDolphin.class, SpawnerType.WATER);
     }
 
     @Override
@@ -37,10 +37,5 @@ public class DolphinSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityDolphin.NETWORK_ID;
     }
 }

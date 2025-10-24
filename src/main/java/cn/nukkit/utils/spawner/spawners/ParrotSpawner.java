@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 public class ParrotSpawner extends AbstractEntitySpawner {
 
     public ParrotSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityParrot.class, SpawnerType.AMBIENT);
     }
 
     @Override
@@ -31,10 +31,5 @@ public class ParrotSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityParrot.NETWORK_ID;
     }
 }

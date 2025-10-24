@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class FoxSpawner extends AbstractEntitySpawner {
 
     public FoxSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityFox.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -36,10 +36,5 @@ public class FoxSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityFox.NETWORK_ID;
     }
 }

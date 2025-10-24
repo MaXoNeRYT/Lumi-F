@@ -13,6 +13,7 @@ import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.LevelDBConstants;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.registry.BlockRegistry;
 import cn.nukkit.registry.Registries;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -225,6 +226,15 @@ public class CustomBlockUtil {
                 runtimeId++;
             }
         }
+    }
+
+    public static CustomBlock getCustomBlockByIdentifier(String identifier) {
+        for (CustomBlock customBlock : BlockRegistry.ID_TO_CUSTOM_BLOCK.values()) {
+            if (customBlock.getIdentifier().equalsIgnoreCase(identifier)) {
+                return customBlock;
+            }
+        }
+        return null;
     }
 
     @Data

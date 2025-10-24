@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 public class SalmonSpawner extends AbstractEntitySpawner {
 
     public SalmonSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntitySalmon.class, SpawnerType.WATER);
     }
 
     @Override
@@ -32,11 +32,6 @@ public class SalmonSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntitySalmon.NETWORK_ID;
     }
 
     @Override

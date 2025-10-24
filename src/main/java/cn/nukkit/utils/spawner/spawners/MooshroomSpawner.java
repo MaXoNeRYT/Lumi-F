@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class MooshroomSpawner extends AbstractEntitySpawner {
 
     public MooshroomSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityMooshroom.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -35,10 +35,5 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityMooshroom.NETWORK_ID;
     }
 }

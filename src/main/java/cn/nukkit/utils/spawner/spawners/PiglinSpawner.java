@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class PiglinSpawner extends AbstractEntitySpawner {
 
     public PiglinSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityPiglin.class, SpawnerType.AMBIENT);
     }
 
     @Override
@@ -27,10 +27,5 @@ public class PiglinSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityPiglin.NETWORK_ID;
     }
 }

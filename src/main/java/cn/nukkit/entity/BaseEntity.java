@@ -65,6 +65,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         put("minecraft:netherite_leggings", 6f);
         put("minecraft:netherite_boots", 3f);
 
+        //NOSENS
+
         put("minecraft:turtle_helmet", 2f);
 
         put("fireshaldrpg:leather_helmet", 1f);
@@ -72,25 +74,25 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         put("fireshaldrpg:leather_platelegs", 2f);
         put("fireshaldrpg:leather_boots", 1f);
 
-        put("fireshaldrpg:adamant_helm", 6f);
-        put("fireshaldrpg:adamant_platebody", 8f);
-        put("fireshaldrpg:adamant_platelegs", 7f);
-        put("fireshaldrpg:adamant_boots", 6f);
+        put("fireshaldrpg:copper_helm", 2f);
+        put("fireshaldrpg:copper_platebody", 4f);
+        put("fireshaldrpg:copper_platelegs", 3f);
+        put("fireshaldrpg:copper_boots", 2f);
+
+        put("fireshaldrpg:iron_helm", 3f);
+        put("fireshaldrpg:iron_platebody", 5f);
+        put("fireshaldrpg:iron_platelegs", 4f);
+        put("fireshaldrpg:iron_boots", 3f);
 
         put("fireshaldrpg:black_helm", 3f);
         put("fireshaldrpg:black_platebody", 5f);
         put("fireshaldrpg:black_platelegs", 4f);
         put("fireshaldrpg:black_boots", 3f);
 
-        put("fireshaldrpg:bronze_helm", 2f);
-        put("fireshaldrpg:bronze_platebody", 4f);
-        put("fireshaldrpg:bronze_platelegs", 3f);
-        put("fireshaldrpg:bronze_boots", 2f);
-
-        put("fireshaldrpg:iron_helm", 3f);
-        put("fireshaldrpg:iron_platebody", 5f);
-        put("fireshaldrpg:iron_platelegs", 4f);
-        put("fireshaldrpg:iron_boots", 3f);
+        put("fireshaldrpg:steel_helm", 4f);
+        put("fireshaldrpg:steel_platebody", 6f);
+        put("fireshaldrpg:steel_platelegs", 5f);
+        put("fireshaldrpg:steel_boots", 4f);
 
         put("fireshaldrpg:mithril_helm", 5f);
         put("fireshaldrpg:mithril_platebody", 7f);
@@ -102,6 +104,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         put("fireshaldrpg:drake_bone_platebody", 7f);
         put("fireshaldrpg:drake_bone_platelegs", 6f);
 
+        put("fireshaldrpg:adamant_helm", 6f);
+        put("fireshaldrpg:adamant_platebody", 8f);
+        put("fireshaldrpg:adamant_platelegs", 7f);
+        put("fireshaldrpg:adamant_boots", 6f);
+
         put("fireshaldrpg:wrought_helm", 7f);
         put("fireshaldrpg:argent_platebody", 9f);
         put("fireshaldrpg:argent_platelegs", 8f);
@@ -112,10 +119,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         put("fireshaldrpg:rune_platelegs", 8f);
         put("fireshaldrpg:rune_boots", 7f);
 
-        put("fireshaldrpg:steel_helm", 4f);
-        put("fireshaldrpg:steel_platebody", 6f);
-        put("fireshaldrpg:steel_platelegs", 5f);
-        put("fireshaldrpg:steel_boots", 4f);
     }};
 
 
@@ -513,134 +516,175 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         Item leggings = Item.get(0);
         Item boots = Item.get(0);
 
-        switch (Utils.rand(1, 5)) {
-            case 1 -> {
-                if (Utils.rand(1, 100) < 39 && Utils.rand(0, 1) == 0) {
-                    helmet = Item.get(Item.LEATHER_HELMET, Utils.rand(30, 48), 1);
+        // Шлем
+        switch (Utils.rand(1, 7)) {
+            case 1 -> { // Leather
+                if (Utils.rand(1, 100) < 40) {
+                    helmet = Item.get("fireshaldrpg:leather_helmet", Utils.rand(30, 48), 1);
                 }
             }
-            case 2 -> {
-                if (Utils.rand(1, 100) < 50 && Utils.rand(0, 1) == 0) {
-                    helmet = Item.get(Item.GOLD_HELMET, Utils.rand(40, 70), 1);
+            case 2 -> { // Copper
+                if (Utils.rand(1, 100) < 30) {
+                    helmet = Item.get("fireshaldrpg:copper_helm", Utils.rand(50, 70), 1);
                 }
             }
-            case 3 -> {
-                if (Utils.rand(1, 100) < 14 && Utils.rand(0, 1) == 0) {
-                    helmet = Item.get(Item.CHAIN_HELMET, Utils.rand(100, 160), 1);
+            case 3 -> { // Iron
+                if (Utils.rand(1, 100) < 20) {
+                    helmet = Item.get("fireshaldrpg:iron_helm", Utils.rand(100, 188), 1);
                 }
             }
-            case 4 -> {
-                if (Utils.rand(1, 100) < 3 && Utils.rand(0, 1) == 0) {
-                    helmet = Item.get(Item.IRON_HELMET, Utils.rand(100, 160), 1);
+            case 4 -> { // Black
+                if (Utils.rand(1, 100) < 15) {
+                    helmet = Item.get("fireshaldrpg:black_helm", Utils.rand(120, 200), 1);
                 }
             }
-            case 5 -> {
-                if (Utils.rand(1, 100) == 100 && Utils.rand(0, 1) == 0) {
-                    helmet = Item.get(Item.DIAMOND_HELMET, Utils.rand(190, 256), 1);
+            case 5 -> { // Steel
+                if (Utils.rand(1, 100) < 10) {
+                    helmet = Item.get("fireshaldrpg:steel_helm", Utils.rand(150, 220), 1);
+                }
+            }
+            case 6 -> { // Mithril
+                if (Utils.rand(1, 100) < 5) {
+                    helmet = Item.get("fireshaldrpg:mithril_helm", Utils.rand(180, 250), 1);
+                }
+            }
+            case 7 -> { // Adamant
+                if (Utils.rand(1, 100) < 2) {
+                    helmet = Item.get("fireshaldrpg:adamant_helm", Utils.rand(200, 280), 1);
                 }
             }
         }
-
         slots[0] = helmet;
 
+        // Нагрудник
         if (Utils.rand(1, 4) != 1) {
-            switch (Utils.rand(1, 5)) {
+            switch (Utils.rand(1, 7)) {
                 case 1 -> {
-                    if (Utils.rand(1, 100) < 39 && Utils.rand(0, 1) == 0) {
-                        chestplate = Item.get(Item.LEATHER_CHESTPLATE, Utils.rand(60, 73), 1);
+                    if (Utils.rand(1, 100) < 40) {
+                        chestplate = Item.get("fireshaldrpg:leather_platebody", Utils.rand(60, 73), 1);
                     }
                 }
                 case 2 -> {
-                    if (Utils.rand(1, 100) < 50 && Utils.rand(0, 1) == 0) {
-                        chestplate = Item.get(Item.GOLD_CHESTPLATE, Utils.rand(65, 105), 1);
+                    if (Utils.rand(1, 100) < 30) {
+                        chestplate = Item.get("fireshaldrpg:copper_platebody", Utils.rand(80, 120), 1);
                     }
                 }
                 case 3 -> {
-                    if (Utils.rand(1, 100) < 14 && Utils.rand(0, 1) == 0) {
-                        chestplate = Item.get(Item.CHAIN_CHESTPLATE, Utils.rand(170, 233), 1);
+                    if (Utils.rand(1, 100) < 20) {
+                        chestplate = Item.get("fireshaldrpg:iron_platebody", Utils.rand(170, 233), 1);
                     }
                 }
                 case 4 -> {
-                    if (Utils.rand(1, 100) < 3 && Utils.rand(0, 1) == 0) {
-                        chestplate = Item.get(Item.IRON_CHESTPLATE, Utils.rand(170, 233), 1);
+                    if (Utils.rand(1, 100) < 15) {
+                        chestplate = Item.get("fireshaldrpg:black_platebody", Utils.rand(180, 240), 1);
                     }
                 }
                 case 5 -> {
-                    if (Utils.rand(1, 100) == 100 && Utils.rand(0, 1) == 0) {
-                        chestplate = Item.get(Item.DIAMOND_CHESTPLATE, Utils.rand(421, 521), 1);
+                    if (Utils.rand(1, 100) < 10) {
+                        chestplate = Item.get("fireshaldrpg:steel_platebody", Utils.rand(200, 260), 1);
+                    }
+                }
+                case 6 -> {
+                    if (Utils.rand(1, 100) < 5) {
+                        chestplate = Item.get("fireshaldrpg:mithril_platebody", Utils.rand(240, 300), 1);
+                    }
+                }
+                case 7 -> {
+                    if (Utils.rand(1, 100) < 2) {
+                        chestplate = Item.get("fireshaldrpg:adamant_platebody", Utils.rand(300, 360), 1);
                     }
                 }
             }
         }
-
         slots[1] = chestplate;
 
+        // Поножи
         if (Utils.rand(1, 2) == 2) {
-            switch (Utils.rand(1, 5)) {
+            switch (Utils.rand(1, 7)) {
                 case 1 -> {
-                    if (Utils.rand(1, 100) < 39 && Utils.rand(0, 1) == 0) {
-                        leggings = Item.get(Item.LEATHER_LEGGINGS, Utils.rand(35, 68), 1);
+                    if (Utils.rand(1, 100) < 40) {
+                        leggings = Item.get("fireshaldrpg:leather_platelegs", Utils.rand(35, 68), 1);
                     }
                 }
                 case 2 -> {
-                    if (Utils.rand(1, 100) < 50 && Utils.rand(0, 1) == 0) {
-                        leggings = Item.get(Item.GOLD_LEGGINGS, Utils.rand(50, 98), 1);
+                    if (Utils.rand(1, 100) < 30) {
+                        leggings = Item.get("fireshaldrpg:copper_platelegs", Utils.rand(60, 100), 1);
                     }
                 }
                 case 3 -> {
-                    if (Utils.rand(1, 100) < 14 && Utils.rand(0, 1) == 0) {
-                        leggings = Item.get(Item.CHAIN_LEGGINGS, Utils.rand(170, 218), 1);
+                    if (Utils.rand(1, 100) < 20) {
+                        leggings = Item.get("fireshaldrpg:iron_platelegs", Utils.rand(170, 218), 1);
                     }
                 }
                 case 4 -> {
-                    if (Utils.rand(1, 100) < 3 && Utils.rand(0, 1) == 0) {
-                        leggings = Item.get(Item.IRON_LEGGINGS, Utils.rand(170, 218), 1);
+                    if (Utils.rand(1, 100) < 15) {
+                        leggings = Item.get("fireshaldrpg:black_platelegs", Utils.rand(180, 230), 1);
                     }
                 }
                 case 5 -> {
-                    if (Utils.rand(1, 100) == 100 && Utils.rand(0, 1) == 0) {
-                        leggings = Item.get(Item.DIAMOND_LEGGINGS, Utils.rand(388, 488), 1);
+                    if (Utils.rand(1, 100) < 10) {
+                        leggings = Item.get("fireshaldrpg:steel_platelegs", Utils.rand(200, 250), 1);
+                    }
+                }
+                case 6 -> {
+                    if (Utils.rand(1, 100) < 5) {
+                        leggings = Item.get("fireshaldrpg:mithril_platelegs", Utils.rand(240, 290), 1);
+                    }
+                }
+                case 7 -> {
+                    if (Utils.rand(1, 100) < 2) {
+                        leggings = Item.get("fireshaldrpg:adamant_platelegs", Utils.rand(300, 350), 1);
                     }
                 }
             }
         }
-
         slots[2] = leggings;
 
+        // Ботинки
         if (Utils.rand(1, 5) < 3) {
-            switch (Utils.rand(1, 5)) {
+            switch (Utils.rand(1, 7)) {
                 case 1 -> {
-                    if (Utils.rand(1, 100) < 39 && Utils.rand(0, 1) == 0) {
-                        boots = Item.get(Item.LEATHER_BOOTS, Utils.rand(35, 58), 1);
+                    if (Utils.rand(1, 100) < 40) {
+                        boots = Item.get("fireshaldrpg:leather_boots", Utils.rand(35, 58), 1);
                     }
                 }
                 case 2 -> {
-                    if (Utils.rand(1, 100) < 50 && Utils.rand(0, 1) == 0) {
-                        boots = Item.get(Item.GOLD_BOOTS, Utils.rand(50, 86), 1);
+                    if (Utils.rand(1, 100) < 30) {
+                        boots = Item.get("fireshaldrpg:copper_boots", Utils.rand(50, 86), 1);
                     }
                 }
                 case 3 -> {
-                    if (Utils.rand(1, 100) < 14 && Utils.rand(0, 1) == 0) {
-                        boots = Item.get(Item.CHAIN_BOOTS, Utils.rand(100, 188), 1);
+                    if (Utils.rand(1, 100) < 20) {
+                        boots = Item.get("fireshaldrpg:iron_boots", Utils.rand(100, 188), 1);
                     }
                 }
                 case 4 -> {
-                    if (Utils.rand(1, 100) < 3 && Utils.rand(0, 1) == 0) {
-                        boots = Item.get(Item.IRON_BOOTS, Utils.rand(100, 188), 1);
+                    if (Utils.rand(1, 100) < 15) {
+                        boots = Item.get("fireshaldrpg:black_boots", Utils.rand(120, 200), 1);
                     }
                 }
                 case 5 -> {
-                    if (Utils.rand(1, 100) == 100 && Utils.rand(0, 1) == 0) {
-                        boots = Item.get(Item.DIAMOND_BOOTS, Utils.rand(350, 428), 1);
+                    if (Utils.rand(1, 100) < 10) {
+                        boots = Item.get("fireshaldrpg:steel_boots", Utils.rand(150, 220), 1);
+                    }
+                }
+                case 6 -> {
+                    if (Utils.rand(1, 100) < 5) {
+                        boots = Item.get("fireshaldrpg:mithril_boots", Utils.rand(180, 250), 1);
+                    }
+                }
+                case 7 -> {
+                    if (Utils.rand(1, 100) < 2) {
+                        boots = Item.get("fireshaldrpg:adamant_boots", Utils.rand(200, 280), 1);
                     }
                 }
             }
         }
-
         slots[3] = boots;
 
         return slots;
     }
+
 
     /**
      * Increases mob's health according to armor the mob has (temporary workaround until armor damage modifiers are implemented for mobs)

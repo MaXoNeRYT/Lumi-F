@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 public class HoglinSpawner extends AbstractEntitySpawner {
 
     public HoglinSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityHoglin.class, SpawnerType.MOB);
     }
 
     @Override
@@ -31,10 +31,5 @@ public class HoglinSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityHoglin.NETWORK_ID;
     }
 }

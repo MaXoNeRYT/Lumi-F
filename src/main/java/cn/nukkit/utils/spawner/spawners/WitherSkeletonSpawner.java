@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 public class WitherSkeletonSpawner extends AbstractEntitySpawner {
 
     public WitherSkeletonSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityWitherSkeleton.class, SpawnerType.MOB);
     }
 
     @Override
@@ -23,10 +23,5 @@ public class WitherSkeletonSpawner extends AbstractEntitySpawner {
         if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.NETHER_BRICKS) {
             this.spawnTask.createEntity("WitherSkeleton", pos.add(0.5, 1, 0.5));
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityWitherSkeleton.NETWORK_ID;
     }
 }

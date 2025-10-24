@@ -14,12 +14,17 @@ import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.format.Chunk;
+import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.spawner.spawners.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,16 +32,21 @@ import java.util.Map;
  */
 public class EntitySpawnerTask implements Runnable {
 
-    private final Map<Class<?>, EntitySpawner> animalSpawners = new HashMap<>();
-    private final Map<Class<?>, EntitySpawner> mobSpawners = new HashMap<>();
+    public final Map<Class<?>, EntitySpawner> animalSpawners = new HashMap<>();
+    public final Map<Class<?>, EntitySpawner> mobSpawners = new HashMap<>();
+    public final List<EntitySpawner> customSpawners = new ArrayList<>();
+    private static final List<EntitySpawnerRegistration> registrationHooks = new ArrayList<>();
+    public final Map<String, EntitySpawner> pluginAnimalSpawners = new HashMap<>();
+    public final Map<String, EntitySpawner> pluginMobSpawners = new HashMap<>();
 
-    /**
-     * Split monster and animal spawning to different ticks to avoid lag spikes
-     * Animals and monsters are spawned every other time the spawer task runs
-     */
+
     private boolean mobsNext;
 
     public EntitySpawnerTask() {
+        this.registerDefaultSpawners();
+    }
+
+    private void registerDefaultSpawners() {
         this.registerAnimalSpawner(BatSpawner.class);
         this.registerAnimalSpawner(ChickenSpawner.class);
         this.registerAnimalSpawner(CowSpawner.class);
@@ -79,86 +89,22 @@ public class EntitySpawnerTask implements Runnable {
         this.registerMobSpawner(PhantomSpawner.class);
         this.registerMobSpawner(PiglinSpawner.class);
         this.registerMobSpawner(HoglinSpawner.class);
-    }
-
-    /**
-     * Register animal spawner
-     *
-     * @param clazz spawner class
-     * @return whether the spawner was registered successfully (no errors and not already registered)
-     */
-    public boolean registerAnimalSpawner(Class<?> clazz) {
-        if (this.animalSpawners.containsKey(clazz)) {
-            return false;
+        for (EntitySpawnerRegistration hook : registrationHooks) {
+            try {
+                hook.register(this);
+            } catch (Exception e) {
+                Server.getInstance().getLogger().error("Failed to register plugin spawners", e);
+            }
         }
-
-        try {
-            EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(EntitySpawnerTask.class).newInstance(this);
-            this.animalSpawners.put(clazz, spawner);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
     }
 
-    /**
-     * Get EntitySpawner for class
-     *
-     * @param clazz spawner class
-     * @return EntitySpawner
-     */
-    public EntitySpawner getAnimalSpawner(Class<?> clazz) {
-        return this.animalSpawners.get(clazz);
+
+    public static void addRegistrationHook(EntitySpawnerRegistration hook) {
+        registrationHooks.add(hook);
     }
 
-    /**
-     * Unregister animal spawner
-     *
-     * @param clazz spawner class
-     * @return succeed
-     */
-    public boolean unregisterAnimalSpawner(Class<?> clazz) {
-        return this.animalSpawners.remove(clazz) != null;
-    }
-
-    /**
-     * Register monster spawner
-     *
-     * @param clazz spawner class
-     * @return whether the spawner was registered successfully (no errors and not already registered)
-     */
-    public boolean registerMobSpawner(Class<?> clazz) {
-        if (this.mobSpawners.containsKey(clazz)) {
-            return false;
-        }
-
-        try {
-            EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(EntitySpawnerTask.class).newInstance(this);
-            this.mobSpawners.put(clazz, spawner);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Get EntitySpawner for class
-     *
-     * @param clazz spawner class
-     * @return EntitySpawner
-     */
-    public EntitySpawner getMobSpawner(Class<?> clazz) {
-        return this.mobSpawners.get(clazz);
-    }
-
-    /**
-     * Unregister monster spawner
-     *
-     * @param clazz spawner class
-     * @return succeed
-     */
-    public boolean unregisterMobSpawner(Class<?> clazz) {
-        return this.mobSpawners.remove(clazz) != null;
+    public interface EntitySpawnerRegistration {
+        void register(EntitySpawnerTask task);
     }
 
     @Override
@@ -170,6 +116,9 @@ public class EntitySpawnerTask implements Runnable {
                     for (EntitySpawner spawner : mobSpawners.values()) {
                         spawner.spawn();
                     }
+                    for (EntitySpawner spawner : pluginMobSpawners.values()) {
+                        spawner.spawn();
+                    }
                 }
             } else {
                 mobsNext = true;
@@ -177,28 +126,142 @@ public class EntitySpawnerTask implements Runnable {
                     for (EntitySpawner spawner : animalSpawners.values()) {
                         spawner.spawn();
                     }
+                    for (EntitySpawner spawner : pluginAnimalSpawners.values()) {
+                        spawner.spawn();
+                    }
                 }
+            }
+
+            for (EntitySpawner spawner : customSpawners) {
+                spawner.spawn();
             }
         }
     }
 
     /**
-     * Check if mob spawning is allowed
-     *
-     * @param level world
-     * @param networkId mob network id
-     * @param player player
-     * @return whether mob spawning is possible near the player
+     * Register animal spawner from plugin by class
      */
-    static boolean entitySpawnAllowed(Level level, int networkId, Player player) {
-        if (networkId == EntityPhantom.NETWORK_ID && (player.getTimeSinceRest() < 72000 || player.isSleeping() || player.isSpectator() || !level.getGameRules().getBoolean(GameRule.DO_INSOMNIA))) {
+    public boolean registerAnimalSpawner(Class<? extends EntitySpawner> clazz) {
+        return registerAnimalSpawner(clazz, null);
+    }
+
+    /**
+     * Register animal spawner from plugin by class with plugin name
+     */
+    public boolean registerAnimalSpawner(Class<? extends EntitySpawner> clazz, String pluginName) {
+        if (this.animalSpawners.containsKey(clazz) ||
+                (pluginName != null && this.pluginAnimalSpawners.containsKey(pluginName + ":" + clazz.getSimpleName()))) {
             return false;
         }
-        int max = getMaxSpawns(networkId, level.getDimension() == Level.DIMENSION_NETHER, level.getDimension() == Level.DIMENSION_THE_END);
+
+        try {
+            EntitySpawner spawner = clazz.getConstructor(EntitySpawnerTask.class).newInstance(this);
+            if (pluginName != null) {
+                this.pluginAnimalSpawners.put(pluginName + ":" + clazz.getSimpleName(), spawner);
+            } else {
+                this.animalSpawners.put(clazz, spawner);
+            }
+            return true;
+        } catch (Exception e) {
+            Server.getInstance().getLogger().error("Failed to register animal spawner: " + clazz.getName(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Register mob spawner from plugin by class
+     */
+    public boolean registerMobSpawner(Class<? extends EntitySpawner> clazz) {
+        return registerMobSpawner(clazz, null);
+    }
+
+    /**
+     * Register mob spawner from plugin by class with plugin name
+     */
+    public boolean registerMobSpawner(Class<? extends EntitySpawner> clazz, String pluginName) {
+        if (this.mobSpawners.containsKey(clazz) ||
+                (pluginName != null && this.pluginMobSpawners.containsKey(pluginName + ":" + clazz.getSimpleName()))) {
+            return false;
+        }
+
+        try {
+            EntitySpawner spawner = clazz.getConstructor(EntitySpawnerTask.class).newInstance(this);
+            if (pluginName != null) {
+                this.pluginMobSpawners.put(pluginName + ":" + clazz.getSimpleName(), spawner);
+            } else {
+                this.mobSpawners.put(clazz, spawner);
+            }
+            return true;
+        } catch (Exception e) {
+            Server.getInstance().getLogger().error("Failed to register mob spawner: " + clazz.getName(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Register custom spawner from plugin
+     */
+    public boolean registerCustomSpawner(EntitySpawner spawner) {
+        return registerCustomSpawner(spawner, null);
+    }
+
+    /**
+     * Register custom spawner from plugin with plugin name
+     */
+    public boolean registerCustomSpawner(EntitySpawner spawner, String pluginName) {
+        if (!customSpawners.contains(spawner)) {
+            customSpawners.add(spawner);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Unregister all spawners from plugin
+     */
+    public boolean unregisterPluginSpawners(String pluginName) {
+        boolean removed = false;
+
+        // Удаляем animal spawners
+        removed |= pluginAnimalSpawners.keySet().removeIf(key -> key.startsWith(pluginName + ":"));
+
+        // Удаляем mob spawners
+        removed |= pluginMobSpawners.keySet().removeIf(key -> key.startsWith(pluginName + ":"));
+
+        return removed;
+    }
+    /**
+     * Unregister specific spawner from plugin
+     */
+    public boolean unregisterPluginSpawner(String pluginName, Class<? extends EntitySpawner> clazz) {
+        String key = pluginName + ":" + clazz.getSimpleName();
+        boolean removed = false;
+
+        removed |= pluginAnimalSpawners.remove(key) != null;
+        removed |= pluginMobSpawners.remove(key) != null;
+
+        return removed;
+    }
+
+    static boolean entitySpawnAllowed(Level level, Class<? extends BaseEntity> entityClass, Player player, AbstractEntitySpawner spawner) {
+        if (spawner.ignoreMaxSpawnRules) {
+            return true;
+        }
+
+        if (entityClass == EntityPhantom.class &&
+                (player.getTimeSinceRest() < 72000 || player.isSleeping() ||
+                        player.isSpectator() || !level.getGameRules().getBoolean(GameRule.DO_INSOMNIA))) {
+            return false;
+        }
+
+        int max = getMaxSpawns(entityClass, level.getDimension() == Level.DIMENSION_NETHER,
+                level.getDimension() == Level.DIMENSION_THE_END);
         if (max == 0) return false;
+
         int count = 0;
         for (Entity entity : level.getEntities()) {
-            if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(player.x, entity.y, player.z).distanceSquared(entity) < 16384) { // 128 blocks
+            if (entity.isAlive() && entity.getClass() == entityClass &&
+                    new Vector3(player.x, entity.y, player.z).distanceSquared(entity) < 16384) {
                 count++;
                 if (count > max) {
                     return false;
@@ -206,6 +269,32 @@ public class EntitySpawnerTask implements Runnable {
             }
         }
         return count < max;
+    }
+
+
+    /**
+     * Get maximum amount of mobs in distance
+     */
+    private static int getMaxSpawns(Class<? extends BaseEntity> entityClass, boolean nether, boolean end) {
+        if (entityClass == EntityZombiePigman.class || entityClass == EntityPiglin.class || entityClass == EntityHoglin.class) {
+            return nether ? 4 : 0;
+        } else if (entityClass == EntityGhast.class || entityClass == EntityMagmaCube.class ||
+                entityClass == EntityBlaze.class || entityClass == EntityWitherSkeleton.class ||
+                entityClass == EntityStrider.class) {
+            return nether ? 2 : 0;
+        } else if (entityClass == EntityEnderman.class) {
+            return end ? 10 : 2;
+        } else if (entityClass == EntitySalmon.class || entityClass == EntityCod.class) {
+            return end || nether ? 0 : 4;
+        } else if (entityClass == EntityWitch.class) {
+            return end || nether ? 0 : 1;
+        } else if (entityClass == EntityPhantom.class) {
+            Difficulty difficulty = Server.getInstance().getDifficulty();
+            return end || nether ? 0 : difficulty == Difficulty.EASY ? 2 :
+                    difficulty == Difficulty.NORMAL ? 3 : 4;
+        } else {
+            return end || nether ? 0 : 2;
+        }
     }
 
     /**
@@ -258,6 +347,31 @@ public class EntitySpawnerTask implements Runnable {
         }
         return addX;
     }
+    public <T extends BaseEntity> T createEntity(Class<T> clazz, Position pos) {
+        try {
+            // Получаем чанк
+            FullChunk chunk = pos.getLevel().getChunk(pos.getChunkX(), pos.getChunkZ());
+
+            // Создаем NBT
+            CompoundTag nbt = Entity.getDefaultNBT(pos.add(0.5, 0, 0.5));
+
+            // Создаем сущность через конструктор FullChunk + NBT
+            T entity = clazz.getConstructor(FullChunk.class, CompoundTag.class)
+                    .newInstance(chunk, nbt);
+
+            // Проверка на блоки
+            if (!entity.isInsideOfSolid()) {
+                entity.spawnToAll(); // прямой спавн
+                return entity;
+            } else {
+                entity.close();
+            }
+        } catch (Exception e) {
+            Server.getInstance().getLogger().error("Failed to spawn entity: " + clazz.getSimpleName(), e);
+        }
+        return null;
+    }
+
 
     /**
      * Get safe y coordinate for mob spawning
@@ -328,38 +442,4 @@ public class EntitySpawnerTask implements Runnable {
         return y;
     }
 
-    /**
-     * Get maximum amount of mobs in distance
-     *
-     * @param id mob network id
-     * @param nether is nether world
-     * @param end is end world
-     * @return maximum amount of mobs
-     */
-    private static int getMaxSpawns(int id, boolean nether, boolean end) {
-        switch (id) {
-            case EntityZombiePigman.NETWORK_ID:
-            case EntityPiglin.NETWORK_ID:
-            case EntityHoglin.NETWORK_ID:
-                return nether ? 4 : 0;
-            case EntityGhast.NETWORK_ID:
-            case EntityMagmaCube.NETWORK_ID:
-            case EntityBlaze.NETWORK_ID:
-            case EntityWitherSkeleton.NETWORK_ID:
-            case EntityStrider.NETWORK_ID:
-                return nether ? 2 : 0;
-            case EntityEnderman.NETWORK_ID:
-                return end ? 10 : 2;
-            case EntitySalmon.NETWORK_ID:
-            case EntityCod.NETWORK_ID:
-                return end || nether ? 0 : 4;
-            case EntityWitch.NETWORK_ID:
-                return end || nether ? 0 : 1;
-            case EntityPhantom.NETWORK_ID:
-                Difficulty difficulty = Server.getInstance().getDifficulty();
-                return end || nether ? 0 : difficulty == Difficulty.EASY ? 2 : difficulty == Difficulty.NORMAL ? 3 : 4;
-            default:
-                return end || nether ? 0 : 2;
-        }
-    }
 }

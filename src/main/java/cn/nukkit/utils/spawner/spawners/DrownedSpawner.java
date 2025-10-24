@@ -11,7 +11,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class DrownedSpawner extends AbstractEntitySpawner {
 
     public DrownedSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityDrowned.class, SpawnerType.MOB);
     }
 
     @Override
@@ -28,11 +28,6 @@ public class DrownedSpawner extends AbstractEntitySpawner {
                 }
             }   
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityDrowned.NETWORK_ID;
     }
 
     @Override

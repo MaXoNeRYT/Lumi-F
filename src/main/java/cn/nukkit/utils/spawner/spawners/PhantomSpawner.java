@@ -10,7 +10,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class PhantomSpawner extends AbstractEntitySpawner {
 
     public PhantomSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityPhantom.class, SpawnerType.MOB);
     }
 
     @Override
@@ -25,10 +25,5 @@ public class PhantomSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityPhantom.NETWORK_ID;
     }
 }

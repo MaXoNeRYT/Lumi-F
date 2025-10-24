@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class CowSpawner extends AbstractEntitySpawner {
 
     public CowSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityCow.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -33,10 +33,5 @@ public class CowSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityCow.NETWORK_ID;
     }
 }

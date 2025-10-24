@@ -2153,7 +2153,6 @@ public class Server {
     public EntitySpawnerTask getSpawnerTask() {
         return this.spawnerTask;
     }
-
     /**
      * Internal: Warn user about non multiversion compatible plugins.
      */

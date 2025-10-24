@@ -11,7 +11,7 @@ import cn.nukkit.utils.Utils;
 public class MagmaCubeSpawner extends AbstractEntitySpawner {
 
     public MagmaCubeSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityMagmaCube.class, SpawnerType.MOB);
     }
 
     @Override
@@ -19,10 +19,5 @@ public class MagmaCubeSpawner extends AbstractEntitySpawner {
         if (Utils.rand(1, 3) != 1) {
             this.spawnTask.createEntity("MagmaCube", pos.add(0.5, 1, 0.5));
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityMagmaCube.NETWORK_ID;
     }
 }

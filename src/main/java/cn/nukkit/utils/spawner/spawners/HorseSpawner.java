@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class HorseSpawner extends AbstractEntitySpawner {
 
     public HorseSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityHorse.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -36,10 +36,5 @@ public class HorseSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityHorse.NETWORK_ID;
     }
 }

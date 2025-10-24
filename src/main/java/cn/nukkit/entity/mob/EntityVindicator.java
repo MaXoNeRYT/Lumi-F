@@ -119,7 +119,7 @@ public class EntityVindicator extends EntityWalkingMob {
 
         MobEquipmentPacket pk = new MobEquipmentPacket();
         pk.eid = this.getId();
-        pk.item = Item.get(Item.IRON_AXE);
+        pk.item = Item.get("fireshaldrpg:iron_sword");
         pk.hotbarSlot = 0;
         player.dataPacket(pk);
     }

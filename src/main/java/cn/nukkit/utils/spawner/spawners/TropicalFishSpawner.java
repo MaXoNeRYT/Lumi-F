@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 public class TropicalFishSpawner extends AbstractEntitySpawner {
 
     public TropicalFishSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityTropicalFish.class, SpawnerType.WATER);
     }
 
     @Override
@@ -32,11 +32,6 @@ public class TropicalFishSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityTropicalFish.NETWORK_ID;
     }
 
     @Override

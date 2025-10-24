@@ -11,7 +11,7 @@ import cn.nukkit.utils.Utils;
 public class EndermanSpawner extends AbstractEntitySpawner {
 
     public EndermanSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityEnderman.class, SpawnerType.MOB);
     }
 
     @Override
@@ -36,10 +36,5 @@ public class EndermanSpawner extends AbstractEntitySpawner {
                 this.spawnTask.createEntity("Enderman", pos.add(0.5, 1, 0.5));
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityEnderman.NETWORK_ID;
     }
 }

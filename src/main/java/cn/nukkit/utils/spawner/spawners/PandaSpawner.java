@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class PandaSpawner extends AbstractEntitySpawner {
 
     public PandaSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityPanda.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -35,10 +35,5 @@ public class PandaSpawner extends AbstractEntitySpawner {
                 entity.setBaby(true);
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityPanda.NETWORK_ID;
     }
 }

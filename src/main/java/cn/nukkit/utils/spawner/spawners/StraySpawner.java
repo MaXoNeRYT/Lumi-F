@@ -10,7 +10,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class StraySpawner extends AbstractEntitySpawner {
 
     public StraySpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityStray.class, SpawnerType.MOB);
     }
 
     @Override
@@ -23,10 +23,5 @@ public class StraySpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityStray.NETWORK_ID;
     }
 }

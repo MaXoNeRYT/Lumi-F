@@ -7,13 +7,14 @@ import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.spawner.AbstractEntitySpawner;
+import cn.nukkit.utils.spawner.EntitySpawner;
 import cn.nukkit.utils.spawner.EntitySpawnerTask;
 import cn.nukkit.utils.Utils;
 
 public class WolfSpawner extends AbstractEntitySpawner {
 
     public WolfSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityWolf.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -36,8 +37,4 @@ public class WolfSpawner extends AbstractEntitySpawner {
         }
     }
 
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityWolf.NETWORK_ID;
-    }
 }

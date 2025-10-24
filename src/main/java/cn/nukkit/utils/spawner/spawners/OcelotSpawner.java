@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class OcelotSpawner extends AbstractEntitySpawner {
 
     public OcelotSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityOcelot.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -36,10 +36,5 @@ public class OcelotSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityOcelot.NETWORK_ID;
     }
 }

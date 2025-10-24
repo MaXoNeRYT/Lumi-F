@@ -8,8 +8,6 @@ import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemShovelIron;
-import cn.nukkit.item.ItemSwordIron;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -91,14 +89,18 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
 
         if (this.namedTag.contains("Item")) {
             this.tool = NBTIO.getItemHelper(this.namedTag.getCompound("Item"));
-            if (tool instanceof ItemSwordIron) {
+
+            // Используем Item.get для создания "шаблона" и сравнения
+            if (this.tool.equals(Item.get("fireshaldrpg:iron_sword"))) {
                 this.setDamage(new int[]{0, 4, 6, 8});
-            } else if (tool instanceof ItemShovelIron) {
+            } else if (this.tool.equals(Item.get("fireshaldrpg:iron_shovel"))) {
                 this.setDamage(new int[]{0, 3, 4, 5});
             }
         } else {
             this.setRandomTool();
         }
+
+
     }
 
     @Override
@@ -205,10 +207,10 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
     private void setRandomTool() {
         if (Utils.rand(1, 10) == 5) {
             if (Utils.rand(1, 3) == 1) {
-                this.tool = Item.get(Item.IRON_SWORD, Utils.rand(200, 246), 1);
+                this.tool = Item.get("fireshaldrpg:iron_sword", Utils.rand(200, 246), 1);
                 this.setDamage(new int[]{0, 4, 6, 8});
             } else {
-                this.tool = Item.get(Item.IRON_SHOVEL, Utils.rand(200, 246), 1);
+                this.tool = Item.get("fireshaldrpg:iron_shovel", Utils.rand(200, 246), 1);
                 this.setDamage(new int[]{0, 3, 4, 5});
             }
         }

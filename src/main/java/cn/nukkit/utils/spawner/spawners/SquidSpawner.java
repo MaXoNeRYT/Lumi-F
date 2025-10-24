@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class SquidSpawner extends AbstractEntitySpawner {
 
     public SquidSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntitySquid.class, SpawnerType.WATER);
     }
 
     @Override
@@ -37,11 +37,6 @@ public class SquidSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntitySquid.NETWORK_ID;
     }
 
     @Override

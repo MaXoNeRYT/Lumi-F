@@ -10,7 +10,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class CreeperSpawner extends AbstractEntitySpawner {
 
     public CreeperSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityCreeper.class, SpawnerType.MOB);
     }
 
     @Override
@@ -20,10 +20,5 @@ public class CreeperSpawner extends AbstractEntitySpawner {
                 this.spawnTask.createEntity("Creeper", pos.add(0.5, 1, 0.5));
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityCreeper.NETWORK_ID;
     }
 }

@@ -10,7 +10,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class SlimeSpawner extends AbstractEntitySpawner {
 
     public SlimeSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntitySlime.class, SpawnerType.MOB);
     }
 
     @Override
@@ -23,10 +23,5 @@ public class SlimeSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntitySlime.NETWORK_ID;
     }
 }

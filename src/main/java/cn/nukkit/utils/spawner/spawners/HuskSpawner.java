@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 public class HuskSpawner extends AbstractEntitySpawner {
 
     public HuskSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityHusk.class, SpawnerType.MOB);
     }
 
     @Override
@@ -29,10 +29,5 @@ public class HuskSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityHusk.NETWORK_ID;
     }
 }

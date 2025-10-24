@@ -10,7 +10,6 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemSwordStone;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
@@ -79,7 +78,7 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
 
         MobEquipmentPacket pk = new MobEquipmentPacket();
         pk.eid = this.getId();
-        pk.item = new ItemSwordStone();
+        pk.item = Item.get("fireshaldrpg:black_sword");
         pk.hotbarSlot = 0;
         player.dataPacket(pk);
     }

@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class PolarBearSpawner extends AbstractEntitySpawner {
 
     public PolarBearSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityPolarBear.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -35,10 +35,5 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityPolarBear.NETWORK_ID;
     }
 }

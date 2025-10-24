@@ -89,16 +89,17 @@ public class AnimateEntityPacket extends DataPacket {
         public static final String DEFAULT_NEXT_STATE = "default";
         public static final int DEFAULT_STOP_EXPRESSION_VERSION = 16777216;
 
-        private String animation;
+        public String animation;
         @Builder.Default
-        private String nextState = DEFAULT_NEXT_STATE;
+        public String nextState = DEFAULT_NEXT_STATE;
         @Builder.Default
-        private float blendOutTime = DEFAULT_BLEND_OUT_TIME;
+        public float blendOutTime = DEFAULT_BLEND_OUT_TIME;
         @Builder.Default
-        private String stopExpression = DEFAULT_STOP_EXPRESSION;
+        public String stopExpression = DEFAULT_STOP_EXPRESSION;
         @Builder.Default
-        private String controller = DEFAULT_CONTROLLER;
+        public String controller = DEFAULT_CONTROLLER;
         @Builder.Default
-        private int stopExpressionVersion = DEFAULT_STOP_EXPRESSION_VERSION;
+        public int stopExpressionVersion = DEFAULT_STOP_EXPRESSION_VERSION;
     }
+
 }

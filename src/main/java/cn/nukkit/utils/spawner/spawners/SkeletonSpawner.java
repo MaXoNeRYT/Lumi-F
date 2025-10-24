@@ -10,7 +10,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class SkeletonSpawner extends AbstractEntitySpawner {
 
     public SkeletonSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntitySkeleton.class, SpawnerType.MOB);
     }
 
     @Override
@@ -20,10 +20,5 @@ public class SkeletonSpawner extends AbstractEntitySpawner {
                 this.spawnTask.createEntity("Skeleton", pos.add(0.5, 1, 0.5));
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntitySkeleton.NETWORK_ID;
     }
 }

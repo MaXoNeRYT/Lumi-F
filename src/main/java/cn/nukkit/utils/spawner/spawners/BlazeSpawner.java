@@ -11,7 +11,7 @@ import cn.nukkit.utils.Utils;
 public class BlazeSpawner extends AbstractEntitySpawner {
 
     public BlazeSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityBlaze.class, SpawnerType.MOB);
     }
 
     @Override
@@ -21,10 +21,5 @@ public class BlazeSpawner extends AbstractEntitySpawner {
         }
 
         this.spawnTask.createEntity("Blaze", pos);
-    }
-
-    @Override
-    public int getEntityNetworkId() {
-        return EntityBlaze.NETWORK_ID;
     }
 }

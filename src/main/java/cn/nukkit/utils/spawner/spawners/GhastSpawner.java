@@ -11,7 +11,7 @@ import cn.nukkit.utils.Utils;
 public class GhastSpawner extends AbstractEntitySpawner {
 
     public GhastSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityGhast.class, SpawnerType.MOB);
     }
 
     @Override
@@ -19,10 +19,5 @@ public class GhastSpawner extends AbstractEntitySpawner {
         if (Utils.rand(1, 3) != 1) {
             this.spawnTask.createEntity("Ghast", pos.add(0.5, 1, 0.5));
         }
-    }
-
-    @Override
-    public int getEntityNetworkId() {
-        return EntityGhast.NETWORK_ID;
     }
 }

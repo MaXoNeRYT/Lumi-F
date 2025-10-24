@@ -8,7 +8,6 @@ import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemSwordGold;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
@@ -138,7 +137,7 @@ public class EntityZombiePigman extends EntityWalkingMob implements EntitySmite 
 
         MobEquipmentPacket pk = new MobEquipmentPacket();
         pk.eid = this.getId();
-        pk.item = new ItemSwordGold();
+        pk.item = Item.get("fireshaldrpg:mithril_sword");
         pk.inventorySlot = 0;
         player.dataPacket(pk);
     }

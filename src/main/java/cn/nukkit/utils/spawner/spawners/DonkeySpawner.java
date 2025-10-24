@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class DonkeySpawner extends AbstractEntitySpawner {
 
     public DonkeySpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityDonkey.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -32,16 +32,13 @@ public class DonkeySpawner extends AbstractEntitySpawner {
                         if (Utils.rand(1, 20) == 1) {
                             entity.setBaby(true);
                         }
+                        Level.RANDOM_TICK_BLOCKS.add(Block.BEEHIVE);
                     }
                 }
             }
         }
     }
 
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityDonkey.NETWORK_ID;
-    }
 
     @Override
     public boolean isWaterMob() {

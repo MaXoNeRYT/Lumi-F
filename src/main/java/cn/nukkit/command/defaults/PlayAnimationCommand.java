@@ -39,29 +39,30 @@ public class PlayAnimationCommand extends VanillaCommand {
             log.addNoTargetMatch().output();
             return 0;
         }
+
         var animationBuilder = AnimateEntityPacket.Animation.builder();
-        String animation = list.getResult(1);
-        animationBuilder.animation(animation);
-        //optional
-        if (list.hasResult(2)) {
-            String next_state = list.getResult(2);
-            animationBuilder.nextState(next_state);
-        }
-        if (list.hasResult(3)) {
-            float blend_out_time = list.getResult(3);
-            animationBuilder.blendOutTime(blend_out_time);
-        }
-        if (list.hasResult(4)) {
-            String stop_expression = list.getResult(4);
-            animationBuilder.stopExpression(stop_expression);
-        }
-        if (list.hasResult(5)) {
-            String controller = list.getResult(5);
-            animationBuilder.controller(controller);
-        }
-        //send animation
-        Entity.playAnimationOnEntities(animationBuilder.build(), entities);
+        animationBuilder.animation(list.getResult(1));
+
+        if (list.hasResult(2)) animationBuilder.nextState(list.getResult(2));
+        if (list.hasResult(3)) animationBuilder.blendOutTime(list.getResult(3));
+        if (list.hasResult(4)) animationBuilder.stopExpression(list.getResult(4));
+        if (list.hasResult(5)) animationBuilder.controller(list.getResult(5));
+
+        AnimateEntityPacket.Animation ani = animationBuilder.build();
+
+        // выводим данные анимации в чат игрока напрямую через поля
+        sender.sendMessage("§aОтправляем анимацию:");
+        sender.sendMessage("§eanimation: §f" + ani.animation);
+        sender.sendMessage("§enextState: §f" + ani.nextState);
+        sender.sendMessage("§eblendOutTime: §f" + ani.blendOutTime);
+        sender.sendMessage("§estopExpression: §f" + ani.stopExpression);
+        sender.sendMessage("§econtroller: §f" + ani.controller);
+        sender.sendMessage("§estopExpressionVersion: §f" + ani.stopExpressionVersion);
+
+        Entity.playAnimationOnEntities(ani, entities);
+
         log.addSuccess("commands.playanimation.success").output();
         return 1;
     }
+
 }

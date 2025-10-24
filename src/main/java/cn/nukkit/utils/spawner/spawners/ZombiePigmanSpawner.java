@@ -6,13 +6,14 @@ import cn.nukkit.entity.mob.EntityZombiePigman;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.spawner.AbstractEntitySpawner;
+import cn.nukkit.utils.spawner.EntitySpawner;
 import cn.nukkit.utils.spawner.EntitySpawnerTask;
 import cn.nukkit.utils.Utils;
 
 public class ZombiePigmanSpawner extends AbstractEntitySpawner {
 
     public ZombiePigmanSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityZombiePigman.class, EntitySpawner.SpawnerType.MOB);
     }
 
     @Override
@@ -26,10 +27,5 @@ public class ZombiePigmanSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityZombiePigman.NETWORK_ID;
     }
 }

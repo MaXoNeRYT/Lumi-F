@@ -10,7 +10,7 @@ import cn.nukkit.utils.spawner.EntitySpawnerTask;
 public class BatSpawner extends AbstractEntitySpawner {
 
     public BatSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityBat.class, SpawnerType.AMBIENT);
     }
 
     @Override
@@ -22,10 +22,5 @@ public class BatSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public int getEntityNetworkId() {
-        return EntityBat.NETWORK_ID;
     }
 }

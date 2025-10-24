@@ -1,6 +1,7 @@
 package cn.nukkit.utils.spawner;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
@@ -8,6 +9,14 @@ import cn.nukkit.level.Position;
  * Interface of a mob spawner
  */
 public interface EntitySpawner {
+
+    enum SpawnerType {
+        ANIMAL,
+        MOB,
+        CUSTOM,
+        WATER,
+        AMBIENT
+    }
 
     /**
      * Find safe coordinates and attempt to spawn a mob
@@ -24,11 +33,18 @@ public interface EntitySpawner {
     void spawn(Player player, Position pos, Level level);
 
     /**
-     * Get entity network id of this mob spawner
+     * Get entity class of this mob spawner
      *
-     * @return entity network id
+     * @return entity class
      */
-    int getEntityNetworkId();
+    Class<? extends BaseEntity> getEntityClass();
+
+    /**
+     * Get spawner type
+     *
+     * @return spawner type
+     */
+    SpawnerType getSpawnerType();
 
     default boolean isWaterMob() {
         return false;

@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class TurtleSpawner extends AbstractEntitySpawner {
 
     public TurtleSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityTurtle.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -39,11 +39,6 @@ public class TurtleSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityTurtle.NETWORK_ID;
     }
 
     @Override

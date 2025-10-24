@@ -14,7 +14,7 @@ import cn.nukkit.utils.Utils;
 public class StriderSpawner extends AbstractEntitySpawner {
 
     public StriderSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityStrider.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -22,10 +22,5 @@ public class StriderSpawner extends AbstractEntitySpawner {
         if (Utils.rand(1, 3) != 1) {
             this.spawnTask.createEntity("Strider", pos.add(0.5, 1, 0.5));
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityStrider.NETWORK_ID;
     }
 }

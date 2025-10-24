@@ -13,7 +13,7 @@ import cn.nukkit.utils.Utils;
 public class CodSpawner extends AbstractEntitySpawner {
 
     public CodSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityCod.class, SpawnerType.WATER);
     }
 
     @Override
@@ -33,11 +33,6 @@ public class CodSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityCod.NETWORK_ID;
     }
 
     @Override

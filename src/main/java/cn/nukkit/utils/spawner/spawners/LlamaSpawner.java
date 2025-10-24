@@ -16,7 +16,7 @@ import cn.nukkit.utils.Utils;
 public class LlamaSpawner extends AbstractEntitySpawner {
 
     public LlamaSpawner(EntitySpawnerTask spawnTask) {
-        super(spawnTask);
+        super(spawnTask, EntityLlama.class, SpawnerType.ANIMAL);
     }
 
     @Override
@@ -39,11 +39,6 @@ public class LlamaSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-    }
-
-    @Override
-    public final int getEntityNetworkId() {
-        return EntityLlama.NETWORK_ID;
     }
 
 }
