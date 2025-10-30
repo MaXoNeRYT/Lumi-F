@@ -161,21 +161,6 @@
     "4": "minecraft:acacia_sapling",
     "5": "minecraft:dark_oak_sapling"
   },
-  "minecraft:wood": {
-    "protocol": 662,
-    "0": "minecraft:oak_wood",
-    "1": "minecraft:spruce_wood",
-    "2": "minecraft:birch_wood",
-    "3": "minecraft:jungle_wood",
-    "4": "minecraft:acacia_wood",
-    "5": "minecraft:dark_oak_wood",
-    "8": "minecraft:stripped_oak_wood",
-    "9": "minecraft:stripped_spruce_wood",
-    "10": "minecraft:stripped_birch_wood",
-    "11": "minecraft:stripped_jungle_wood",
-    "12": "minecraft:stripped_acacia_wood",
-    "13": "minecraft:stripped_dark_oak_wood"
-  },
   "minecraft:double_wooden_slab": {
     "protocol": 662,
     "0": "minecraft:oak_double_slab",
@@ -369,16 +354,6 @@
     "3": "minecraft:jungle_fence",
     "4": "minecraft:acacia_fence",
     "5": "minecraft:dark_oak_fence"
-  },
-  "minecraft:log": {
-    "0": "minecraft:oak_log",
-    "1": "minecraft:spruce_log",
-    "2": "minecraft:birch_log",
-    "3": "minecraft:jungle_log"
-  },
-  "minecraft:log2": {
-    "0": "minecraft:acacia_log",
-    "1": "minecraft:dark_oak_log"
   },
   "minecraft:wool": {
     "0": "minecraft:white_wool",

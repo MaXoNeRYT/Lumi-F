@@ -18,7 +18,7 @@ public abstract class TreeGenerator extends cn.nukkit.level.generator.object.Bas
      */
     protected boolean canGrowInto(int id) {
         return switch (id) {
-            case Item.AIR, Item.LEAVES, Item.GRASS, Item.DIRT, Item.LOG, Item.LOG2, Item.SAPLING, Item.VINE,
+            case Item.AIR, Item.LEAVES, Item.GRASS, Item.DIRT, BlockID.OAK_LOG, BlockID.SPRUCE_LOG, BlockID.BIRCH_LOG, BlockID.JUNGLE_LOG, BlockID.ACACIA_LOG, BlockID.DARK_OAK_LOG, Item.SAPLING, Item.VINE,
                     Item.DIRT_WITH_ROOTS, Item.AZALEA_LEAVES, Item.AZALEA_LEAVES_FLOWERED,
                  Item.CHERRY_LEAVES, Item.CHERRY_LOG, Item.CHERRY_SAPLING, BlockID.PALE_OAK_SAPLING, BlockID.PALE_OAK_LEAVES -> true;
             default -> false;

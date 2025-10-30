@@ -22,7 +22,7 @@ public class PillagerOutpostChest extends RandomizableContainer {
         pools.put(pool2.build(), new RollEntry(3, 2, pool2.getTotalWeight()));
 
         final PoolBuilder pool3 = new PoolBuilder()
-            .register(new ItemEntry(BlockID.LOG2, 1, 3, 2, 1));
+            .register(new ItemEntry(BlockID.DARK_OAK_LOG, 0, 3, 2, 1));
         pools.put(pool3.build(), new RollEntry(3, 1, pool3.getTotalWeight()));
 
         final PoolBuilder pool4 = new PoolBuilder()

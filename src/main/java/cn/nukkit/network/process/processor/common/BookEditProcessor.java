@@ -24,6 +24,12 @@ public class BookEditProcessor extends DataPacketProcessor<BookEditPacket> {
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull BookEditPacket pk) {
         Player player = playerHandle.player;
+
+        if(pk.inventorySlot < 0 || pk.inventorySlot > player.getInventory().getSize()) {
+            player.getServer().getLogger().debug(playerHandle.getUsername() + ": BookEditPacket with invalid slot index (" + pk.inventorySlot + ")");
+            return;
+        }
+
         Item oldBook = player.getInventory().getItem(pk.inventorySlot);
         if (oldBook.getId() != Item.BOOK_AND_QUILL) {
             return;

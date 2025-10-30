@@ -13,6 +13,8 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ShortTag;
+import cn.nukkit.registry.Registries;
+import cn.nukkit.utils.Identifier;
 import cn.nukkit.utils.Utils;
 
 public class BlockEntitySpawner extends BlockEntitySpawnable {
@@ -21,7 +23,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final String TAG_X = "x";
     public static final String TAG_Y = "y";
     public static final String TAG_Z = "z";
-    public static final String TAG_ENTITY_ID = "EntityId";
+    public static final String TAG_ENTITY_ID = "EntityIdentifier";
     public static final String TAG_SPAWN_RANGE = "SpawnRange";
     public static final String TAG_MIN_SPAWN_DELAY = "MinSpawnDelay";
     public static final String TAG_MAX_SPAWN_DELAY = "MaxSpawnDelay";
@@ -36,7 +38,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final short REQUIRED_PLAYER_RANGE = 16;
     public static final short MINIMUM_SPAWN_COUNT = 1;
     public static final short MAXIMUM_SPAWN_COUNT = 4;
-    private int entityId;
+    private String entityId;
     private int spawnRange;
     private int maxNearbyEntities;
     private int requiredPlayerRange;
@@ -49,7 +51,14 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
 
     public BlockEntitySpawner(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-        this.entityId = this.namedTag.getInt(TAG_ENTITY_ID);
+        String id = this.namedTag.getString(TAG_ENTITY_ID);
+
+        if(id != null) {
+            this.entityId = id;
+            return;
+        }
+
+        this.entityId = "";
     }
 
     @Override
@@ -82,6 +91,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             this.namedTag.putShort(TAG_MAXIMUM_SPAWN_COUNT, MAXIMUM_SPAWN_COUNT);
         }
 
+        this.entityId = "";
         this.spawnRange = this.namedTag.getShort(TAG_SPAWN_RANGE);
         this.minSpawnDelay = this.namedTag.getShort(TAG_MIN_SPAWN_DELAY);
         this.maxSpawnDelay = this.namedTag.getShort(TAG_MAX_SPAWN_DELAY);
@@ -138,14 +148,14 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                         continue;
                     }
 
-                    CreatureSpawnEvent ev = new CreatureSpawnEvent(this.entityId, pos, CreatureSpawnEvent.SpawnReason.SPAWNER, null);
+                    CreatureSpawnEvent ev = new CreatureSpawnEvent(Registries.ENTITY.getNetworkId(this.entityId), pos, CreatureSpawnEvent.SpawnReason.SPAWNER, null);
                     level.getServer().getPluginManager().callEvent(ev);
 
                     if (ev.isCancelled()) {
                         continue;
                     }
 
-                    Entity entity = Entity.createEntity(this.entityId, pos);
+                    Entity entity = Entity.createEntity(Registries.ENTITY.getNetworkId(this.entityId), pos);
                     if (entity != null) {
                         if (entity instanceof EntityMob && this.level.getBlockLightAt((int) x, (int) y, (int) z) > 3) {
                             entity.close();
@@ -165,7 +175,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public void saveNBT() {
         super.saveNBT();
 
-        this.namedTag.putInt(TAG_ENTITY_ID, this.entityId);
+        this.namedTag.putString(TAG_ENTITY_ID, this.entityId);
         this.namedTag.putString(TAG_ID, "MobSpawner");
         this.namedTag.putShort(TAG_SPAWN_RANGE, this.spawnRange);
         this.namedTag.putShort(TAG_MIN_SPAWN_DELAY, this.minSpawnDelay);
@@ -180,17 +190,17 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public CompoundTag getSpawnCompound() {
         return new CompoundTag()
                 .putString(TAG_ID, BlockEntity.MOB_SPAWNER)
-                .putInt(TAG_ENTITY_ID, this.entityId)
+                .putString(TAG_ENTITY_ID, this.entityId)
                 .putInt(TAG_X, (int) this.x)
                 .putInt(TAG_Y, (int) this.y)
                 .putInt(TAG_Z, (int) this.z);
     }
 
-    public int getSpawnEntityType() {
+    public String getSpawnEntityType() {
         return this.entityId;
     }
 
-    public void setSpawnEntityType(int entityId) {
+    public void setSpawnEntityType(String entityId) {
         this.entityId = entityId;
         this.spawnToAll();
     }

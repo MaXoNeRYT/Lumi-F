@@ -1,5 +1,7 @@
 package cn.nukkit.resourcepacks;
 
+import cn.nukkit.network.protocol.ResourcePackDataInfoPacket;
+
 import java.util.UUID;
 
 public interface ResourcePack {
@@ -21,6 +23,8 @@ public interface ResourcePack {
     byte[] getSha256();
 
     byte[] getPackChunk(int off, int len);
+
+    ResourcePackDataInfoPacket toNetwork();
 
     default String getEncryptionKey() {
         return "";

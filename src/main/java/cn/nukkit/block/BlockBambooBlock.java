@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
 
-public class BlockBambooBlock extends BlockWood {
+public class BlockBambooBlock extends BlockLog {
     public BlockBambooBlock() {
         this(0);
     }
@@ -47,7 +47,7 @@ public class BlockBambooBlock extends BlockWood {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_BAMBOO_BLOCK;
     }
 }

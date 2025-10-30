@@ -42,7 +42,7 @@ public class JungleBigTreePopulator extends Populator {
             if (y == -1) {
                 continue;
             }
-            new ObjectJungleBigTree(10, 20, Block.get(BlockID.WOOD, BlockWood.JUNGLE), Block.get(BlockID.LEAVES, BlockLeaves.JUNGLE)).generate(this.level, random, v.setComponents(x, y, z));
+            new ObjectJungleBigTree(10, 20, Block.get(JUNGLE_LOG), Block.get(BlockID.LEAVES, BlockLeaves.JUNGLE)).generate(this.level, random, v.setComponents(x, y, z));
         }
     }
 

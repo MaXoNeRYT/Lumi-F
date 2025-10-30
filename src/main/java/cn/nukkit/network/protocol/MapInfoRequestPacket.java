@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.network.protocol.exception.DataPacketDecodeException;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.ToString;
 
@@ -12,6 +13,7 @@ import java.util.List;
 public class MapInfoRequestPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.MAP_INFO_REQUEST_PACKET;
+    public static final int MAX_MAP_PIXELS = 128 * 128;
 
     public long mapId;
 
@@ -28,11 +30,15 @@ public class MapInfoRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode() throws DataPacketDecodeException {
         mapId = this.getVarLong();
 
         if (this.protocol >= ProtocolInfo.v1_19_20) {
             int count = (int) this.getUnsignedVarInt();
+            if(count > MAX_MAP_PIXELS) {
+                throw new DataPacketDecodeException("Too many pixels!");
+            }
+
             for (int i = 0; i < count; i++) {
                 MapPixel pixel = new MapPixel();
                 pixel.pixel = this.getInt();

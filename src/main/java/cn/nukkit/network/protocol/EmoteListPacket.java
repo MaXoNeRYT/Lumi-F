@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.network.protocol.exception.DataPacketDecodeException;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.ToString;
 
@@ -20,15 +21,23 @@ public class EmoteListPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode() throws DataPacketDecodeException {
         this.runtimeId = this.getEntityRuntimeId();
         int size = (int) this.getUnsignedVarInt();
-        if (size > 1000) {
-            throw new RuntimeException("Too big EmoteListPacket: " + size);
+        if (size > 15) {
+            throw new DataPacketDecodeException("Too big EmoteListPacket: " + size);
         }
         for (int i = 0; i < size; i++) {
-            UUID id = this.getUUID();
-            pieceIds.add(id);
+            try {
+                UUID id = this.getUUID();
+                if(id.version() != 4) {
+                    throw new DataPacketDecodeException("Invalid UUID version : " + id);
+                }
+
+                pieceIds.add(id);
+            } catch (IllegalArgumentException e) {
+                throw new DataPacketDecodeException("Invalid UUID");
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.network.Network;
+import cn.nukkit.network.protocol.exception.DataPacketDecodeException;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.compression.SnappyCompression;
 import cn.nukkit.utils.compression.Zlib;
@@ -26,7 +27,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public abstract byte pid();
 
-    public abstract void decode();
+    public abstract void decode() throws DataPacketDecodeException;
 
     public abstract void encode();
 

@@ -362,8 +362,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected AsyncTask preLoginEventTask = null;
     protected boolean shouldLogin = false;
+    protected boolean shouldPack = false;
 
+    private List<UUID> availableEmotes = new ArrayList<>();
     private int lastEmote;
+    private int lastEating;
     private int lastEnderPearlThrow = 20;
     private int lastWindChargeThrow = 10;
     private int lastChorusFruitTeleport = 20;
@@ -3163,20 +3166,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.close("", "disconnectionScreen.noReason");
                         break;
                     case ResourcePackClientResponsePacket.STATUS_SEND_PACKS:
+                        if(this.shouldPack || responsePacket.packEntries.length > this.server.getResourcePackManager().getResourceStack().length) {
+                            this.close("", "disconnectionScreen.resourcePack");
+                            break;
+                        }
+
+                        this.shouldPack = true;
+                        Set<String> uniqueIds = new LinkedHashSet<>();
                         for (ResourcePackClientResponsePacket.Entry entry : responsePacket.packEntries) {
                             ResourcePack resourcePack = this.server.getResourcePackManager().getPackById(entry.uuid);
-                            if (resourcePack == null) {
+                            if (resourcePack == null || uniqueIds.contains(entry.uuid.toString())) {
                                 this.close("", "disconnectionScreen.resourcePack");
                                 break;
                             }
 
-                            ResourcePackDataInfoPacket dataInfoPacket = new ResourcePackDataInfoPacket();
-                            dataInfoPacket.packId = resourcePack.getPackId();
-                            dataInfoPacket.maxChunkSize = RESOURCE_PACK_CHUNK_SIZE;
-                            dataInfoPacket.chunkCount = MathHelper.ceil(resourcePack.getPackSize() / (float) RESOURCE_PACK_CHUNK_SIZE);
-                            dataInfoPacket.compressedPackSize = resourcePack.getPackSize();
-                            dataInfoPacket.sha256 = resourcePack.getSha256();
-                            this.dataPacket(dataInfoPacket);
+                            uniqueIds.add(entry.uuid.toString());
+                            this.dataPacket(resourcePack.toNetwork());
                         }
                         break;
                     case ResourcePackClientResponsePacket.STATUS_HAVE_ALL_PACKS:
@@ -3196,6 +3201,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
                 break;
             case ProtocolInfo.MOVE_PLAYER_PACKET:
+                if(protocol > ProtocolInfo.v1_21_90) {
+                    this.close("","Client sent invalid packet");
+                    break;
+                }
+
                 if (this.teleportPosition != null || !this.spawned || this.isMovementServerAuthoritative() || this.isLockMovementInput()) {
                     break;
                 }
@@ -4017,8 +4027,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         }
 
+                        if(this.getServer().getTick() - this.lastEating < 4) {
+                            break;
+                        }
+
+                        Item hand = this.getInventory().getItemInHand();
+                        if(!hand.canRelease()) {
+                            break;
+                        }
+
+                        this.lastEating = 0;
                         entityEventPacket.isEncoded = false;
                         entityEventPacket.originProtocol = this.protocol;
+                        entityEventPacket.data = (hand.getNetworkId() << 16) | hand.getDamage();
                         this.dataPacket(entityEventPacket);
                         Server.broadcastPacket(this.getViewers().values(), entityEventPacket);
                         break;
@@ -4036,7 +4057,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         int levels = entityEventPacket.data; // Sent as negative number of levels lost
-                        if (levels < 0) {
+                        if (this.expLevel > 0 && this.expLevel - levels > 0  && levels < 0) {
                             this.setExperience(this.exp, this.expLevel + levels);
                         }
                         break;
@@ -4248,6 +4269,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     actions.add(a);
+                }
+                if(actions.size() > 50) {
+                    this.close("", "Client sent invalid packet");
+                    break;
                 }
 
                 if (transactionPacket.isCraftingPart) {
@@ -7535,6 +7560,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public String getUsername() {
         return username;
+    }
+
+    public List<UUID> getAvailableEmotes() {
+        return availableEmotes;
     }
 
     public int getLastEmote() {

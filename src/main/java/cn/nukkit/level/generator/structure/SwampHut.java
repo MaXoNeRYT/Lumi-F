@@ -36,10 +36,10 @@ public class SwampHut extends ScatteredStructurePiece {
         builder.fill(new BlockVector3(0, 4, 8), new BlockVector3(6, 4, 8), BlockID.SPRUCE_WOOD_STAIRS, 3); // S
         builder.fill(new BlockVector3(0, 4, 2), new BlockVector3(0, 4, 7), BlockID.SPRUCE_WOOD_STAIRS, 0); // W
 
-        builder.fill(new BlockVector3(1, 0, 2), new BlockVector3(1, 3, 2), BlockID.LOG);
-        builder.fill(new BlockVector3(5, 0, 2), new BlockVector3(5, 3, 2), BlockID.LOG);
-        builder.fill(new BlockVector3(1, 0, 7), new BlockVector3(1, 3, 7), BlockID.LOG);
-        builder.fill(new BlockVector3(5, 0, 7), new BlockVector3(5, 3, 7), BlockID.LOG);
+        builder.fill(new BlockVector3(1, 0, 2), new BlockVector3(1, 3, 2), BlockID.OAK_LOG);
+        builder.fill(new BlockVector3(5, 0, 2), new BlockVector3(5, 3, 2), BlockID.OAK_LOG);
+        builder.fill(new BlockVector3(1, 0, 7), new BlockVector3(1, 3, 7), BlockID.OAK_LOG);
+        builder.fill(new BlockVector3(5, 0, 7), new BlockVector3(5, 3, 7), BlockID.OAK_LOG);
 
         builder.setBlock(new BlockVector3(1, 2, 1), BlockID.FENCE);
         builder.setBlock(new BlockVector3(5, 2, 1), BlockID.FENCE);
@@ -49,10 +49,10 @@ public class SwampHut extends ScatteredStructurePiece {
 
         builder.setBlock(new BlockVector3(3, 2, 6), BlockID.CRAFTING_TABLE);
 
-        builder.setBlockDownward(new BlockVector3(1, -1, 2), BlockID.LOG);
-        builder.setBlockDownward(new BlockVector3(5, -1, 2), BlockID.LOG);
-        builder.setBlockDownward(new BlockVector3(1, -1, 7), BlockID.LOG);
-        builder.setBlockDownward(new BlockVector3(5, -1, 7), BlockID.LOG);
+        builder.setBlockDownward(new BlockVector3(1, -1, 2), BlockID.OAK_LOG);
+        builder.setBlockDownward(new BlockVector3(5, -1, 2), BlockID.OAK_LOG);
+        builder.setBlockDownward(new BlockVector3(1, -1, 7), BlockID.OAK_LOG);
+        builder.setBlockDownward(new BlockVector3(5, -1, 7), BlockID.OAK_LOG);
 
     }
 }

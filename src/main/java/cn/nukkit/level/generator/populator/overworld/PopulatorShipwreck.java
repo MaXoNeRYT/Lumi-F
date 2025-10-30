@@ -90,7 +90,7 @@ public class PopulatorShipwreck extends Populator implements CallbackableTemplat
 
     static {
         FILTER[AIR] = true;
-        FILTER[LOG] = true;
+        FILTER[OAK_LOG] = true;
         FILTER[WATER] = true;
         FILTER[STILL_WATER] = true;
         FILTER[LAVA] = true;
@@ -114,7 +114,7 @@ public class PopulatorShipwreck extends Populator implements CallbackableTemplat
         FILTER[WATER_LILY] = true;
         FILTER[COCOA] = true;
         FILTER[LEAVES2] = true;
-        FILTER[LOG2] = true;
+        FILTER[ACACIA_LOG] = true;
         FILTER[PACKED_ICE] = true;
         FILTER[DOUBLE_PLANT] = true;
     }

@@ -109,9 +109,18 @@ public class BlockNoteblock extends BlockSolid implements BlockEntityHolder<Bloc
                 return Instrument.BANJO;
             case GLOWSTONE_BLOCK:
                 return Instrument.ELECTRIC_PIANO;
-            case LOG:
-            case LOG2:
-            case PLANKS:
+            case OAK_LOG:
+            case SPRUCE_LOG:
+            case BIRCH_LOG:
+            case JUNGLE_LOG:
+            case ACACIA_LOG:
+            case DARK_OAK_LOG:
+            case OAK_PLANKS:
+            case SPRUCE_PLANKS:
+            case BIRCH_PLANKS:
+            case JUNGLE_PLANKS:
+            case ACACIA_PLANKS:
+            case DARK_OAK_PLANKS:
             case DOUBLE_WOODEN_SLAB:
             case WOODEN_SLAB:
             case WOOD_STAIRS:

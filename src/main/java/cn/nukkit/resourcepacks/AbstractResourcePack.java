@@ -1,6 +1,9 @@
 package cn.nukkit.resourcepacks;
 
+import cn.nukkit.Player;
+import cn.nukkit.math.MathHelper;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.network.protocol.ResourcePackDataInfoPacket;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -58,6 +61,18 @@ public abstract class AbstractResourcePack implements ResourcePack {
         return String.join(".", version.get(0).getAsString(),
                 version.get(1).getAsString(),
                 version.get(2).getAsString());
+    }
+
+    @Override
+    public ResourcePackDataInfoPacket toNetwork() {
+        ResourcePackDataInfoPacket packet = new ResourcePackDataInfoPacket();
+        packet.packId = this.getPackId();
+        packet.maxChunkSize = Player.RESOURCE_PACK_CHUNK_SIZE;
+        packet.chunkCount = MathHelper.ceil(this.getPackSize() / (float) Player.RESOURCE_PACK_CHUNK_SIZE);
+        packet.compressedPackSize = this.getPackSize();
+        packet.sha256 = this.getSha256();
+        packet.premium = false;
+        return packet;
     }
 
     @Override

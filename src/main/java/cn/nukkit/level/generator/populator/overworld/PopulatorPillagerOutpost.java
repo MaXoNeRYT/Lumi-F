@@ -51,7 +51,7 @@ public class PopulatorPillagerOutpost extends Populator {
                 final int baseMeta = chunk.getBlockData(x, baseY, z);
 
                 switch (baseId) {
-                    case COBBLESTONE, MOSS_STONE, LOG2, PLANKS, FENCE -> {
+                    case COBBLESTONE, MOSS_STONE, DARK_OAK_LOG, PLANKS, FENCE -> {
                         int y = baseY - 1;
                         int id = chunk.getBlockId(x, y, z);
                         while (BlockTypes.isPlantOrFluid[id] && y > 1) {

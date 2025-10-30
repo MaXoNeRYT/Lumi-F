@@ -1,6 +1,9 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.network.protocol.exception.DataPacketDecodeException;
 import lombok.ToString;
+
+import java.util.UUID;
 
 @ToString
 public class EmotePacket extends DataPacket {
@@ -19,7 +22,7 @@ public class EmotePacket extends DataPacket {
      * @since 588
      */
     public String platformId;
-    public String emoteID;
+    public UUID emoteID;
     public byte flags;
     /**
      * @since v729
@@ -32,9 +35,22 @@ public class EmotePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode() throws DataPacketDecodeException {
         this.runtimeId = this.getEntityRuntimeId();
-        this.emoteID = this.getString();
+
+        String id = this.getString();
+
+        try {
+            UUID uuid = UUID.fromString(id);
+            if(uuid.version() != 4) {
+                throw new DataPacketDecodeException("Invalid UUID Version: " + this.emoteID);
+            }
+
+            this.emoteID = uuid;
+        } catch (IllegalArgumentException e) {
+            throw new DataPacketDecodeException("Invalid UUID: " + this.emoteID);
+        }
+
         if (this.protocol >= ProtocolInfo.v1_20_0_23) {
             if (this.protocol >= ProtocolInfo.v1_21_30) {
                 this.emoteDuration = this.getUnsignedVarInt();
@@ -49,7 +65,7 @@ public class EmotePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putEntityRuntimeId(this.runtimeId);
-        this.putString(this.emoteID);
+        this.putUUID(this.emoteID);
         if (this.protocol >= ProtocolInfo.v1_20_0_23) {
             if (this.protocol >= ProtocolInfo.v1_21_30) {
                 this.putUnsignedVarInt(this.emoteDuration);

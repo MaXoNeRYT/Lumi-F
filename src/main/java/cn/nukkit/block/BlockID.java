@@ -29,8 +29,7 @@ public interface BlockID {
     int GOLD_ORE = 14;
     int IRON_ORE = 15;
     int COAL_ORE = 16;
-    int LOG = 17;
-    int WOOD = 17;
+    int OAK_LOG = 17;
     int LEAVES = 18;
     int SPONGE = 19;
     int GLASS = 20;
@@ -222,9 +221,7 @@ public interface BlockID {
     int STAINED_GLASS_PANE = 160;
     int LEAVES2 = 161;
     int LEAVE2 = 161;
-    int WOOD2 = 162;
-    int TRUNK2 = 162;
-    int LOG2 = 162;
+    int ACACIA_LOG = 162;
     int ACACIA_WOOD_STAIRS = 163;
     int ACACIA_WOODEN_STAIRS = 163;
     int DARK_OAK_WOOD_STAIRS = 164;
@@ -419,7 +416,7 @@ public interface BlockID {
     int LANTERN = 463;
     int CAMPFIRE_BLOCK = 464;
     int LAVA_CAULDRON = 465;
-    int WOOD_BARK = 467;
+    int OAK_WOOD = 467;
     int COMPOSTER = 468;
     int LIT_BLAST_FURNACE = 469;
     int LIGHT_BLOCK = 470;
@@ -757,7 +754,10 @@ public interface BlockID {
 
     int TORCHFLOWER_CROP = 822;
     int TORCHFLOWER = 823;
-
+    int SPRUCE_LOG = 824;
+    int BIRCH_LOG = 825;
+    int JUNGLE_LOG = 826;
+    int DARK_OAK_LOG = 827;
     int SUSPICIOUS_GRAVEL = 828;
     int PITCHER_CROP = 829;
     int CALIBRATED_SCULK_SENSOR = 835;
@@ -826,6 +826,18 @@ public interface BlockID {
     int WAXED_EXPOSED_COPPER_TRAPDOOR = 1052;
     int WAXED_WEATHERED_COPPER_TRAPDOOR = 1053;
     int WAXED_OXIDIZED_COPPER_TRAPDOOR = 1054;
+
+    int SPRUCE_WOOD = 1069;
+    int BIRCH_WOOD = 1070;
+    int JUNGLE_WOOD = 1071;
+    int ACACIA_WOOD = 1072;
+    int DARK_OAK_WOOD = 1073;
+    int STRIPPED_OAK_WOOD = 1074;
+    int STRIPPED_SPRUCE_WOOD = 1075;
+    int STRIPPED_BIRCH_WOOD = 1076;
+    int STRIPPED_JUNGLE_WOOD = 1077;
+    int STRIPPED_ACACIA_WOOD = 1078;
+    int STRIPPED_DARK_OAK_WOOD = 1079;
 
     int BLUE_ORCHID = 1085;
     int ALLIUM = 1086;

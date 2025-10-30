@@ -9,7 +9,7 @@ public final class BlockTypes {
 
     static {
         isPlant[BlockID.AIR] = true; //gap
-        isPlant[Block.LOG] = true;
+        isPlant[Block.OAK_LOG] = true;
         isPlant[Block.LEAVES] = true;
         isPlant[Block.TALL_GRASS] = true;
         isPlant[Block.DEAD_BUSH] = true;
@@ -28,7 +28,7 @@ public final class BlockTypes {
         isPlant[Block.WATER_LILY] = true;
         isPlant[Block.COCOA] = true;
         isPlant[Block.LEAVES2] = true;
-        isPlant[Block.LOG2] = true;
+        isPlant[Block.ACACIA_LOG] = true;
         isPlant[Block.DOUBLE_PLANT] = true;
     }
 

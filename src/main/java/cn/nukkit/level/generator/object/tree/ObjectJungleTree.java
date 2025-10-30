@@ -1,6 +1,7 @@
 package cn.nukkit.level.generator.object.tree;
 
-import cn.nukkit.block.BlockWood;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockLog;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
 
@@ -13,7 +14,12 @@ public class ObjectJungleTree extends ObjectTree {
 
     @Override
     public int getType() {
-        return BlockWood.JUNGLE;
+        return 3;
+    }
+
+    @Override
+    public int getTrunkBlock() {
+        return BlockID.JUNGLE_LOG;
     }
 
     @Override

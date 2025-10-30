@@ -10,7 +10,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 public abstract class ScatteredStructurePiece {
     private static final IntList PLANTS = new IntArrayList() {
         {
-            add(BlockID.LOG);
+            add(BlockID.OAK_LOG);
             add(BlockID.LEAVES);
             add(BlockID.TALL_GRASS);
             add(BlockID.DEAD_BUSH);
@@ -28,7 +28,7 @@ public abstract class ScatteredStructurePiece {
             add(BlockID.WATER_LILY);
             add(BlockID.COCOA);
             add(BlockID.LEAVES2);
-            add(BlockID.LOG2);
+            add(BlockID.ACACIA_LOG);
             add(BlockID.DOUBLE_PLANT);
         }
     };

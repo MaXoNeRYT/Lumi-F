@@ -238,8 +238,9 @@ public class BlockLeaves extends BlockTransparentMeta {
 
     protected boolean isLog(int id, int damage) {
         return switch (id) {
-            case LOG, LOG2, MANGROVE_LOG, CHERRY_LOG, MANGROVE_WOOD, CHERRY_WOOD -> true;
-            case WOOD_BARK -> (damage & BlockWoodBark.STRIPPED_BIT) == 0;
+            case OAK_LOG, SPRUCE_LOG, BIRCH_LOG, ACACIA_LOG, JUNGLE_LOG, DARK_OAK_LOG, MANGROVE_LOG, CHERRY_LOG, PALE_OAK_LOG,
+                 OAK_WOOD, SPRUCE_WOOD, BIRCH_WOOD, ACACIA_WOOD, JUNGLE_WOOD, DARK_OAK_WOOD, MANGROVE_WOOD, CHERRY_WOOD,
+                 PALE_OAK_WOOD -> true;
             default -> false;
         };
     }

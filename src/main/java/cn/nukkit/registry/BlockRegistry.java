@@ -76,7 +76,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(GOLD_ORE, BlockOreGold.class); //14
         register(IRON_ORE, BlockOreIron.class); //15
         register(COAL_ORE, BlockOreCoal.class); //16
-        register(WOOD, BlockWood.class); //17
+        register(OAK_LOG, BlockOakLog.class); //17
         register(LEAVES, BlockLeaves.class); //18
         register(SPONGE, BlockSponge.class); //19
         register(GLASS, BlockGlass.class); //20
@@ -220,7 +220,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(STAINED_TERRACOTTA, BlockTerracottaStained.class); //159
         register(STAINED_GLASS_PANE, BlockGlassPaneStained.class); //160
         register(LEAVES2, BlockLeaves2.class); //161
-        register(WOOD2, BlockWood2.class); //162
+        register(ACACIA_LOG, BlockAcaciaLog.class); //162
         register(ACACIA_WOOD_STAIRS, BlockStairsAcacia.class); //163
         register(DARK_OAK_WOOD_STAIRS, BlockStairsDarkOak.class); //164
         register(SLIME_BLOCK, BlockSlime.class); //165
@@ -318,12 +318,12 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PRISMARINE_STAIRS, BlockStairsPrismarine.class); //257
         register(DARK_PRISMARINE_STAIRS, BlockStairsDarkPrismarine.class); //258
         register(PRISMARINE_BRICKS_STAIRS, BlockStairsPrismarineBrick.class); //259
-        register(STRIPPED_SPRUCE_LOG, BlockWoodStrippedSpruce.class); //260
-        register(STRIPPED_BIRCH_LOG, BlockWoodStrippedBirch.class); //261
-        register(STRIPPED_JUNGLE_LOG, BlockWoodStrippedJungle.class); //262
-        register(STRIPPED_ACACIA_LOG, BlockWoodStrippedAcacia.class); //263
-        register(STRIPPED_DARK_OAK_LOG, BlockWoodStrippedDarkOak.class); //264
-        register(STRIPPED_OAK_LOG, BlockWoodStrippedOak.class); //265
+        register(STRIPPED_SPRUCE_LOG, BlockStrippedSpruceLog.class); //260
+        register(STRIPPED_BIRCH_LOG, BlockStrippedBirchLog.class); //261
+        register(STRIPPED_JUNGLE_LOG, BlockStrippedJungleLog.class); //262
+        register(STRIPPED_ACACIA_LOG, BlockStrippedAcaciaLog.class); //263
+        register(STRIPPED_DARK_OAK_LOG, BlockStrippedDarkOakLog.class); //264
+        register(STRIPPED_OAK_LOG, BlockStrippedOakLog.class); //265
         register(BLUE_ICE, BlockBlueIce.class); //266
 
         register(SEAGRASS, BlockSeagrass.class); //385
@@ -407,7 +407,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(LANTERN, BlockLantern.class); //463
         register(CAMPFIRE_BLOCK, BlockCampfire.class); //464
         register(LAVA_CAULDRON, BlockCauldronLava.class); //465
-        register(WOOD_BARK, BlockWoodBark.class); //467
+        register(OAK_WOOD, BlockOakWood.class); //467
         register(COMPOSTER, BlockComposter.class); //468
         register(LIT_BLAST_FURNACE, BlockBlastFurnaceLit.class); //469
         register(LIGHT_BLOCK, BlockLightBlock.class); //470
@@ -672,8 +672,8 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(MUD_BRICK_WALL, BlockWallMudBrick.class); //736
         register(MANGROVE_ROOTS, BlockMangroveRoots.class); //737
         register(MUDDY_MANGROVE_ROOTS, BlockMangroveRootsMuddy.class); //738
-        register(MANGROVE_LOG, BlockLogMangrove.class); //739
-        register(STRIPPED_MANGROVE_LOG, BlockLogStrippedMangrove.class); //740
+        register(MANGROVE_LOG, BlockMangroveLog.class); //739
+        register(STRIPPED_MANGROVE_LOG, BlockStrippedMangroveLog.class); //740
         register(MANGROVE_PLANKS, BlockPlanksMangrove.class); //741
         register(MANGROVE_BUTTON, BlockButtonMangrove.class); //742
         register(MANGROVE_STAIRS, BlockStairsMangrove.class); //743
@@ -685,8 +685,8 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(MANGROVE_STANDING_SIGN, BlockMangroveSignPost.class); //749
         register(MANGROVE_WALL_SIGN, BlockMangroveWallSign.class); //750
         register(MANGROVE_TRAPDOOR, BlockTrapdoorMangrove.class); //751
-        register(MANGROVE_WOOD, BlockWoodMangrove.class); //752
-        register(STRIPPED_MANGROVE_WOOD, BlockWoodStrippedMangrove.class); //753
+        register(MANGROVE_WOOD, BlockMangroveWood.class); //752
+        register(STRIPPED_MANGROVE_WOOD, BlockStrippedMangroveWood.class); //753
         register(MANGROVE_DOUBLE_SLAB, BlockDoubleSlabMangrove.class); //754
         register(OAK_HANGING_SIGN, BlockOakHangingSign.class); //755
         register(SPRUCE_HANGING_SIGN, BlockSpruceHangingSign.class); //756
@@ -723,7 +723,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(CHERRY_FENCE, BlockFenceCherry.class); //787
         register(CHERRY_FENCE_GATE, BlockFenceGateCherry.class); //788
         register(CHERRY_HANGING_SIGN, BlockCherryHangingSign.class); //789
-        register(STRIPPED_CHERRY_LOG, BlockLogStrippedCherry.class); //790
+        register(STRIPPED_CHERRY_LOG, BlockStrippedCherryLog.class); //790
         register(CHERRY_LOG, BlockCherryLog.class); //791
         register(CHERRY_PLANKS, BlockPlanksCherry.class); //792
         register(CHERRY_PRESSURE_PLATE, BlockPressurePlateCherry.class); //793
@@ -733,8 +733,8 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(CHERRY_STANDING_SIGN, BlockCherrySignPost.class); //797
         register(CHERRY_TRAPDOOR, BlockTrapdoorCherry.class); //798
         register(CHERRY_WALL_SIGN, BlockCherryWallSign.class); //799
-        register(STRIPPED_CHERRY_WOOD, BlockWoodStrippedCherry.class); //800
-        register(CHERRY_WOOD, BlockWoodCherry.class); //801
+        register(STRIPPED_CHERRY_WOOD, BlockStrippedCherryWood.class); //800
+        register(CHERRY_WOOD, BlockCherryWood.class); //801
         register(CHERRY_SAPLING, BlockCherrySapling.class); //802
         register(CHERRY_LEAVES, BlockCherryLeaves.class); //803
         register(PINK_PETALS, BlockPinkPetals.class); //804
@@ -743,7 +743,10 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
         register(TORCHFLOWER_CROP, BlockTorchflowerCrop.class); //822
         register(TORCHFLOWER, BlockTorchflower.class); //823
-
+        register(SPRUCE_LOG, BlockSpruceLog.class); //824
+        register(BIRCH_LOG, BlockBirchLog.class); //825
+        register(JUNGLE_LOG, BlockJungleLog.class); //826
+        register(DARK_OAK_LOG, BlockDarkOakLog.class); //827
         register(SUSPICIOUS_GRAVEL, BlockSuspiciousGravel.class); //828
         register(PITCHER_CROP, BlockPitcherCrop.class); //829
 
@@ -816,6 +819,18 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(WAXED_WEATHERED_COPPER_TRAPDOOR, BlockWaxedWeatheredCopperTrapdoor.class); //1053
         register(WAXED_OXIDIZED_COPPER_TRAPDOOR, BlockWaxedOxidizedCopperTrapdoor.class); //1054
 
+        register(SPRUCE_WOOD, BlockSpruceWood.class); //1069
+        register(BIRCH_WOOD, BlockBirchWood.class); //1070
+        register(JUNGLE_WOOD, BlockJungleWood.class); //1071
+        register(ACACIA_WOOD, BlockAcaciaWood.class); //1072
+        register(DARK_OAK_WOOD, BlockDarkOakWood.class); //1073
+        register(STRIPPED_OAK_WOOD, BlockStrippedOakWood.class); //1074
+        register(STRIPPED_SPRUCE_WOOD, BlockStrippedSpruceWood.class); //1075
+        register(STRIPPED_BIRCH_WOOD, BlockStrippedBirchWood.class); //1076
+        register(STRIPPED_JUNGLE_WOOD, BlockStrippedJungleWood.class); //1077
+        register(STRIPPED_ACACIA_WOOD, BlockStrippedAcaciaWood.class); //1078
+        register(STRIPPED_DARK_OAK_WOOD, BlockStrippedDarkOakWood.class); //1079
+
         register(BLUE_ORCHID, BlockBlueOrchid.class); //1085
         register(ALLIUM, BlockAllium.class); //1086
         register(AZURE_BLUET, BlockAzureBluet.class); //1087
@@ -856,8 +871,8 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_FENCE, BlockFencePaleOak.class); //1246
         register(PALE_OAK_FENCE_GATE, BlockFenceGatePaleOak.class); //1247
         register(PALE_OAK_HANGING_SIGN, BlockPaleOakHangingSign.class); //1248
-        register(STRIPPED_PALE_OAK_LOG, BlockLogStrippedPaleOak.class); //1249
-        register(PALE_OAK_LOG, BlockLogPaleOak.class); //1250
+        register(STRIPPED_PALE_OAK_LOG, BlockStrippedPaleOakLog.class); //1249
+        register(PALE_OAK_LOG, BlockPaleOakLog.class); //1250
         register(PALE_OAK_PLANKS, BlockPlanksPaleOak.class); //1251
         register(PALE_OAK_PRESSURE_PLATE, BlockPressurePlatePaleOak.class); //1252
         register(PALE_OAK_SLAB, BlockSlabPaleOak.class); //1253
@@ -866,8 +881,8 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_STANDING_SIGN, BlockPaleOakSignPost.class); //1256
         register(PALE_OAK_TRAPDOOR, BlockTrapdoorPaleOak.class); //1257
         register(PALE_OAK_WALL_SIGN, BlockPaleOakWallSign.class); //1258
-        register(STRIPPED_PALE_OAK_WOOD, BlockWoodStrippedPaleOak.class); //1259
-        register(PALE_OAK_WOOD, BlockWoodPaleOak.class); //1260
+        register(STRIPPED_PALE_OAK_WOOD, BlockStrippedPaleOakWood.class); //1259
+        register(PALE_OAK_WOOD, BlockPaleOakWood.class); //1260
         register(PALE_OAK_SAPLING, BlockPaleOakSapling.class); //1261
         register(PALE_OAK_LEAVES, BlockLeavesPaleOak.class); //1262
         register(MUSHROOM_STEM, BlockMushroomStem.class); //1263

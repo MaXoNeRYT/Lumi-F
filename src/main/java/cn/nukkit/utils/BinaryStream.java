@@ -433,7 +433,7 @@ public class BinaryStream {
         skin.setSkinData(this.getImage(Skin.SKIN_PERSONA_SIZE));
 
         int animationCount = this.getLInt();
-        for (int i = 0; i < Math.min(animationCount, 1024); i++) {
+        for (int i = 0; i < Math.min(animationCount, 128); i++) {
             SerializedImage image = this.getImage(Skin.SKIN_128_128_SIZE);
             int type = this.getLInt();
             float frames = this.getLFloat();
@@ -458,7 +458,7 @@ public class BinaryStream {
         skin.setSkinColor(this.getString());
 
         int piecesLength = this.getLInt();
-        for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
+        for (int i = 0; i < Math.min(piecesLength, 128); i++) {
             String pieceId = this.getString();
             String pieceType = this.getString();
             String packId = this.getString();
@@ -468,11 +468,11 @@ public class BinaryStream {
         }
 
         int tintsLength = this.getLInt();
-        for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
+        for (int i = 0; i < Math.min(tintsLength, 128); i++) {
             String pieceType = this.getString();
             List<String> colors = new ArrayList<>();
             int colorsLength = this.getLInt();
-            for (int i2 = 0; i2 < Math.min(colorsLength, 1024); i2++) {
+            for (int i2 = 0; i2 < Math.min(colorsLength, 128); i2++) {
                 colors.add(this.getString());
             }
             skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
