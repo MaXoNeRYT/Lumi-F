@@ -380,6 +380,13 @@ public class EntitySpawnerTask implements Runnable {
      * @param pos initial position
      * @return safe spawn y coordinate
      */
+    /**
+     * Get safe y coordinate for mob spawning
+     *
+     * @param level world
+     * @param pos initial position
+     * @return safe spawn y coordinate
+     */
     static int getSafeYCoord(Level level, Position pos) {
         int x = (int) pos.x;
         int y = (int) pos.y;
@@ -393,8 +400,8 @@ public class EntitySpawnerTask implements Runnable {
                     y = level.getMaxBlockY() + 1;
                     break;
                 }
-                if (y < 1) {
-                    y = 0;
+                if (y < -64) {
+                    y = -64;
                     break;
                 }
                 if (level.getBlockIdAt(chunk, x, y, z) != Block.AIR) {
@@ -419,8 +426,8 @@ public class EntitySpawnerTask implements Runnable {
                     y = level.getMaxBlockY() + 1;
                     break;
                 }
-                if (y < 1) {
-                    y = 0;
+                if (y < -64) {
+                    y = -64;
                     break;
                 }
                 if (level.getBlockIdAt(chunk, x, y, z) != Block.AIR) {
@@ -429,7 +436,7 @@ public class EntitySpawnerTask implements Runnable {
                     while (true) {
                         checkY--;
                         checkNeedDegree--;
-                        if (checkY < 1 || level.getBlockIdAt(chunk, x, checkY, z) != Block.AIR) {
+                        if (checkY < -64 || level.getBlockIdAt(chunk, x, checkY, z) != Block.AIR) {
                             break;
                         }
                         if (checkNeedDegree <= 0) {

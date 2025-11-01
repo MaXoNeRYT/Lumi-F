@@ -108,6 +108,9 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     /**
      * Attempt to spawn a mob to a player
      */
+    /**
+     * Attempt to spawn a mob to a player
+     */
     private void spawnTo(Player player) {
         if (!canSpawnMoreMobs(player)) {
             return;
@@ -175,6 +178,12 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
                     }
                 }
 
+                if (spawnerType == SpawnerType.MOB) {
+                    if (!isDarkEnoughToSpawn(level, pos)) {
+                        return;
+                    }
+                }
+
                 try {
                     this.spawn(player, pos, level);
                 } catch (Exception e) {
@@ -182,6 +191,25 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
                 }
             }
         }
+    }
+
+    /**
+     * Check if light level is low enough for hostile mobs to spawn
+     * Similar to vanilla Minecraft - mobs spawn at light level 7 or below
+     */
+    private boolean isDarkEnoughToSpawn(Level level, Position pos) {
+        if (this.ignoreMaxSpawnRules) {
+            return true;
+        }
+
+        int x = (int) pos.x;
+        int y = (int) pos.y;
+        int z = (int) pos.z;
+
+        int blockLight = level.getBlockLightAt(x, y, z);
+        int skyLight = level.getBlockSkyLightAt(x, y, z);
+
+        return blockLight <= 7 && skyLight <= 7;
     }
 
     /**

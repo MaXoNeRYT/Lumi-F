@@ -306,9 +306,7 @@ public abstract class EntityWalking extends PathfindingMob {
             if (this.isCloseToTarget) {
                 lookAtTargetTicks = 20;
                 moveCloseToTarget(this.followTarget);
-                if (canSeeTarget(this.followTarget)) {
-                    lookAtTargetWithHead(this.followTarget);
-                }
+                lookAtTargetWithHead(this.followTarget);
             } else {
                 lookAtTargetTicks = 0;
                 if (shouldRecalculatePath(this.followTarget)) {
@@ -317,12 +315,16 @@ public abstract class EntityWalking extends PathfindingMob {
 
                 if (!isWaitingForPath && !currentPath.isEmpty()) {
                     followPath();
+                    if (!currentPath.isEmpty() && pathIndex < currentPath.size()) {
+                        Vector3 nextPoint = currentPath.get(pathIndex);
+                        lookAtPosition(nextPoint);
+                    }
                 } else if (!isWaitingForPath) {
                     moveDirectlyTo(this.followTarget);
                 }
             }
 
-            if (this.followTarget instanceof Entity && canSeeTarget(this.followTarget)) {
+            if (!this.isCloseToTarget && this.followTarget instanceof Entity && canSeeTarget(this.followTarget)) {
                 lookAtTargetWithHead(this.followTarget);
             }
 
@@ -341,9 +343,7 @@ public abstract class EntityWalking extends PathfindingMob {
                 if (this.isCloseToTarget) {
                     lookAtTargetTicks = 20;
                     moveCloseToTarget(this.target);
-                    if (canSeeTarget(this.target)) {
-                        lookAtTargetWithHead(this.target);
-                    }
+                    lookAtTargetWithHead(this.target);
 
                     if (repathCooldown > 0) repathCooldown--;
                     return;
@@ -358,62 +358,31 @@ public abstract class EntityWalking extends PathfindingMob {
 
             if (!isWaitingForPath && !currentPath.isEmpty()) {
                 followPath();
+                if (!currentPath.isEmpty() && pathIndex < currentPath.size()) {
+                    Vector3 nextPoint = currentPath.get(pathIndex);
+                    lookAtPosition(nextPoint);
+                }
             } else if (!isWaitingForPath) {
-                if (this.stayTime <= 0 || this.distance(this.target) > (this.getWidth() / 2 + 0.5)) {
-                    moveDirectlyTo(this.target);
-                } else {
-                    this.motionX = 0;
-                    this.motionZ = 0;
+                moveDirectlyTo(this.target);
+                if (this.motionX != 0 || this.motionZ != 0) {
+                    updateBodyYaw(this.motionX, this.motionZ);
                 }
             }
 
-            if (this.target instanceof Entity && canSeeTarget(this.target)) {
+            if (this.target instanceof Entity && !this.isCloseToTarget && canSeeTarget(this.target)) {
                 lookAtTargetWithHead(this.target);
             }
 
             if (repathCooldown > 0) repathCooldown--;
-        }
-    }
-
-    private void moveCloseToTarget(Vector3 target) {
-        double dx = target.x - this.x;
-        double dz = target.z - this.z;
-        double distance = Math.sqrt(dx * dx + dz * dz);
-
-        double stopDistance = 0.1;
-        if (distance < stopDistance) {
-            this.motionX = 0;
-            this.motionZ = 0;
         } else {
-            double speed = this.getSpeed() * moveMultiplier * 0.08;
-            this.motionX = speed * (dx / distance);
-            this.motionZ = speed * (dz / distance);
+            if (this.motionX != 0 || this.motionZ != 0) {
+                updateBodyYaw(this.motionX, this.motionZ);
+            }
         }
-    }
-
-    private void lookAtTargetWithHead(Vector3 target) {
-        if (!(target instanceof Entity)) return;
-
-        double dx = target.x - this.x;
-        double dz = target.z - this.z;
-
-        double targetY = target.y + ((Entity) target).getHeight() * 0.5;
-        double dy = targetY - (this.y + this.getEyeHeight());
-
-        double distanceXZ = Math.sqrt(dx * dx + dz * dz);
-
-        double yaw = Math.toDegrees(-Math.atan2(dx, dz));
-        yaw = (yaw + 360) % 360;
-
-        double pitch = Math.toDegrees(-Math.atan2(dy, distanceXZ));
-        pitch = Math.max(-60, Math.min(60, pitch));
-
-        this.setHeadYaw((float) yaw);
-        this.setPitch((float) pitch);
     }
 
     private void performMovement(int tickDiff) {
-        if (lookAtTargetTicks > 0 && this.target instanceof Entity && canSeeTarget(this.target)) {
+        if (lookAtTargetTicks > 0 && !this.isCloseToTarget && this.target instanceof Entity && canSeeTarget(this.target)) {
             lookAtTargetWithHead(this.target);
             lookAtTargetTicks--;
         }
@@ -451,6 +420,62 @@ public abstract class EntityWalking extends PathfindingMob {
         }
 
         this.updateMovement();
+    }
+
+    private void lookAtPosition(Vector3 position) {
+        double dx = position.x - this.x;
+        double dz = position.z - this.z;
+
+        double targetY = position.y;
+        double dy = targetY - (this.y + this.getEyeHeight());
+
+        double distanceXZ = Math.sqrt(dx * dx + dz * dz);
+
+        double yaw = Math.toDegrees(-Math.atan2(dx, dz));
+        yaw = (yaw + 360) % 360;
+
+        double pitch = Math.toDegrees(-Math.atan2(dy, distanceXZ));
+        pitch = Math.max(-60, Math.min(60, pitch));
+
+        this.setHeadYaw((float) yaw);
+        this.setPitch((float) pitch);
+    }
+
+    private void moveCloseToTarget(Vector3 target) {
+        double dx = target.x - this.x;
+        double dz = target.z - this.z;
+        double distance = Math.sqrt(dx * dx + dz * dz);
+
+        double stopDistance = 0.1;
+        if (distance < stopDistance) {
+            this.motionX = 0;
+            this.motionZ = 0;
+        } else {
+            double speed = this.getSpeed() * moveMultiplier * 0.08;
+            this.motionX = speed * (dx / distance);
+            this.motionZ = speed * (dz / distance);
+        }
+    }
+
+    private void lookAtTargetWithHead(Vector3 target) {
+        if (!(target instanceof Entity)) return;
+
+        double dx = target.x - this.x;
+        double dz = target.z - this.z;
+
+        double targetY = target.y + ((Entity) target).getHeight() * 0.5;
+        double dy = targetY - (this.y + this.getEyeHeight());
+
+        double distanceXZ = Math.sqrt(dx * dx + dz * dz);
+
+        double yaw = Math.toDegrees(-Math.atan2(dx, dz));
+        yaw = (yaw + 360) % 360;
+
+        double pitch = Math.toDegrees(-Math.atan2(dy, distanceXZ));
+        pitch = Math.max(-60, Math.min(60, pitch));
+
+        this.setHeadYaw((float) yaw);
+        this.setPitch((float) pitch);
     }
 
     @Override
