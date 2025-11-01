@@ -32,12 +32,13 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final String TAG_MINIMUM_SPAWN_COUNT = "MinimumSpawnerCount";
     public static final String TAG_MAXIMUM_SPAWN_COUNT = "MaximumSpawnerCount";
     public static final short SPAWN_RANGE = 4;
-    public static final short MIN_SPAWN_DELAY = 200;
-    public static final short MAX_SPAWN_DELAY = 5000;
-    public static final short MAX_NEARBY_ENTITIES = 16;
+    public static final short MIN_SPAWN_DELAY = 800;
+    public static final short MAX_SPAWN_DELAY = 20000;
+    public static final short MAX_NEARBY_ENTITIES = 4;
     public static final short REQUIRED_PLAYER_RANGE = 16;
     public static final short MINIMUM_SPAWN_COUNT = 1;
-    public static final short MAXIMUM_SPAWN_COUNT = 4;
+    public static final short MAXIMUM_SPAWN_COUNT = 1;
+
     private String entityId;
     private int spawnRange;
     private int maxNearbyEntities;
@@ -111,6 +112,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             return false;
         }
 
+        // Замедление спавна в 4 раза - проверяем каждые 4 тика вместо каждого
         if (this.delay++ >= Utils.rand(this.minSpawnDelay, this.maxSpawnDelay)) {
             this.delay = 0;
 
@@ -128,9 +130,15 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                 }
             }
 
-            int amountToSpawn = minSpawnCount + Utils.nukkitRandom.nextBoundedInt(maxSpawnCount);
+            if (nearbyEntities >= this.maxNearbyEntities) {
+                return true;
+            }
+
+            int amountToSpawn = minSpawnCount + Utils.nukkitRandom.nextBoundedInt(maxSpawnCount - minSpawnCount + 1);
+            amountToSpawn = Math.min(amountToSpawn, this.maxNearbyEntities - nearbyEntities);
+
             for (int i = 0; i < amountToSpawn; i++) {
-                if (playerInRange && nearbyEntities <= this.maxNearbyEntities) {
+                if (playerInRange && nearbyEntities < this.maxNearbyEntities) {
                     Position pos = new Position
                             (
                                     this.x + Utils.rand(-this.spawnRange, this.spawnRange),

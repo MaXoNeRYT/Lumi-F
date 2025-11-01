@@ -1,7 +1,8 @@
 package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockWood;
+
+import cn.nukkit.block.BlockID;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
 
@@ -658,7 +659,12 @@ public class ObjectBirchTree extends ObjectTree {
 
     @Override
     public int getType() {
-        return BlockWood.BIRCH;
+        return 1;
+    }
+
+    @Override
+    public int getTrunkBlock() {
+        return BlockID.BIRCH_LOG;
     }
 
     @Override
@@ -797,9 +803,9 @@ public class ObjectBirchTree extends ObjectTree {
         }
 
         if (blockType == 17.2) {  // Trunk
-            level.setBlockAt(x, y, z, this.getTrunkBlock(), this.getType());
+            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
         } else if (blockType >= 18.0 && blockType <= 18.9) {  // Leaves
-            level.setBlockAt(x, y, z, this.getLeafBlock(), this.getType());
+            level.setBlockAt(x, y, z, this.getLeafBlock(), 2);
         }
     }
 

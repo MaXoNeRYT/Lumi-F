@@ -1,7 +1,7 @@
 package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockWood;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
 
@@ -1139,7 +1139,12 @@ public class ObjectSwampTree extends ObjectTree {
 
     @Override
     public int getType() {
-        return BlockWood.OAK;
+        return 0;
+    }
+
+    @Override
+    public int getTrunkBlock() {
+        return BlockID.OAK_LOG;
     }
 
     @Override
@@ -1253,9 +1258,9 @@ public class ObjectSwampTree extends ObjectTree {
         }
 
         if (blockType == 17.0) {  // Trunk
-            level.setBlockAt(x, y, z, this.getTrunkBlock(), this.getType());
+            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
         } else if (blockType >= 18.0 && blockType <= 18.9) {  // Leaves
-            level.setBlockAt(x, y, z, this.getLeafBlock(), this.getType());
+            level.setBlockAt(x, y, z, this.getLeafBlock(), 0);
         }
     }
 

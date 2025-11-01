@@ -74,7 +74,14 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 
         for (Entity entity : level.getEntities()) {
             if (entity instanceof BaseEntity && entity.isAlive() && !entity.isClosed()) {
-                if (entity.distanceSquared(player) <= MOB_TRACKING_RADIUS * MOB_TRACKING_RADIUS) {
+                BaseEntity baseEntity = (BaseEntity) entity;
+
+                // Игнорируем мобов с тегом "nodespawn"
+                if (baseEntity.namedTag.getBoolean("nodespawn")) {
+                    continue;
+                }
+
+                if (baseEntity.distanceSquared(player) <= MOB_TRACKING_RADIUS * MOB_TRACKING_RADIUS) {
                     count++;
                     if (count >= MAX_MOBS_PER_PLAYER) {
                         break;
@@ -85,6 +92,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 
         return count;
     }
+
 
     private boolean canSpawnMoreMobs(Player player) {
         return countMobsNearPlayer(player) < MAX_MOBS_PER_PLAYER;

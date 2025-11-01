@@ -98,7 +98,19 @@ public class EntityChicken extends EntityWalkingAnimal implements EntityClimateV
             }
         }
 
+        updateRotation();
+
         return hasUpdate;
+    }
+
+    protected void updateRotation() {
+        double dx = this.motionX;
+        double dz = this.motionZ;
+
+        if (dx != 0 || dz != 0) {
+            float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+            this.setBothYaw(yaw);
+        }
     }
 
     private Item getEgg() {

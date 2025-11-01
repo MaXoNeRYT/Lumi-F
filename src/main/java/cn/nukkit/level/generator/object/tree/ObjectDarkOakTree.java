@@ -3,14 +3,13 @@ package cn.nukkit.level.generator.object.tree;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLeaves2;
-import cn.nukkit.block.BlockWood2;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
 public class ObjectDarkOakTree extends TreeGenerator {
-    private static final int DARK_OAK_LOG_ID = BlockID.WOOD2;
-    private static final int DARK_OAK_LOG_META = BlockWood2.DARK_OAK;
+    private static final int DARK_OAK_LOG_ID = BlockID.DARK_OAK_LOG;
+    private static final int DARK_OAK_LOG_META = 0;
     private static final int DARK_OAK_LEAVES_ID = BlockID.LEAVES2;
     private static final int DARK_OAK_LEAVES_META = BlockLeaves2.DARK_OAK;
 

@@ -58,11 +58,25 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         this.lastUpdate = currentTick;
         this.entityBaseTick(tickDiff);
 
-        // fix look at
         Optional.ofNullable(this.updateMove(tickDiff))
                 .ifPresent(this::lookAt);
+
+        updateRotation();
+
         return true;
     }
+
+
+    protected void updateRotation() {
+        double dx = this.motionX;
+        double dz = this.motionZ;
+
+        if (dx != 0 || dz != 0) {
+            float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+            this.setBothYaw(yaw);
+        }
+    }
+
 
     public int getPanicTicks() {
         return this.panicTicks;

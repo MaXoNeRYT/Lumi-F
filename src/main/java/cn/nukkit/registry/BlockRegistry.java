@@ -12,6 +12,7 @@ import cn.nukkit.block.customblock.properties.exception.InvalidBlockPropertyMeta
 import cn.nukkit.block.material.BlockTypes;
 import cn.nukkit.block.material.CustomBlockType;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.BlockPalette;
@@ -1037,9 +1038,12 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
                             }
 
                             final int itemId = 255 - id;
+
+                            int itemMeta = 0;
+
                             for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
-                                mapping.registerCustomBlockItem(customBlock.getIdentifier(), itemId, meta);
-                                Registries.ITEM.addToCustom(customBlock.getIdentifier(), Item.get(itemId, meta));
+                                mapping.registerCustomBlockItem(customBlock.getIdentifier(), itemId, itemMeta);
+                                Registries.ITEM.addToCustom(customBlock.getIdentifier(), Item.get(itemId, itemMeta));
                             }
 
                             CustomBlockUtil.CustomBlockState state;
@@ -1091,11 +1095,15 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
                 TRANSPARENT[id] = ((Block) block).isTransparent();
                 DIFFUSES_SKY_LIGHT[id] = ((Block) block).diffusesSkyLight();
 
-                // Registering custom block type
                 BlockTypes.register(new CustomBlockType(block));
 
                 if (block.shouldBeRegisteredInCreative()) {
-                    Registries.CREATIVE_ITEM.register(Item.get(block.getIdentifier()));
+
+                    Item creativeItem = Item.get(block.getIdentifier());
+                    if (creativeItem instanceof ItemBlock) {
+                        ((ItemBlock) creativeItem).setDamage(0);
+                    }
+                    Registries.CREATIVE_ITEM.register(creativeItem);
                 }
             });
         }
