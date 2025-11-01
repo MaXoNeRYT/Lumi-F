@@ -1,5 +1,6 @@
 package cn.nukkit.debugshape;
 
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
 import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
@@ -29,7 +30,7 @@ public class DebugShapeSphere extends DebugShape {
      * @param scale    the scale of the sphere, which is a multiplier for the size of the sphere.
      * @param segments the segments of the sphere, which determines how many segments the sphere will be divided into.
      */
-    public DebugShapeSphere(Vector3f position, Color color, Float scale, Integer segments) {
+    public DebugShapeSphere(Position position, Color color, Float scale, Integer segments) {
         super(position, color);
         this.scale = scale;
         this.segments = segments;

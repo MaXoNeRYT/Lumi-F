@@ -1,5 +1,6 @@
 package cn.nukkit.debugshape;
 
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
 import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
@@ -43,7 +44,7 @@ public class DebugShapeArrow extends DebugShape {
      * @param arrowHeadRadius   the radius of the arrow head.
      * @param arrowHeadSegments the number of segments in the arrow head.
      */
-    public DebugShapeArrow(Vector3f position, Color color, Vector3f endPosition, Float arrowHeadLength, Float arrowHeadRadius, Integer arrowHeadSegments) {
+    public DebugShapeArrow(Position position, Color color, Vector3f endPosition, Float arrowHeadLength, Float arrowHeadRadius, Integer arrowHeadSegments) {
         super(position, color);
         this.endPosition = endPosition;
         this.arrowHeadLength = arrowHeadLength;
@@ -133,7 +134,7 @@ public class DebugShapeArrow extends DebugShape {
         return new ScriptDebugShape(
                 id, getType(), position, null,
                 null, null, color,
-                null, null, position,
+                null, null, null,
                 arrowHeadLength, arrowHeadRadius, arrowHeadSegments
         );
     }

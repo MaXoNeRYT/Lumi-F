@@ -1,5 +1,6 @@
 package cn.nukkit.debugshape;
 
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
 import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
@@ -22,7 +23,7 @@ public class DebugShapeText extends DebugShape {
      * @param color    The color of the text.
      * @param text     The text to display.
      */
-    public DebugShapeText(Vector3f position, Color color, String text) {
+    public DebugShapeText(Position position, Color color, String text) {
         super(position, color);
         this.text = text;
     }

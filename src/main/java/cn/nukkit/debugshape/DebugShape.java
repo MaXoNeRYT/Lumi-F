@@ -1,6 +1,7 @@
 package cn.nukkit.debugshape;
 
 import cn.nukkit.Player;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
 import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
@@ -35,7 +36,7 @@ public abstract class DebugShape {
      * <p>
      * Can be {@code null}, and in that case that the position will be set to (0, 0, 0) client-side.
      */
-    protected Vector3f position;
+    protected Position position;
     /**
      * The color of the shape.
      * <p>
@@ -49,7 +50,7 @@ public abstract class DebugShape {
      * @param position The position of the shape.
      * @param color    the color of the shape.
      */
-    public DebugShape(Vector3f position, Color color) {
+    public DebugShape(Position position, Color color) {
         this.id = DEBUG_SHAPE_ID_COUNTER.getAndIncrement();
         this.viewers = new Long2ObjectOpenHashMap<>();
         this.position = position;
@@ -61,8 +62,8 @@ public abstract class DebugShape {
      *
      * @return the position of this debug shape.
      */
-    public Vector3f getPosition() {
-        return this.position != null ? this.position : ZERO_VECTOR;
+    public Position getPosition() {
+        return this.position != null ? this.position : Position.fromObject(ZERO_VECTOR.asVector3());
     }
 
     /**
@@ -70,7 +71,7 @@ public abstract class DebugShape {
      *
      * @param position the new position of this debug shape.
      */
-    public void setPosition(Vector3f position) {
+    public void setPosition(Position position) {
         this.position = position;
     }
 
