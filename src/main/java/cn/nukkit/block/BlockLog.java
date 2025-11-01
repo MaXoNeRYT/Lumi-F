@@ -5,6 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.AnimatePacket;
 
 public abstract class BlockLog extends BlockSolidMeta {
 
@@ -49,7 +50,6 @@ public abstract class BlockLog extends BlockSolidMeta {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         this.setDamage(faces[face.getIndex()]);
         this.getLevel().setBlock(block, this, true, true);
-
         return true;
     }
 
@@ -70,6 +70,12 @@ public abstract class BlockLog extends BlockSolidMeta {
         if (item.isAxe()) {
             Block strippedBlock = Block.get(this.getStrippedId(), this.getDamage());
             item.useOn(this);
+
+            AnimatePacket packet = new AnimatePacket();
+            packet.eid = player.getId();
+            packet.action = AnimatePacket.Action.SWING_ARM;
+            player.dataPacket(packet);
+            
             this.level.setBlock(this, strippedBlock, true, true);
             return true;
         }

@@ -4,6 +4,14 @@ import cn.nukkit.block.data.BlockColor;
 
 public class BlockJungleWood extends BlockLog {
 
+    public BlockJungleWood() {
+        this(0);
+    }
+
+    public BlockJungleWood(int meta) {
+        super(meta);
+    }
+
     @Override
     public int getId() {
         return JUNGLE_WOOD;

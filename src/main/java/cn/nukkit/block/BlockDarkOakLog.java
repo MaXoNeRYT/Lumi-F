@@ -4,6 +4,14 @@ import cn.nukkit.block.data.BlockColor;
 
 public class BlockDarkOakLog extends BlockLog {
 
+    public BlockDarkOakLog() {
+        this(0);
+    }
+
+    public BlockDarkOakLog(int meta) {
+        super(meta);
+    }
+
     @Override
     public int getId() {
         return DARK_OAK_LOG;

@@ -4,6 +4,14 @@ import cn.nukkit.block.data.BlockColor;
 
 public class BlockBirchWood extends BlockLog {
 
+    public BlockBirchWood() {
+        this(0);
+    }
+
+    public BlockBirchWood(int meta) {
+        super(meta);
+    }
+
     @Override
     public int getId() {
         return BIRCH_WOOD;

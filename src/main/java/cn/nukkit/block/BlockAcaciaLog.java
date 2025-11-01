@@ -4,6 +4,14 @@ import cn.nukkit.block.data.BlockColor;
 
 public class BlockAcaciaLog extends BlockLog {
 
+    public BlockAcaciaLog() {
+        this(0);
+    }
+
+    public BlockAcaciaLog(int meta) {
+        super(meta);
+    }
+
     @Override
     public int getId() {
         return ACACIA_LOG;

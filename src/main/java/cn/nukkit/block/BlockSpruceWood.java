@@ -4,6 +4,14 @@ import cn.nukkit.block.data.BlockColor;
 
 public class BlockSpruceWood extends BlockLog {
 
+    public BlockSpruceWood() {
+        this(0);
+    }
+
+    public BlockSpruceWood(int meta) {
+        super(meta);
+    }
+
     @Override
     public int getId() {
         return SPRUCE_WOOD;

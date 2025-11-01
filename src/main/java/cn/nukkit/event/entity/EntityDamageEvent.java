@@ -68,6 +68,10 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         return 0;
     }
 
+    public Map<DamageModifier, Float> getModifiers() {
+        return modifiers;
+    }
+
     public float getDamage() {
         return this.getDamage(DamageModifier.BASE);
     }
@@ -178,7 +182,11 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         /**
          * Damage reduction caused by armor's enchantments
          */
-        ARMOR_ENCHANTMENTS
+        ARMOR_ENCHANTMENTS,
+        /**
+         * Critical hit
+         */
+        CRITICAL,
     }
 
     public enum DamageCause {

@@ -129,9 +129,13 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        if (source instanceof EntityDamageByEntityEvent event) {
-            if (event.getDamager() instanceof Player damager && damager.attackCooldown > 0) {
+        if (source instanceof EntityDamageByEntityEvent event && event.getDamager() instanceof Player damager) {
+            if(damager.attackCooldown > 0) {
                 return false;
+            }
+
+            if (damager.fallDistance < 0 && !damager.onGround && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
+                source.setDamage(source.getFinalDamage() / 2, EntityDamageEvent.DamageModifier.CRITICAL);
             }
         }
 
@@ -147,15 +151,14 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
 
                 // Critical hit
-                if (damager instanceof Player && !damager.onGround) {
+                if(source.isApplicable(EntityDamageEvent.DamageModifier.CRITICAL)) {
                     AnimatePacket animate = new AnimatePacket();
                     animate.action = AnimatePacket.Action.CRITICAL_HIT;
                     animate.eid = getId();
+                    animate.data = 55;
 
                     this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
                     this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
-
-                    source.setDamage(source.getDamage() * 1.5f);
                 }
 
                 if (damager.isOnFire() && !(damager instanceof Player)) {

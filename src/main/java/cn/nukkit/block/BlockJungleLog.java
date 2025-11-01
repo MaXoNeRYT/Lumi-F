@@ -4,6 +4,14 @@ import cn.nukkit.block.data.BlockColor;
 
 public class BlockJungleLog extends BlockLog {
 
+    public BlockJungleLog() {
+        this(0);
+    }
+
+    public BlockJungleLog(int meta) {
+        super(meta);
+    }
+
     @Override
     public int getId() {
         return JUNGLE_LOG;

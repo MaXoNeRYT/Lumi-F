@@ -4,6 +4,14 @@ import cn.nukkit.block.data.BlockColor;
 
 public class BlockSpruceLog extends BlockLog {
 
+    public BlockSpruceLog() {
+        this(0);
+    }
+
+    public BlockSpruceLog(int meta) {
+        super(meta);
+    }
+
     @Override
     public int getId() {
         return SPRUCE_LOG;

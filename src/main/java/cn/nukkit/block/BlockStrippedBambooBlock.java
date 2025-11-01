@@ -11,7 +11,6 @@ public class BlockStrippedBambooBlock extends BlockLogStripped {
         super(meta);
     }
 
-
     public int getId() {
         return STRIPPED_BAMBOO_BLOCK;
     }
