@@ -51,7 +51,6 @@ import cn.nukkit.permission.Permissible;
 import cn.nukkit.plugin.*;
 import cn.nukkit.plugin.service.NKServiceManager;
 import cn.nukkit.plugin.service.ServiceManager;
-import cn.nukkit.recipe.parser.RecipeParser;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePackManager;
 import cn.nukkit.resourcepacks.loader.JarPluginResourcePackLoader;
@@ -373,7 +372,6 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
-
         Registries.BLOCK.initCustomBlocks();
 
         LevelProviderManager.addProvider(this, Anvil.class);
@@ -440,7 +438,9 @@ public class Server {
         if (loadPlugins) {
             this.enablePlugins(PluginLoadOrder.POSTWORLD);
         }
+
         Registries.RECIPE.buildPackets();
+
         EntityProperty.init();
         EntityProperty.buildPacket();
         EntityProperty.buildPlayerProperty();
@@ -616,6 +616,7 @@ public class Server {
         this.commandMap.clearCommands();
 
         log.info("Reloading server settings...");
+        this.settings.save();
         this.settings.load();
 
         if (this.settings.world().enableHardcore() && this.getDifficulty() != Difficulty.HARD) {
@@ -657,12 +658,14 @@ public class Server {
         }
 
         try {
-            isRunning.compareAndSet(true, false);
-
+            this.isRunning.compareAndSet(true, false);
             this.hasStopped = true;
 
             ServerStopEvent serverStopEvent = new ServerStopEvent();
-            pluginManager.callEvent(serverStopEvent);
+            this.pluginManager.callEvent(serverStopEvent);
+
+            this.getLogger().debug("Saving server settings...");
+            this.settings.save();
 
             if (this.rcon != null) {
                 this.getLogger().debug("Closing RCON...");
@@ -773,38 +776,9 @@ public class Server {
         this.nextTick = System.currentTimeMillis();
         try {
             while (this.isRunning.get()) {
+
                 try {
                     this.tick();
-
-                    long next = this.nextTick;
-                    long current = System.currentTimeMillis();
-
-                    if (next - 0.1 > current) {
-                        long allocated = next - current - 1;
-
-                        if (settings.world().doWorldGc()) { // Instead of wasting time, do something potentially useful
-                            int offset = 0;
-                            for (int i = 0; i < levelArray.length; i++) {
-                                offset = (i + lastLevelGC) % levelArray.length;
-                                Level level = levelArray[offset];
-                                if (!level.isBeingConverted) {
-                                    level.doGarbageCollection(allocated - 1);
-                                }
-                                allocated = next - System.currentTimeMillis();
-                                if (allocated <= 0) break;
-                            }
-                            lastLevelGC = offset + 1;
-                        }
-
-                        if (allocated > 0 || !settings.world().doWorldGc()) {
-                            try {
-                                //noinspection BusyWait
-                                Thread.sleep(allocated, 900000);
-                            } catch (Exception e) {
-                                this.getLogger().logException(e);
-                            }
-                        }
-                    }
                 } catch (RuntimeException e) {
                     log.error("A RuntimeException happened while ticking the server", e);
                 }
@@ -986,14 +960,11 @@ public class Server {
 
     private void tick() {
         long tickTime = System.currentTimeMillis();
+        this.network.processInterfaces();
 
         long time = tickTime - this.nextTick;
         if (time < -25) {
-            try {
-                Thread.sleep(Math.max(5, -time - 25));
-            } catch (InterruptedException e) {
-                Server.getInstance().getLogger().logException(e);
-            }
+            return;
         }
 
         long tickTimeNano = System.nanoTime();
@@ -1002,8 +973,6 @@ public class Server {
         }
 
         ++this.tickCounter;
-
-        this.network.processInterfaces();
 
         if (this.rcon != null) {
             this.rcon.check();
@@ -2098,7 +2067,7 @@ public class Server {
      * @return true if the current thread matches the expected primary thread, false otherwise
      */
     public boolean isPrimaryThread() {
-        return (Thread.currentThread() == currentThread);
+        return Thread.currentThread() == currentThread;
     }
 
     /**
@@ -2153,6 +2122,7 @@ public class Server {
     public EntitySpawnerTask getSpawnerTask() {
         return this.spawnerTask;
     }
+
     /**
      * Internal: Warn user about non multiversion compatible plugins.
      */

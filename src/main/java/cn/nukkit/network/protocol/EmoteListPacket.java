@@ -30,10 +30,6 @@ public class EmoteListPacket extends DataPacket {
         for (int i = 0; i < size; i++) {
             try {
                 UUID id = this.getUUID();
-                if(id.version() != 4) {
-                    throw new DataPacketDecodeException("Invalid UUID version : " + id);
-                }
-
                 pieceIds.add(id);
             } catch (IllegalArgumentException e) {
                 throw new DataPacketDecodeException("Invalid UUID");
