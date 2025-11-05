@@ -209,8 +209,11 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         int blockLight = level.getBlockLightAt(x, y, z);
         int skyLight = level.getBlockSkyLightAt(x, y, z);
 
-        return blockLight <= 7 && skyLight <= 7;
+        int lightLevel = Math.max(blockLight, skyLight);
+
+        return lightLevel <= 3;
     }
+
 
     /**
      * Check if mob spawning is allowed

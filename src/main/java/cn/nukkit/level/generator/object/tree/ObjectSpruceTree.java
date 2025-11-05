@@ -951,7 +951,7 @@ public class ObjectSpruceTree extends ObjectTree {
 
                 if (blockType == 17.0) {  // Trunk
                         // Используем бревно с ориентацией вверх
-                        level.setBlockAt(x, y, z, spruceLogUp.getId(), spruceLogUp.getDamage());
+                        level.setBlockAt(x, y, z, spruceLogUp.getId(), 0);
                 } else if (blockType >= 18.0 && blockType <= 18.9) {  // Leaves
                         level.setBlockAt(x, y, z, this.getLeafBlock(), this.getType());
                 }
@@ -1014,37 +1014,6 @@ public class ObjectSpruceTree extends ObjectTree {
         }
 
         return null;
-    }
-
-    private void placeSimpleTree(ChunkManager level, int x, int y, int z, double[][][] tree) {
-        // Fallback method if trunk position couldn't be found
-        for (int layer = 0; layer < tree.length; layer++) {
-            double[][] currentLayer = tree[layer];
-            for (int row = 0; row < currentLayer.length; row++) {
-                for (int col = 0; col < currentLayer[row].length; col++) {
-                    double blockType = currentLayer[row][col];
-                    if (blockType > 0) {
-                        int blockX = x + col - (currentLayer[0].length / 2);
-                        int blockZ = z + row - (currentLayer.length / 2);
-                        int blockY = y + layer;
-
-                        placeBlockIfReplaceable(level, blockX, blockY, blockZ, blockType);
-                    }
-                }
-            }
-        }
-    }
-
-    private void placeBlockIfReplaceable(ChunkManager level, int x, int y, int z, double blockType) {
-        if (!canReplace(level.getBlockIdAt(x, y, z))) {
-            return;
-        }
-
-        if (blockType == 17.0) {  // Trunk
-            level.setBlockAt(x, y, z, this.getTrunkBlock(), this.getType());
-        } else if (blockType >= 18.0 && blockType <= 18.9) {  // Leaves
-            level.setBlockAt(x, y, z, this.getLeafBlock(), this.getType());
-        }
     }
 
     private boolean canReplace(int blockId) {
