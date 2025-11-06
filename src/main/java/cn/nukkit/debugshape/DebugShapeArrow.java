@@ -44,8 +44,8 @@ public class DebugShapeArrow extends DebugShape {
      * @param arrowHeadRadius   the radius of the arrow head.
      * @param arrowHeadSegments the number of segments in the arrow head.
      */
-    public DebugShapeArrow(Position position, Color color, Vector3f endPosition, Float arrowHeadLength, Float arrowHeadRadius, Integer arrowHeadSegments) {
-        super(position, color);
+    public DebugShapeArrow(Vector3f position, Color color, int dimensionId, Vector3f endPosition, Float arrowHeadLength, Float arrowHeadRadius, Integer arrowHeadSegments) {
+        super(position, color, dimensionId);
         this.endPosition = endPosition;
         this.arrowHeadLength = arrowHeadLength;
         this.arrowHeadRadius = arrowHeadRadius;
@@ -134,7 +134,7 @@ public class DebugShapeArrow extends DebugShape {
         return new ScriptDebugShape(
                 id, getType(), position, null,
                 null, null, color,
-                null, null, null,
+                dimensionId, null, null, null,
                 arrowHeadLength, arrowHeadRadius, arrowHeadSegments
         );
     }

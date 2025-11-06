@@ -5397,7 +5397,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
              scriptDebugShapes.add(new ScriptDebugShape(
                      id, null, null,
                      null, null, null,
-                     null, null, null,
+                     null, 0, null, null,
                      null, null, null, null
              ));
         }

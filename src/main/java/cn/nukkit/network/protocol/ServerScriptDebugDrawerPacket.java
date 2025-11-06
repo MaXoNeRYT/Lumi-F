@@ -1,6 +1,5 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
 import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
@@ -37,9 +36,9 @@ public class ServerScriptDebugDrawerPacket extends DataPacket {
             if(protocol < ProtocolInfo.v1_21_120) {
                 shape = new ScriptDebugShape(
                         getUnsignedVarLong(), getOptional(null, BinaryStream::getScriptDebugShapeType),
-                        Position.fromObject(getOptional(null, BinaryStream::getVector3f).asVector3()), getOptional(null, BinaryStream::getLFloat),
                         getOptional(null, BinaryStream::getVector3f), getOptional(null, BinaryStream::getLFloat),
-                        getOptional(null, BinaryStream::getColor), getOptional(null, BinaryStream::getString),
+                        getOptional(null, BinaryStream::getVector3f), getOptional(null, BinaryStream::getLFloat),
+                        getOptional(null, BinaryStream::getColor), getVarInt(), getOptional(null, BinaryStream::getString),
                         getOptional(null, BinaryStream::getVector3f), getOptional(null, BinaryStream::getVector3f),
                         getOptional(null, BinaryStream::getLFloat), getOptional(null, BinaryStream::getLFloat),
                         getOptional(null, BinaryStream::getByte)
@@ -68,7 +67,7 @@ public class ServerScriptDebugDrawerPacket extends DataPacket {
                 this.putOptionalNull(shape.getArrowHeadRadius(), this::putLFloat);
                 this.putOptionalNull(shape.getSegments(), (buffer, segments) -> buffer.putByte(segments.byteValue()));
             } else {
-                this.putVarInt(shape.getPosition().getLevel() != null ? shape.getPosition().getLevel().getDimension() : 0);
+                this.putVarInt(shape.getDimensionId());
                 this.putUnsignedVarInt(toPayloadType(shape.getType()));
                 this.writeShapeData(shape);
             }
@@ -100,7 +99,7 @@ public class ServerScriptDebugDrawerPacket extends DataPacket {
 
     private void writeCommandShapeData(ScriptDebugShape shape) {
         this.putOptionalNull(shape.getType(), this::writeScriptDebugShapeType);
-        this.putOptionalNull(shape.getPosition().asVector3f(), this::putVector3f);
+        this.putOptionalNull(shape.getPosition(), this::putVector3f);
         this.putOptionalNull(shape.getScale(), this::putLFloat);
         this.putOptionalNull(shape.getRotation(), this::putVector3f);
         this.putOptionalNull(shape.getTotalTimeLeft(), this::putLFloat);
@@ -110,14 +109,14 @@ public class ServerScriptDebugDrawerPacket extends DataPacket {
     private ScriptDebugShape readShape() {
         long id = getUnsignedVarLong();
         ScriptDebugShapeType type = getOptional(null, BinaryStream::getScriptDebugShapeType);
-        Position position = Position.fromObject(getOptional(null, BinaryStream::getVector3f).asVector3());
+        Vector3f position = getOptional(null, BinaryStream::getVector3f);
         float scale = getOptional(null, BinaryStream::getLFloat);
         Vector3f rotation = getOptional(null, BinaryStream::getVector3f);
         float totalTimeLeft = getOptional(null, BinaryStream::getLFloat);
         Color color = getOptional(null, BinaryStream::getColor);
         //TODO: somehow setLevel for position to set right dimensionId or do it better way
-        this.getVarInt(); //dimensionID
-        this.getUnsignedVarInt(); //payloadType
+        int dimensionId = this.getVarInt();
+        this.getUnsignedVarInt(); //payloadType, we just skip it
         String text = null;
         Vector3f boxBounds = null;
         Vector3f lineEndPosition = null;
@@ -146,7 +145,7 @@ public class ServerScriptDebugDrawerPacket extends DataPacket {
                 break;
         }
 
-        return new ScriptDebugShape(id, type, position, scale, rotation, totalTimeLeft, color, text, boxBounds, lineEndPosition, arrowHeadLength, arrowHeadRadius, segments);
+        return new ScriptDebugShape(id, type, position, scale, rotation, totalTimeLeft, color, dimensionId, text, boxBounds, lineEndPosition, arrowHeadLength, arrowHeadRadius, segments);
     }
 
     private int toPayloadType(ScriptDebugShapeType type) {

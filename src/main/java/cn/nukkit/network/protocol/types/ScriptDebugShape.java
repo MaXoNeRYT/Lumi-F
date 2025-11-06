@@ -1,6 +1,5 @@
 package cn.nukkit.network.protocol.types;
 
-import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
 import lombok.Value;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +12,7 @@ public class ScriptDebugShape {
     @Nullable
     ScriptDebugShapeType type;
     @Nullable
-    Position position;
+    Vector3f position;
     @Nullable
     Float scale;
     @Nullable
@@ -22,6 +21,7 @@ public class ScriptDebugShape {
     Float totalTimeLeft;
     @Nullable
     Color color;
+    int dimensionId;
     @Nullable
     String text;
     @Nullable
