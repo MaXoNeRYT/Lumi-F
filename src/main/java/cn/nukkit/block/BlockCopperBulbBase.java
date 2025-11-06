@@ -4,8 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import cn.nukkit.event.redstone.RedstoneUpdateEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
-import cn.nukkit.math.BlockFace;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,6 +73,11 @@ public abstract class BlockCopperBulbBase extends BlockSolidMeta implements Oxid
     @Override
     public double getResistance() {
         return 1.5D;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(this, 0);
     }
 
     public boolean isLit() {

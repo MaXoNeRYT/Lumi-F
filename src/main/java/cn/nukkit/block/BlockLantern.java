@@ -149,7 +149,7 @@ public class BlockLantern extends BlockFlowable {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(this);
+        return new ItemBlock(this, 0);
     }
 
     @Override
