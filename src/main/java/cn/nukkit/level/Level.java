@@ -264,7 +264,7 @@ public class Level implements ChunkManager, Metadatable {
     private final String folderName;
 
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
-    private final Long2ObjectOpenHashMap<SoftReference<Int2ObjectOpenHashMap<Object>>> changedBlocks= new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<SoftReference<Int2ObjectOpenHashMap<Object>>> changedBlocks = new Long2ObjectOpenHashMap<>();
     // Storing the vector is redundant
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
@@ -1087,7 +1087,7 @@ public class Level implements ChunkManager, Metadatable {
 
         this.levelCurrentTick++;
 
-        if(currentTick % 200 == 0) {
+        if (currentTick % 200 == 0) {
             this.unloadChunks(true);
         }
 
@@ -2991,7 +2991,7 @@ public class Level implements ChunkManager, Metadatable {
      * @param pos   方块实体所在的位置。
      *              The position where the block entity is located.
      * @return 如果区块已加载且存在方块实体，则返回该方块实体；否则返回 null。
-     *         If the chunk is loaded and there is a block entity, return the block entity; otherwise, return null.
+     * If the chunk is loaded and there is a block entity, return the block entity; otherwise, return null.
      */
     public BlockEntity getBlockEntityIfLoaded(FullChunk chunk, Vector3 pos) {
         int by = pos.getFloorY();
@@ -4643,263 +4643,11 @@ public class Level implements ChunkManager, Metadatable {
         return !Server.getInstance().getSettings().world().entity().worldsEntitySpawningDisabled().contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 
-public boolean createPortal(Block target, boolean fireCharge) {
-    if (this.getDimension() == DIMENSION_THE_END) return false;
-    final int maxPortalSize = 23;
-    final int targX = target.getFloorX();
-    final int targY = target.getFloorY();
-    final int targZ = target.getFloorZ();
-    
-    // Check air above target
-    for (int i = 1; i < 4; i++) {
-        if (this.getBlockIdAt(targX, targY + i, targZ) != BlockID.AIR) {
-            return false;
-        }
-    }
-    
-    // Calculate frame dimensions in all directions
-    int sizePosX = countObsidianInDirection(targX, targY, targZ, 1, 0, maxPortalSize);
-    int sizeNegX = countObsidianInDirection(targX, targY, targZ, -1, 0, maxPortalSize);
-    int sizePosZ = countObsidianInDirection(targX, targY, targZ, 0, 1, maxPortalSize);
-    int sizeNegZ = countObsidianInDirection(targX, targY, targZ, 0, -1, maxPortalSize);
-    
-    int sizeX = sizePosX + sizeNegX + 1;
-    int sizeZ = sizePosZ + sizeNegZ + 1;
-    
-    // Try X-axis portal first
-    if (sizeX >= 2 && sizeX <= maxPortalSize) {
-        PortalScanResult scan = findPortalStartX(targX, targY, targZ, sizePosX, sizeNegX);
-        if (scan != null && validateAndCreatePortal(scan, fireCharge, target)) {
-            return true;
-        }
-    }
-    
-    // Try Z-axis portal
-    if (sizeZ >= 2 && sizeZ <= maxPortalSize) {
-        PortalScanResult scan = findPortalStartZ(targX, targY, targZ, sizePosZ, sizeNegZ);
-        if (scan != null && validateAndCreatePortal(scan, fireCharge, target)) {
-            return true;
-        }
-    }
-    
-    return false;
-}
+    private final LevelPortalCreator portalCreator = new LevelPortalCreator(this);
 
-private int countObsidianInDirection(int x, int y, int z, int dirX, int dirZ, int maxSize) {
-    int count = 0;
-    for (int i = 1; i < maxSize; i++) {
-        if (this.getBlockIdAt(x + dirX * i, y, z + dirZ * i) == BlockID.OBSIDIAN) {
-            count++;
-        } else {
-            break;
-        }
+    public boolean createPortal(Block target, boolean fireCharge) {
+        return this.portalCreator.create(target, fireCharge);
     }
-    return count;
-}
-
-private PortalScanResult findPortalStartX(int targX, int targY, int targZ, int sizePosX, int sizeNegX) {
-    int scanY = targY + 1;
-    
-    // Try positive X direction first (original logic)
-    for (int i = 0; i <= sizePosX; i++) {
-        int checkX = targX + i;
-        if (this.getBlockIdAt(checkX, scanY, targZ) != BlockID.AIR) {
-            break;
-        }
-        if (this.getBlockIdAt(checkX + 1, scanY, targZ) == BlockID.OBSIDIAN) {
-            return new PortalScanResult(checkX, scanY, targZ, true);
-        }
-    }
-    
-    // Try negative X direction (fix for left-side ignition)
-    for (int i = 0; i <= sizeNegX; i++) {
-        int checkX = targX - i;
-        if (this.getBlockIdAt(checkX, scanY, targZ) != BlockID.AIR) {
-            break;
-        }
-        if (this.getBlockIdAt(checkX - 1, scanY, targZ) == BlockID.OBSIDIAN) {
-            return new PortalScanResult(checkX, scanY, targZ, true);
-        }
-    }
-    
-    return null;
-}
-
-private PortalScanResult findPortalStartZ(int targX, int targY, int targZ, int sizePosZ, int sizeNegZ) {
-    int scanY = targY + 1;
-    
-    // Try positive Z direction first (original logic)
-    for (int i = 0; i <= sizePosZ; i++) {
-        int checkZ = targZ + i;
-        if (this.getBlockIdAt(targX, scanY, checkZ) != BlockID.AIR) {
-            break;
-        }
-        if (this.getBlockIdAt(targX, scanY, checkZ + 1) == BlockID.OBSIDIAN) {
-            return new PortalScanResult(targX, scanY, checkZ, false);
-        }
-    }
-    
-    // Try negative Z direction
-    for (int i = 0; i <= sizeNegZ; i++) {
-        int checkZ = targZ - i;
-        if (this.getBlockIdAt(targX, scanY, checkZ) != BlockID.AIR) {
-            break;
-        }
-        if (this.getBlockIdAt(targX, scanY, checkZ - 1) == BlockID.OBSIDIAN) {
-            return new PortalScanResult(targX, scanY, checkZ, false);
-        }
-    }
-    
-    return null;
-}
-
-private boolean validateAndCreatePortal(PortalScanResult scan, boolean fireCharge, Block target) {
-    int innerWidth = findInnerWidth(scan);
-    int innerHeight = findInnerHeight(scan);
-    
-    if (innerWidth < 2 || innerWidth > 21 || innerHeight < 3 || innerHeight > 21) {
-        return false;
-    }
-    
-    if (!validatePortalStructure(scan, innerWidth, innerHeight)) {
-        return false;
-    }
-    
-    createPortalBlocks(scan, innerWidth, innerHeight);
-    playPortalEffects(target, fireCharge);
-    return true;
-}
-
-private int findInnerWidth(PortalScanResult scan) {
-    int width = 0;
-    int dirX = scan.isXAxis ? -1 : 0;
-    int dirZ = scan.isXAxis ? 0 : -1;
-    
-    for (int i = 0; i < 21; i++) {
-        int checkX = scan.startX + dirX * i;
-        int checkZ = scan.startZ + dirZ * i;
-        int id = this.getBlockIdAt(checkX, scan.startY, checkZ);
-        
-        if (id == BlockID.AIR) {
-            width++;
-        } else if (id == BlockID.OBSIDIAN) {
-            break;
-        } else {
-            return -1; // Invalid block
-        }
-    }
-    return width;
-}
-
-private int findInnerHeight(PortalScanResult scan) {
-    int height = 0;
-    for (int i = 0; i < 21; i++) {
-        int id = this.getBlockIdAt(scan.startX, scan.startY + i, scan.startZ);
-        if (id == BlockID.AIR) {
-            height++;
-        } else if (id == BlockID.OBSIDIAN) {
-            break;
-        } else {
-            return -1; // Invalid block
-        }
-    }
-    return height;
-}
-
-private boolean validatePortalStructure(PortalScanResult scan, int innerWidth, int innerHeight) {
-    // Validate top row
-    if (!validateTopRow(scan, innerWidth, innerHeight)) {
-        return false;
-    }
-    
-    // Validate sides and interior for each level
-    for (int height = 0; height < innerHeight; height++) {
-        if (!validatePortalLevel(scan, innerWidth, height)) {
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-private boolean validateTopRow(PortalScanResult scan, int innerWidth, int innerHeight) {
-    int dirX = scan.isXAxis ? -1 : 0;
-    int dirZ = scan.isXAxis ? 0 : -1;
-    
-    for (int width = 0; width < innerWidth; width++) {
-        int checkX = scan.startX + dirX * width;
-        int checkZ = scan.startZ + dirZ * width;
-        if (this.getBlockIdAt(checkX, scan.startY + innerHeight, checkZ) != BlockID.OBSIDIAN) {
-            return false;
-        }
-    }
-    return true;
-}
-
-private boolean validatePortalLevel(PortalScanResult scan, int innerWidth, int height) {
-    int dirX = scan.isXAxis ? -1 : 0;
-    int dirZ = scan.isXAxis ? 0 : -1;
-    
-    // Check right/front pillar
-    int pillar1X = scan.startX + (scan.isXAxis ? 1 : 0);
-    int pillar1Z = scan.startZ + (scan.isXAxis ? 0 : 1);
-    if (this.getBlockIdAt(pillar1X, scan.startY + height, pillar1Z) != BlockID.OBSIDIAN) {
-        return false;
-    }
-    
-    // Check left/back pillar  
-    int pillar2X = scan.startX + dirX * innerWidth;
-    int pillar2Z = scan.startZ + dirZ * innerWidth;
-    if (this.getBlockIdAt(pillar2X, scan.startY + height, pillar2Z) != BlockID.OBSIDIAN) {
-        return false;
-    }
-    
-    // Check interior is air
-    for (int width = 0; width < innerWidth; width++) {
-        int checkX = scan.startX + dirX * width;
-        int checkZ = scan.startZ + dirZ * width;
-        if (this.getBlockIdAt(checkX, scan.startY + height, checkZ) != BlockID.AIR) {
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-private void createPortalBlocks(PortalScanResult scan, int innerWidth, int innerHeight) {
-    int dirX = scan.isXAxis ? -1 : 0;
-    int dirZ = scan.isXAxis ? 0 : -1;
-    
-    for (int height = 0; height < innerHeight; height++) {
-        for (int width = 0; width < innerWidth; width++) {
-            int portalX = scan.startX + dirX * width;
-            int portalZ = scan.startZ + dirZ * width;
-            this.setBlock(new Vector3(portalX, scan.startY + height, portalZ), 
-            Block.get(BlockID.NETHER_PORTAL));
-        }
-    }
-}
-
-private void playPortalEffects(Block target, boolean fireCharge) {
-    if (fireCharge) {
-        this.addSoundToViewers(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
-    } else {
-        this.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);
-    }
-}
-
-// Simple data class to hold portal scan results
-private static class PortalScanResult {
-    final int startX, startY, startZ;
-    final boolean isXAxis;
-    
-    PortalScanResult(int startX, int startY, int startZ, boolean isXAxis) {
-        this.startX = startX;
-        this.startY = startY;
-        this.startZ = startZ;
-        this.isXAxis = isXAxis;
-    }
-}
 
     public Position calculatePortalMirror(Vector3 portal) {
         Level nether = Server.getInstance().getNetherWorld(this.getName());
