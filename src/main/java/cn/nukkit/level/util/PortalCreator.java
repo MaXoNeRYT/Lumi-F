@@ -1,19 +1,21 @@
-package cn.nukkit.level;
+package cn.nukkit.level.util;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import static cn.nukkit.level.Level.DIMENSION_THE_END;
 
-public class LevelPortalCreator {
-    final int maxPortalSize = 23;
+public class PortalCreator {
+    public final int maxPortalSize = 23;
 
-    Level level;
-    LevelPortalCreator(Level level) {
+    private final Level level;
+
+    PortalCreator(Level level) {
         this.level = level;
-    };
+    }
 
     public boolean create(Block target, boolean fireCharge) {
         if (level.getDimension() == DIMENSION_THE_END) return false;
@@ -257,7 +259,6 @@ public class LevelPortalCreator {
         }
     }
 
-    // Simple data class to hold portal scan results
     private record PortalScanResult(int startX, int startY, int startZ, boolean isXAxis) {
     }
 }

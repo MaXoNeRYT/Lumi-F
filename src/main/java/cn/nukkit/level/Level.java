@@ -53,6 +53,7 @@ import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.level.persistence.impl.DelegatePersistentDataContainer;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.level.util.BlockUpdateEntry;
+import cn.nukkit.level.util.PortalCreator;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
 import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.level.vibration.VibrationManager;
@@ -288,6 +289,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private boolean autoSave;
     private boolean autoCompaction;
+
     @Getter
     @Setter
     private boolean saveOnUnloadEnabled = true;
@@ -353,6 +355,8 @@ public class Level implements ChunkManager, Metadatable {
     public GameRules gameRules;
 
     private final boolean randomTickingEnabled;
+
+    private final PortalCreator portalCreator = new PortalCreator(this);
 
     @Getter
     private ExecutorService asyncChuckExecutor;
@@ -4642,8 +4646,6 @@ public class Level implements ChunkManager, Metadatable {
     public boolean isMobSpawningAllowed() {
         return !Server.getInstance().getSettings().world().entity().worldsEntitySpawningDisabled().contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
     }
-
-    private final LevelPortalCreator portalCreator = new LevelPortalCreator(this);
 
     public boolean createPortal(Block target, boolean fireCharge) {
         return this.portalCreator.create(target, fireCharge);
