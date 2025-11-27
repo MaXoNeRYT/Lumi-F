@@ -76,7 +76,7 @@ public class BlockCauldronLava extends BlockCauldron {
                     BlockEntity.createBlockEntity("Cauldron", this.getChunk(), new CompoundTag("").putString("id", "Cauldron").putInt("x", (int)this.x).putInt("y", (int)this.y).putInt("z", (int)this.z).putShort("PotionId", 65535).putByte("SplashPotion", 0), new Object[0]);
                 }
                 this.level.setBlock(this, Block.get(Block.CAULDRON_BLOCK), true);
-                this.getLevel().addSound((Vector3)this.add(0.5, 1.0, 0.5), Sound.BUCKET_FILL_LAVA);
+                this.getLevel().addSound(this.add(0.5, 1.0, 0.5), Sound.BUCKET_FILL_LAVA);
             }
         }
         this.level.updateComparatorOutputLevel(this);

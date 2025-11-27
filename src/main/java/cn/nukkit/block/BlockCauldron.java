@@ -1,6 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.customblock.properties.BlockProperties;
+import cn.nukkit.block.customblock.properties.EnumBlockProperty;
+import cn.nukkit.block.customblock.properties.IntBlockProperty;
+import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.impl.BlockEntityCauldron;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
@@ -24,7 +28,10 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author CreeperFace
  * Nukkit Project
  */
-public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<BlockEntityCauldron> {
+public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<BlockEntityCauldron>, BlockPropertiesHelper {
+
+    private static final IntBlockProperty FILL_LEVEL = new IntBlockProperty("fill_level", false, 6);
+    private static final EnumBlockProperty<CauldronLiquid> CAULDRON_LIQUID = new EnumBlockProperty<>("cauldron_liquid", false, CauldronLiquid.class);
 
     /**
      * Used to cache biome check for freezing
@@ -43,6 +50,11 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
     @Override
     public int getId() {
         return CAULDRON_BLOCK;
+    }
+
+    @Override
+    public BlockProperties getBlockProperties() {
+        return new BlockProperties(FILL_LEVEL, CAULDRON_LIQUID);
     }
 
     @NotNull
@@ -83,20 +95,20 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
     }
 
     public boolean isFull() {
-        return (this.getDamage() & 0x06) == 0x06;
+        return getFillLevel() >= 6;
     }
 
     public boolean isEmpty() {
-        return this.getDamage() == 0x00;
+        return getFillLevel() == 0;
     }
 
     public int getFillLevel() {
-        return (getDamage() & 0x6) >> 1;
+        return this.getIntValue(FILL_LEVEL);
     }
 
     public void setFillLevel(int fillLevel) {
         fillLevel = MathHelper.clamp(fillLevel, 0, 3);
-        setDamage(fillLevel << 1);
+        this.setPropertyValue(FILL_LEVEL, fillLevel);
     }
 
     @Override
@@ -421,5 +433,11 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
         this.level.setBlock(this, new BlockCauldron(0), true);
         this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
         this.getLevel().addParticle(new SmokeParticle(add(Math.random(), 1.2, Math.random())), null, 8);
+    }
+
+    private enum CauldronLiquid {
+        WATER,
+        LAVA,
+        POWDER_SNOW
     }
 }
