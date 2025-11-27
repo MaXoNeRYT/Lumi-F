@@ -13,11 +13,15 @@ Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTim
 4. Custom Enchantments support
 5. Better AntiXray system
 6. Better API (effects, food, projectiles and etc.)
+7. Mixin support (changing behavior of any arbitrary methods) through [ignite-lumi](https://github.com/KoshakMineDEV/ignite-lumi) ([example mod](https://github.com/KoshakMineDEV/BlockTypePatch))
 
 ### How to install?
-1. Install java 21 or higher
+1. Install java 21 or higher (recommended is azul zulu jdk 21)
 2. Download the .jar file from the links below
 3. Write a command to run: `java -jar Lumi-1.3.0-SNAPSHOT.jar`
+
+### Plugin Development
+Use [template](https://github.com/LuminiaDev/ExamplePlugin)
 
 ### Need support?
 Go to our **[Discord Server](https://discord.gg/HkTnrkUySJ)**!
