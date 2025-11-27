@@ -13,7 +13,7 @@ public class PortalCreator {
 
     private final Level level;
 
-    PortalCreator(Level level) {
+    public PortalCreator(Level level) {
         this.level = level;
     }
 
