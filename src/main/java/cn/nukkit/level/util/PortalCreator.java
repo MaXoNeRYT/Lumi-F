@@ -23,7 +23,6 @@ public class PortalCreator {
         final int targY = target.getFloorY();
         final int targZ = target.getFloorZ();
 
-        // Check air above target
         for (int i = 1; i < 4; i++) {
             if (level.getBlockIdAt(targX, targY + i, targZ) != BlockID.AIR) {
                 return false;
@@ -71,7 +70,7 @@ public class PortalCreator {
     private PortalScanResult findPortalStartX(int targX, int targY, int targZ, int sizePosX, int sizeNegX) {
         int scanY = targY + 1;
 
-        // Try positive X direction first (original logic)
+        // Try positive X direction
         for (int i = 0; i <= sizePosX; i++) {
             int checkX = targX + i;
             if (level.getBlockIdAt(checkX, scanY, targZ) != BlockID.AIR) {
@@ -82,7 +81,7 @@ public class PortalCreator {
             }
         }
 
-        // Try negative X direction (fix for left-side ignition)
+        // Try negative X direction
         for (int i = 0; i <= sizeNegX; i++) {
             int checkX = targX - i;
             if (level.getBlockIdAt(checkX, scanY, targZ) != BlockID.AIR) {
@@ -99,7 +98,7 @@ public class PortalCreator {
     private PortalScanResult findPortalStartZ(int targX, int targY, int targZ, int sizePosZ, int sizeNegZ) {
         int scanY = targY + 1;
 
-        // Try positive Z direction first (original logic)
+        // Try positive Z direction
         for (int i = 0; i <= sizePosZ; i++) {
             int checkZ = targZ + i;
             if (level.getBlockIdAt(targX, scanY, checkZ) != BlockID.AIR) {
@@ -178,12 +177,10 @@ public class PortalCreator {
     }
 
     private boolean validatePortalStructure(PortalScanResult scan, int innerWidth, int innerHeight) {
-        // Validate top row
         if (!validateTopRow(scan, innerWidth, innerHeight)) {
             return false;
         }
 
-        // Validate sides and interior for each level
         for (int height = 0; height < innerHeight; height++) {
             if (!validatePortalLevel(scan, innerWidth, height)) {
                 return false;
