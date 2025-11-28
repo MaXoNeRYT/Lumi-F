@@ -13,6 +13,8 @@ import cn.nukkit.event.server.PlayerDataSerializeEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.event.server.ServerStopEvent;
 import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.item.enchantment.custom.CustomEnchantmentDisplay;
+import cn.nukkit.item.enchantment.custom.CustomEnchantmentDisplayStandard;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.level.*;
@@ -142,6 +144,8 @@ public class Server {
     private final IScoreboardManager scoreboardManager;
 
     private final TickingAreaManager tickingAreaManager;
+
+    private CustomEnchantmentDisplay customEnchantmentDisplay = new CustomEnchantmentDisplayStandard();
 
     private RCON rcon;
 
@@ -1172,6 +1176,14 @@ public class Server {
 
     public MainLogger getLogger() {
         return MainLogger.getLogger();
+    }
+
+    public CustomEnchantmentDisplay getCustomEnchantmentDisplay() {
+        return customEnchantmentDisplay;
+    }
+
+    public void setCustomEnchantmentDisplay(CustomEnchantmentDisplay customEnchantmentDisplay) {
+        this.customEnchantmentDisplay = customEnchantmentDisplay;
     }
 
     public EntityMetadataStore getEntityMetadata() {
