@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -648,29 +650,16 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             }
         }
 
-        if (!customEnchants.isEmpty()) {
-            var customName = getCustomEnchantmentDisplay(customEnchants);
-            if (tag.contains("display") && tag.get("display") instanceof CompoundTag) {
-                tag.getCompound("display").putString("Name", customName);
-            } else {
-                tag.putCompound("display", new CompoundTag()
-                        .putString("Name", customName)
-                );
-            }
-        }
-
         this.setNamedTag(tag);
-    }
 
-    private String getCustomEnchantmentDisplay(ListTag<CompoundTag> customEnchantments) {
-        StringJoiner joiner = new StringJoiner("\n", String.valueOf(TextFormat.RESET) + TextFormat.AQUA + idConvertToName() + "\n", "");
-        for (var enchant : customEnchantments.getAll()) {
-            var enchantment = Enchantment.get(
-                    enchant.getString("id")).setLevel(
-                    enchant.getShort("lvl"));
-            joiner.add(TextFormat.GRAY + enchantment.getName() + " " + Enchantment.getLevelString(enchantment.getLevel()));
+        var customEnchantmentDisplay = Server.getInstance().getCustomEnchantmentDisplay();
+        if (customEnchantmentDisplay != null) {
+            customEnchantmentDisplay.apply(this, customEnchants.getAll().stream()
+                    .map(enchant -> Enchantment.get(
+                            enchant.getString("id")).setLevel(
+                            enchant.getShort("lvl")))
+                    .toList());
         }
-        return joiner.toString();
     }
 
     public boolean hasCustomName() {
