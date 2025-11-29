@@ -12,23 +12,14 @@ import java.util.List;
 public interface ProtocolInfo {
 
     int v1_16_0 = 407;
-    int v1_16_20 = 408;
-    int v1_16_100_0 = 409;
-    int v1_16_100_51 = 410;
     int v1_16_100_52 = 411;
     int v1_16_100 = 419;
-    int v1_16_200_51 = 420;
     int v1_16_200 = 422;
-    int v1_16_210_50 = 423;
-    int v1_16_210_53 = 424;
     int v1_16_210 = 428;
     int v1_16_220 = 431;
     int v1_16_230_50 = 433;
-    int v1_16_230 = 434;
-    int v1_16_230_54 = 435;
     int v1_17_0 = 440;
     int v1_17_10 = 448;
-    int v1_17_20_20 = 453;
     int v1_17_30 = 465;
     int v1_17_40 = 471;
     int v1_18_0 = 475;
@@ -40,7 +31,6 @@ public interface ProtocolInfo {
     int v1_19_0 = 527;
     int v1_19_10 = 534;
     int v1_19_20 = 544;
-    int v1_19_21 = 545;
     int v1_19_30_23 = 553;
     int v1_19_30 = 554;
     int v1_19_40 = 557;
