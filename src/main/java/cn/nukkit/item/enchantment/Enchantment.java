@@ -84,6 +84,10 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
         return rarity;
     }
 
+    public EnchantmentType getType() {
+        return type;
+    }
+
     public int getLevel() {
         return level;
     }
