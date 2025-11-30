@@ -41,6 +41,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(BLUE_DYE, ItemDyeBlue::new);
         register(BLUE_EGG, ItemBlueEgg::new);
         register(BOLT_ARMOR_TRIM_SMITHING_TEMPLATE, ItemSmithingTemplateArmorTrimBolt::new);
+        register(BONE, ItemBone::new);
         register(BONE_MEAL, ItemBoneMeal::new);
         register(BREEZE_ROD, ItemBreezeRod::new);
         register(BREWER_POTTERY_SHERD, ItemBrewerPotterySherd::new);
@@ -48,8 +49,10 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(BROWN_EGG, ItemBrownEgg::new);
         register(BRUSH, ItemBrush::new);
         register(BURN_POTTERY_SHERD, ItemBurnPotterySherd::new);
+        register(CHARCOAL, ItemCharcoal::new);
         register(CHERRY_DOOR, ItemDoorCherry::new);
         register(CHERRY_SIGN, ItemCherrySign::new);
+        register(COAL, ItemCoal::new);
         register(COAST_ARMOR_TRIM_SMITHING_TEMPLATE, ItemCoastArmorTrimSmithingTemplate::new);
         register(COCOA_BEANS, ItemCocoaBeans::new);
         register(COPPER_AXE, ItemAxeCopper::new);
@@ -132,6 +135,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE, ItemSnoutArmorTrimSmithingTemplate::new);
         register(SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemSpireArmorTrimSmithingTemplate::new);
         register(SPRUCE_SIGN, ItemSpruceSign::new);
+        register(SUGAR, ItemSugar::new);
         register(TIDE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTideArmorTrimSmithingTemplate::new);
         register(TORCHFLOWER_SEEDS, ItemTorchflowerSeeds::new);
         register(TRIAL_KEY, ItemTrialKey::new);

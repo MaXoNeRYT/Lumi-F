@@ -14,7 +14,6 @@ public interface ItemID {
     int APPLE = 260;
     int BOW = 261;
     int ARROW = 262;
-    int COAL = 263;
     int DIAMOND = 264;
     int IRON_INGOT = 265;
     int GOLD_INGOT = 266;
@@ -120,8 +119,6 @@ public interface ItemID {
     int GLOWSTONE_DUST = 348;
     int RAW_FISH = 349;
     int COOKED_FISH = 350;
-    int BONE = 352;
-    int SUGAR = 353;
     int CAKE = 354;
     int BED = 355;
     int REPEATER = 356;

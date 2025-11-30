@@ -3,6 +3,7 @@ package cn.nukkit.item.randomitem;
 import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDyeBlack;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.enchantment.Enchantment;
 
 import static cn.nukkit.item.randomitem.RandomItem.*;
@@ -36,7 +37,7 @@ public final class Fishing {
     public static final Selector JUNK_STICK = putSelector(new ConstantItemSelector(Item.STICK, JUNKS), 0.06F);
     public static final Selector JUNK_STRING_ITEM = putSelector(new ConstantItemSelector(Item.STRING, JUNKS), 0.06F);
     public static final Selector JUNK_WATTER_BOTTLE = putSelector(new ConstantItemSelector(Item.POTION, PotionType.WATER.id(), JUNKS), 0.12F);
-    public static final Selector JUNK_BONE = putSelector(new ConstantItemSelector(Item.BONE, JUNKS), 0.12F);
+    public static final Selector JUNK_BONE = putSelector(new ConstantItemSelector(ItemNamespaceId.BONE, JUNKS), 0.12F);
     public static final Selector JUNK_INK_SAC = putSelector(new ConstantItemSelector(new ItemDyeBlack(), 10, JUNKS), 0.012F);
     public static final Selector JUNK_TRIPWIRE_HOOK = putSelector(new ConstantItemSelector(Item.TRIPWIRE_HOOK, JUNKS), 0.12F);
 
