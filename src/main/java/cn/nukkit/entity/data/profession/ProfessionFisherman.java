@@ -26,7 +26,7 @@ public class ProfessionFisherman extends Profession {
         rodEnchantment.setLevel(random.nextInt(3) + 1);
         rod.addEnchantment(rodEnchantment);
 
-        recipes.add(RecipeBuildUtils.of(Item.get(Item.STRING, 0, 20), Item.get(Item.EMERALD))
+        recipes.add(RecipeBuildUtils.of(Item.get(ItemNamespaceId.STRING, 0, 20), Item.get(Item.EMERALD))
                         .setMaxUses(16)
                         .setRewardExp((byte) 1)
                         .setTier(1)

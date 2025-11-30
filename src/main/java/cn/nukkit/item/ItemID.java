@@ -32,7 +32,6 @@ public interface ItemID {
     int DIAMOND_AXE = 279;
     int STICK = 280;
     int STICKS = 280;
-    int BOWL = 281;
     int MUSHROOM_STEW = 282;
     int GOLD_SWORD = 283;
     int GOLDEN_SWORD = 283;
@@ -42,8 +41,6 @@ public interface ItemID {
     int GOLDEN_PICKAXE = 285;
     int GOLD_AXE = 286;
     int GOLDEN_AXE = 286;
-    int STRING = 287;
-    int FEATHER = 288;
     int GUNPOWDER = 289;
     int WOODEN_HOE = 290;
     int STONE_HOE = 291;
