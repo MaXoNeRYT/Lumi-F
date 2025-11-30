@@ -449,16 +449,14 @@ public class Utils {
     public static String getVersionByProtocol(int protocol) {
         return switch (protocol) {
             case ProtocolInfo.v1_16_0 -> "1.16.0";
-            case ProtocolInfo.v1_16_20 -> "1.16.20";
-            case ProtocolInfo.v1_16_100_0, ProtocolInfo.v1_16_100_51, ProtocolInfo.v1_16_100_52, ProtocolInfo.v1_16_100 ->
+            case ProtocolInfo.v1_16_100_52, ProtocolInfo.v1_16_100 ->
                     "1.16.100";
-            case ProtocolInfo.v1_16_200_51, ProtocolInfo.v1_16_200 -> "1.16.200";
-            case ProtocolInfo.v1_16_210_50, ProtocolInfo.v1_16_210_53, ProtocolInfo.v1_16_210 -> "1.16.210";
+            case ProtocolInfo.v1_16_200 -> "1.16.200";
+            case ProtocolInfo.v1_16_210 -> "1.16.210";
             case ProtocolInfo.v1_16_220 -> "1.16.220";
-            case ProtocolInfo.v1_16_230_50, ProtocolInfo.v1_16_230, ProtocolInfo.v1_16_230_54 -> "1.16.230";
+            case ProtocolInfo.v1_16_230_50 -> "1.16.230";
             case ProtocolInfo.v1_17_0 -> "1.17.0";
             case ProtocolInfo.v1_17_10 -> "1.17.10";
-            case ProtocolInfo.v1_17_20_20 -> "1.17.20";
             case ProtocolInfo.v1_17_30 -> "1.17.30";
             case ProtocolInfo.v1_17_40 -> "1.17.40";
             case ProtocolInfo.v1_18_0 -> "1.18.0";
@@ -467,7 +465,6 @@ public class Utils {
             case ProtocolInfo.v1_19_0_29, ProtocolInfo.v1_19_0_31, ProtocolInfo.v1_19_0 -> "1.19.0";
             case ProtocolInfo.v1_19_10 -> "1.19.10";
             case ProtocolInfo.v1_19_20 -> "1.19.20";
-            case ProtocolInfo.v1_19_21 -> "1.19.21";
             case ProtocolInfo.v1_19_30_23, ProtocolInfo.v1_19_30 -> "1.19.30";
             case ProtocolInfo.v1_19_40 -> "1.19.40";
             case ProtocolInfo.v1_19_50_20, ProtocolInfo.v1_19_50 -> "1.19.50";
