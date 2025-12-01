@@ -23,7 +23,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.Deflater;
@@ -67,11 +69,11 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         brewing.get("potionMixes").getAsJsonArray().forEach((potionMix) -> {
             final JsonObject recipe = potionMix.getAsJsonObject();
 
-            int fromPotionId = recipe.get("inputId").getAsInt();
+            String fromPotionId = recipe.get("inputId").getAsString();
             int fromPotionMeta = recipe.get("inputMeta").getAsInt();
-            int ingredient = recipe.get("reagentId").getAsInt();
+            String ingredient = recipe.get("reagentId").getAsString();
             int ingredientMeta = recipe.get("reagentMeta").getAsInt();
-            int toPotionId = recipe.get("outputId").getAsInt();
+            String toPotionId = recipe.get("outputId").getAsString();
             int toPotionMeta = recipe.get("outputMeta").getAsInt();
 
             Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
@@ -80,10 +82,10 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         brewing.get("containerMixes").getAsJsonArray().forEach((containerMix) -> {
             final JsonObject recipe = containerMix.getAsJsonObject();
 
-            final Item ingredient = Item.get(recipe.get("reagentId").getAsInt());
+            final Item ingredient = Item.get(recipe.get("reagentId").getAsString());
 
-            final int fromPotionId = recipe.get("inputId").getAsInt();
-            final int toPotionId = recipe.get("outputId").getAsInt();
+            final String fromPotionId = recipe.get("inputId").getAsString();
+            final String toPotionId = recipe.get("outputId").getAsString();
 
             for (int meta : Registries.POTION.getPotionId2TypeMap().keySet()) {
                 Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(
