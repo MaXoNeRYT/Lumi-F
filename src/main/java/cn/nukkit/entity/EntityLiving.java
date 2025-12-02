@@ -10,6 +10,7 @@ import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.util.BlockIterator;
 import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -30,8 +31,6 @@ import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
-import cn.nukkit.entity.util.BlockIterator;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 
@@ -130,7 +129,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
 
         if (source instanceof EntityDamageByEntityEvent event && event.getDamager() instanceof Player damager) {
-            if(damager.attackCooldown > 0) {
+            if (damager.attackCooldown > 0) {
                 return false;
             }
 
@@ -151,7 +150,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
 
                 // Critical hit
-                if(source.isApplicable(EntityDamageEvent.DamageModifier.CRITICAL)) {
+                if (source.isApplicable(EntityDamageEvent.DamageModifier.CRITICAL)) {
                     AnimatePacket animate = new AnimatePacket();
                     animate.action = AnimatePacket.Action.CRITICAL_HIT;
                     animate.eid = getId();
@@ -268,29 +267,28 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             return;
         }
         super.kill();
-        EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
-        this.server.getPluginManager().callEvent(ev);
+
+        EntityDeathEvent event = new EntityDeathEvent(this, this.getDrops(), 0);
+        if (event.getEntity() instanceof BaseEntity baseEntity) {
+            event.setExperience(baseEntity.getKillExperience());
+        }
+        event.call();
 
         this.checkTameableEntityDeath();
 
         if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT) && this.lastDamageCause != null && DamageCause.VOID != this.lastDamageCause.getCause()) {
-            if (ev.getEntity() instanceof BaseEntity) {
-                BaseEntity baseEntity = (BaseEntity) ev.getEntity();
-                if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                    if (((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager() instanceof Player) {
-                        this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
+            if (event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityEvent && entityEvent.getDamager() instanceof Player) {
+                this.getLevel().dropExpOrb(this, event.getExperience());
 
-                        if (!this.dropsOnNaturalDeath()) {
-                            for (Item item : ev.getDrops()) {
-                                this.getLevel().dropItem(this, item);
-                            }
-                        }
+                if (!this.dropsOnNaturalDeath()) {
+                    for (Item item : event.getDrops()) {
+                        this.getLevel().dropItem(this, item);
                     }
                 }
             }
 
             if (this.dropsOnNaturalDeath()) {
-                for (Item item : ev.getDrops()) {
+                for (Item item : event.getDrops()) {
                     this.getLevel().dropItem(this, item);
                 }
             }
@@ -448,7 +446,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
      * Get an array of blocks within the entity's line of sight.
      *
      * @param maxDistance 视线的最大距离，超过 120 会被限制为 120 / The maximum distance of the line of sight. If it exceeds 120, it will be limited to 120.
-     * @param maxLength  返回的方块列表的最大长度，若不为 0，列表长度超过该值时会移除最早添加的方块 / The maximum length of the returned block list. If it is not 0, the earliest added block will be removed when the list length exceeds this value.
+     * @param maxLength   返回的方块列表的最大长度，若不为 0，列表长度超过该值时会移除最早添加的方块 / The maximum length of the returned block list. If it is not 0, the earliest added block will be removed when the list length exceeds this value.
      * @param transparent 透明方块 ID 的集合，若方块 ID 在该集合中，会停止遍历 / A set of transparent block IDs. If a block ID is in this set, the traversal will stop.
      * @return 视线范围内的方块数组 / An array of blocks within the line of sight.
      */
@@ -513,7 +511,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     return block;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return null;
     }
@@ -534,7 +533,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     public boolean removeMovementSpeedModifier(String identifier) {
         Object result = this.movementSpeedModifiers.remove(identifier);
 
-        if(result != null) {
+        if (result != null) {
             this.recalculateMovementSpeed();
             return true;
         }
