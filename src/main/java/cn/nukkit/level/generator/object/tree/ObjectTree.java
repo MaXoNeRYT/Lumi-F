@@ -40,6 +40,10 @@ public abstract class ObjectTree {
 
     public abstract int getTrunkBlock();
 
+    protected int getLeafType() {
+        return 0;
+    }
+
     public int getLeafBlock() {
         return Block.LEAVES;
     }
@@ -116,7 +120,7 @@ public abstract class ObjectTree {
                         continue;
                     }
                     if (!Registries.BLOCK.isSolid(level.getBlockIdAt(xx, yy, zz))) {
-                        level.setBlockAt(xx, yy, zz, this.getLeafBlock(), this.getType());
+                        level.setBlockAt(xx, yy, zz, this.getLeafBlock(), this.getLeafType());
                     }
                 }
             }

@@ -47,7 +47,7 @@ public abstract class ObjectNetherTree extends ObjectTree {
                         if (random.nextBoundedInt(20) == 0) {
                             level.setBlockAt(xx, yy, zz, Block.SHROOMLIGHT);
                         } else {
-                            level.setBlockAt(xx, yy, zz, getLeafBlock());
+                            level.setBlockAt(xx, yy, zz, getLeafBlock(), getLeafType());
                         }
                     }
                 }
@@ -64,7 +64,7 @@ public abstract class ObjectNetherTree extends ObjectTree {
                         if (random.nextBoundedInt(20) == 0) {
                             level.setBlockAt(xx, yy, zz, Block.SHROOMLIGHT);
                         } else {
-                            level.setBlockAt(xx, yy, zz, getLeafBlock());
+                            level.setBlockAt(xx, yy, zz, getLeafBlock(), getLeafType());
                         }
                     }
                 }
@@ -82,7 +82,7 @@ public abstract class ObjectNetherTree extends ObjectTree {
                         if (random.nextBoundedInt(3) == 0) {
                             for (int i = 0; i < random.nextBoundedInt(5); i++) {
                                 if (!Registries.BLOCK.isSolid(level.getBlockIdAt(xx, yy - i, zz))) {
-                                    level.setBlockAt(xx, yy - i, zz, getLeafBlock());
+                                    level.setBlockAt(xx, yy - i, zz, getLeafBlock(), getLeafType());
                                 }
                             }
                         }
@@ -96,7 +96,7 @@ public abstract class ObjectNetherTree extends ObjectTree {
                         if (random.nextBoundedInt(3) == 0) {
                             for (int i = 0; i < random.nextBoundedInt(4); i++) {
                                 if (!Registries.BLOCK.isSolid(level.getBlockIdAt(xx, yy - i, zz))) {
-                                    level.setBlockAt(xx, yy - i, zz, getLeafBlock());
+                                    level.setBlockAt(xx, yy - i, zz, getLeafBlock(), getLeafType());
                                 }
                             }
                         }
@@ -112,7 +112,7 @@ public abstract class ObjectNetherTree extends ObjectTree {
                     continue;
                 }
                 if (!Registries.BLOCK.isSolid(level.getBlockIdAt(xCanopy, y1, zCanopy))) {
-                    level.setBlockAt(xCanopy, y1, zCanopy, getLeafBlock());
+                    level.setBlockAt(xCanopy, y1, zCanopy, getLeafBlock(), getLeafType());
                 }
             }
         }

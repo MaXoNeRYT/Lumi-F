@@ -6,7 +6,6 @@ import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.material.CustomItemType;
 import cn.nukkit.item.material.ItemTypes;
-import cn.nukkit.utils.OK;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -233,11 +232,11 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
 
     @Override
     public Item get(String id) {
-        Supplier<Item> supplier = NAMESPACE_ID_ITEMS.get(id);
+        Supplier<Item> supplier = getSupplier(id);
         if (supplier == null) {
-            return Item.AIR_ITEM;
+            return Item.AIR_ITEM.clone();
         }
-        return supplier.get();
+        return supplier.get().clone();
     }
 
     public Supplier<Item> getSupplier(String id) {

@@ -1386,10 +1386,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return id == WATER || id == STILL_WATER;
     }
 
-    public boolean isSuspiciousBlock() {
-        return false;
-    }
-
     public PersistentDataContainer getPersistentDataContainer() {
         if (!this.isValid()) {
             throw new IllegalStateException("Block does not have valid level");

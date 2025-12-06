@@ -11,27 +11,17 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
 /**
- * @author glorydark
+ * @author Koshak_Mine, glorydark
  */
 public class BlockEntityBrushableBlock extends BlockEntitySpawnable implements BlockEntityNameable {
 
-    private static final int BRUSH_COOLDOWN_TICKS = 10;
-
-    private static final int BRUSH_RESET_TICKS = 40;
-
-    private static final int REQUIRED_BRUSHES_TO_BREAK = 10;
+    public static final int REQUIRED_BRUSHES_TO_BREAK = 20;
 
     private Item item;
 
     private byte brushDirection;
 
-    private int brushCount;
-
-    private long brushCountResetsAtTick;
-
-    private long coolDownEndsAtTick;
-
-    private boolean rare = false;
+    private int brushCount = 0;
 
     public BlockEntityBrushableBlock(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -44,6 +34,7 @@ public class BlockEntityBrushableBlock extends BlockEntitySpawnable implements B
     public void setBrushDirection(BlockFace face) {
         this.brushDirection = (byte) face.getIndex();
         this.namedTag.putByte("brush_direction", this.brushDirection);
+        this.spawnToAll();
     }
 
     public int getBrushCount() {
@@ -53,15 +44,16 @@ public class BlockEntityBrushableBlock extends BlockEntitySpawnable implements B
     public void setBrushCount(int brushCount) {
         this.brushCount = brushCount;
         this.namedTag.putInt("brush_count", brushCount);
+        this.spawnToAll();
     }
 
-    public boolean isRare() {
-        return rare;
+    public void setItem(Item item) {
+        this.item = item;
+        this.namedTag.putCompound("item", NBTIO.putItemHelper(this.item, true));
     }
 
-    public void setRare(boolean rare) {
-        this.rare = rare;
-        this.namedTag.putString("LootTable", getLootTablePath());
+    public Item getItem() {
+        return item;
     }
 
     @Override
@@ -103,26 +95,24 @@ public class BlockEntityBrushableBlock extends BlockEntitySpawnable implements B
                 .putInt("z", (int) this.z)
                 .putCompound("item", NBTIO.putItemHelper(this.item))
                 .putList("type", namedTag.getList(getBlock().toItem().getNamespaceId()))
+                .putInt("brush_count", brushCount / 2)
+                .putByte("brush_direction", brushDirection)
                 .putInt("LootTableSeed", Utils.random.nextInt())
-                .putString("LootTable", getLootTablePath());
+                .putString("LootTable", "");
     }
 
-    // todo: check if paths are correct.
-    public String getLootTablePath() {
-        if (rare) {
-            return "loot_tables/entities/trail_ruins_brushable_block_rare.json";
-        } else {
-            return "loot_tables/entities/trail_ruins_brushable_block_common.json";
-        }
-    }
-
-    private int getCompletionState() {
-        if (this.brushCount == 0) {
-            return 0;
-        } else if (this.brushCount < 3) {
+    public int getCompletionState() {
+        //TODO: Make it match vanilla time with better code style
+        if (brushCount >= 3) {
+            if (brushCount >= 7) {
+                if (brushCount >= 14) {
+                    return 3;
+                }
+                return 2;
+            }
             return 1;
         } else {
-            return this.brushCount < 6 ? 2 : 3;
+            return 0;
         }
     }
 }

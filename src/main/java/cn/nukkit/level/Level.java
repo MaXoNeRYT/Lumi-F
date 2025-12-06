@@ -53,6 +53,7 @@ import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.level.persistence.impl.DelegatePersistentDataContainer;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.level.util.BlockUpdateEntry;
+import cn.nukkit.level.util.PortalCreator;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
 import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.level.vibration.VibrationManager;
@@ -264,7 +265,7 @@ public class Level implements ChunkManager, Metadatable {
     private final String folderName;
 
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
-    private final Long2ObjectOpenHashMap<SoftReference<Int2ObjectOpenHashMap<Object>>> changedBlocks= new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<SoftReference<Int2ObjectOpenHashMap<Object>>> changedBlocks = new Long2ObjectOpenHashMap<>();
     // Storing the vector is redundant
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
@@ -288,6 +289,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private boolean autoSave;
     private boolean autoCompaction;
+
     @Getter
     @Setter
     private boolean saveOnUnloadEnabled = true;
@@ -353,6 +355,8 @@ public class Level implements ChunkManager, Metadatable {
     public GameRules gameRules;
 
     private final boolean randomTickingEnabled;
+
+    private final PortalCreator portalCreator = new PortalCreator(this);
 
     @Getter
     private ExecutorService asyncChuckExecutor;
@@ -1087,7 +1091,7 @@ public class Level implements ChunkManager, Metadatable {
 
         this.levelCurrentTick++;
 
-        if(currentTick % 200 == 0) {
+        if (currentTick % 200 == 0) {
             this.unloadChunks(true);
         }
 
@@ -2491,7 +2495,8 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (this.gameRules.getBoolean(GameRule.DO_TILE_DROPS)) {
-            if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
+            //TODO: rework the way how the experience is dropped
+            if (!isSilkTouch && player != null && (drops.length != 0 || target.getId() == BlockID.SCULK)) { // For example no xp from redstone if it's mined with stone pickaxe + trick for xp with sculk block
                 if (player.isSurvival() || player.isAdventure()) {
                     this.dropExpOrb(vector.add(0.5, 0.5, 0.5), dropExp);
                 }
@@ -2990,7 +2995,7 @@ public class Level implements ChunkManager, Metadatable {
      * @param pos   方块实体所在的位置。
      *              The position where the block entity is located.
      * @return 如果区块已加载且存在方块实体，则返回该方块实体；否则返回 null。
-     *         If the chunk is loaded and there is a block entity, return the block entity; otherwise, return null.
+     * If the chunk is loaded and there is a block entity, return the block entity; otherwise, return null.
      */
     public BlockEntity getBlockEntityIfLoaded(FullChunk chunk, Vector3 pos) {
         int by = pos.getFloorY();
@@ -4643,231 +4648,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {
-        if (this.getDimension() == DIMENSION_THE_END) return false;
-        final int maxPortalSize = 23;
-        final int targX = target.getFloorX();
-        final int targY = target.getFloorY();
-        final int targZ = target.getFloorZ();
-        //check if there's air above (at least 3 blocks)
-        for (int i = 1; i < 4; i++) {
-            if (this.getBlockIdAt(targX, targY + i, targZ) != BlockID.AIR) {
-                return false;
-            }
-        }
-        int sizePosX = 0;
-        int sizeNegX = 0;
-        int sizePosZ = 0;
-        int sizeNegZ = 0;
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX + i, targY, targZ) == BlockID.OBSIDIAN) {
-                sizePosX++;
-            } else {
-                break;
-            }
-        }
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX - i, targY, targZ) == BlockID.OBSIDIAN) {
-                sizeNegX++;
-            } else {
-                break;
-            }
-        }
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX, targY, targZ + i) == BlockID.OBSIDIAN) {
-                sizePosZ++;
-            } else {
-                break;
-            }
-        }
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX, targY, targZ - i) == BlockID.OBSIDIAN) {
-                sizeNegZ++;
-            } else {
-                break;
-            }
-        }
-        //plus one for target block
-        int sizeX = sizePosX + sizeNegX + 1;
-        int sizeZ = sizePosZ + sizeNegZ + 1;
-        if (sizeX >= 2 && sizeX <= maxPortalSize) {
-            //start scan from 1 block above base
-            //find pillar or end of portal to start scan
-            int scanX = targX;
-            int scanY = targY + 1;
-            for (int i = 0; i < sizePosX + 1; i++) {
-                //this must be air
-                if (this.getBlockIdAt(scanX + i, scanY, targZ) != BlockID.AIR) {
-                    return false;
-                }
-                if (this.getBlockIdAt(scanX + i + 1, scanY, targZ) == BlockID.OBSIDIAN) {
-                    scanX += i;
-                    break;
-                }
-            }
-            //make sure that the above loop finished
-            if (this.getBlockIdAt(scanX + 1, scanY, targZ) != BlockID.OBSIDIAN) {
-                return false;
-            }
-
-            int innerWidth = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(scanX - i, scanY, targZ);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerWidth++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            int innerHeight = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(scanX, scanY + i, targZ);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerHeight++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            if (!(innerWidth <= 21
-                    && innerWidth >= 2
-                    && innerHeight <= 21
-                    && innerHeight >= 3)) {
-                return false;
-            }
-
-            for (int height = 0; height < innerHeight + 1; height++) {
-                if (height == innerHeight) {
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(scanX - width, scanY + height, targZ) != BlockID.OBSIDIAN) {
-                            return false;
-                        }
-                    }
-                } else {
-                    if (this.getBlockIdAt(scanX + 1, scanY + height, targZ) != BlockID.OBSIDIAN
-                            || this.getBlockIdAt(scanX - innerWidth, scanY + height, targZ) != BlockID.OBSIDIAN) {
-                        return false;
-                    }
-
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(scanX - width, scanY + height, targZ) != BlockID.AIR) {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            for (int height = 0; height < innerHeight; height++) {
-                for (int width = 0; width < innerWidth; width++) {
-                    this.setBlock(new Vector3(scanX - width, scanY + height, targZ), Block.get(BlockID.NETHER_PORTAL));
-                }
-            }
-
-            if (fireCharge) {
-                this.addSoundToViewers(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
-            } else {
-                this.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);
-            }
-            return true;
-        } else if (sizeZ >= 2 && sizeZ <= maxPortalSize) {
-            //start scan from 1 block above base
-            //find pillar or end of portal to start scan
-            int scanY = targY + 1;
-            int scanZ = targZ;
-            for (int i = 0; i < sizePosZ + 1; i++) {
-                //this must be air
-                if (this.getBlockIdAt(targX, scanY, scanZ + i) != BlockID.AIR) {
-                    return false;
-                }
-                if (this.getBlockIdAt(targX, scanY, scanZ + i + 1) == BlockID.OBSIDIAN) {
-                    scanZ += i;
-                    break;
-                }
-            }
-            //make sure that the above loop finished
-            if (this.getBlockIdAt(targX, scanY, scanZ + 1) != BlockID.OBSIDIAN) {
-                return false;
-            }
-
-            int innerWidth = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(targX, scanY, scanZ - i);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerWidth++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            int innerHeight = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(targX, scanY + i, scanZ);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerHeight++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            if (!(innerWidth <= 21
-                    && innerWidth >= 2
-                    && innerHeight <= 21
-                    && innerHeight >= 3)) {
-                return false;
-            }
-
-            for (int height = 0; height < innerHeight + 1; height++) {
-                if (height == innerHeight) {
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(targX, scanY + height, scanZ - width) != BlockID.OBSIDIAN) {
-                            return false;
-                        }
-                    }
-                } else {
-                    if (this.getBlockIdAt(targX, scanY + height, scanZ + 1) != BlockID.OBSIDIAN
-                            || this.getBlockIdAt(targX, scanY + height, scanZ - innerWidth) != BlockID.OBSIDIAN) {
-                        return false;
-                    }
-
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(targX, scanY + height, scanZ - width) != BlockID.AIR) {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            for (int height = 0; height < innerHeight; height++) {
-                for (int width = 0; width < innerWidth; width++) {
-                    this.setBlock(new Vector3(targX, scanY + height, scanZ - width), Block.get(BlockID.NETHER_PORTAL));
-                }
-            }
-
-            if (fireCharge) {
-                this.addSoundToViewers(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
-            } else {
-                this.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);
-            }
-            return true;
-        }
-
-        return false;
+        return this.portalCreator.create(target, fireCharge);
     }
 
     public Position calculatePortalMirror(Vector3 portal) {

@@ -41,12 +41,7 @@ public class EmotePacket extends DataPacket {
         String id = this.getString();
 
         try {
-            UUID uuid = UUID.fromString(id);
-            if(uuid.version() != 4) {
-                throw new DataPacketDecodeException("Invalid UUID Version: " + this.emoteID);
-            }
-
-            this.emoteID = uuid;
+            this.emoteID = UUID.fromString(id);
         } catch (IllegalArgumentException e) {
             throw new DataPacketDecodeException("Invalid UUID: " + this.emoteID);
         }
@@ -65,7 +60,7 @@ public class EmotePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putEntityRuntimeId(this.runtimeId);
-        this.putUUID(this.emoteID);
+        this.putString(this.emoteID.toString());
         if (this.protocol >= ProtocolInfo.v1_20_0_23) {
             if (this.protocol >= ProtocolInfo.v1_21_30) {
                 this.putUnsignedVarInt(this.emoteDuration);

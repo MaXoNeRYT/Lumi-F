@@ -12,23 +12,14 @@ import java.util.List;
 public interface ProtocolInfo {
 
     int v1_16_0 = 407;
-    int v1_16_20 = 408;
-    int v1_16_100_0 = 409;
-    int v1_16_100_51 = 410;
     int v1_16_100_52 = 411;
     int v1_16_100 = 419;
-    int v1_16_200_51 = 420;
     int v1_16_200 = 422;
-    int v1_16_210_50 = 423;
-    int v1_16_210_53 = 424;
     int v1_16_210 = 428;
     int v1_16_220 = 431;
     int v1_16_230_50 = 433;
-    int v1_16_230 = 434;
-    int v1_16_230_54 = 435;
     int v1_17_0 = 440;
     int v1_17_10 = 448;
-    int v1_17_20_20 = 453;
     int v1_17_30 = 465;
     int v1_17_40 = 471;
     int v1_18_0 = 475;
@@ -40,7 +31,6 @@ public interface ProtocolInfo {
     int v1_19_0 = 527;
     int v1_19_10 = 534;
     int v1_19_20 = 544;
-    int v1_19_21 = 545;
     int v1_19_30_23 = 553;
     int v1_19_30 = 554;
     int v1_19_40 = 557;
@@ -79,13 +69,14 @@ public interface ProtocolInfo {
     int v1_21_110_26 = 843;
     int v1_21_111 = 844;
     int v1_21_120 = 859;
+    int v1_21_124 = 860;
 
-    int CURRENT_PROTOCOL = Utils.dynamic(v1_21_120);
+    int CURRENT_PROTOCOL = Utils.dynamic(v1_21_124);
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
             v1_20_0_23, v1_20_0, v1_20_10_21, v1_20_10, v1_20_30_24, v1_20_30, v1_20_40, v1_20_50, v1_20_60, v1_20_70, v1_20_80,
             v1_21_0, v1_21_2, v1_21_20, v1_21_30, v1_21_40, v1_21_50_26, v1_21_50, v1_21_60, v1_21_70_24, v1_21_70, v1_21_80, v1_21_90,
-            v1_21_93, v1_21_100, v1_21_110_26, v1_21_111, v1_21_120
+            v1_21_93, v1_21_100, v1_21_110_26, v1_21_111, v1_21_120, v1_21_124
     );
 
     String MINECRAFT_VERSION_NETWORK = Utils.getVersionByProtocol(CURRENT_PROTOCOL);

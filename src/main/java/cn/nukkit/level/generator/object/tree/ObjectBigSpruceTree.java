@@ -154,7 +154,7 @@ public class ObjectBigSpruceTree extends ObjectSpruceTree {
                     }
 
                     if (!Registries.BLOCK.isSolid(level.getBlockIdAt(xx, yyy, zz))) {
-                        level.setBlockAt(xx, yyy, zz, this.getLeafBlock(), this.getType());
+                        level.setBlockAt(xx, yyy, zz, this.getLeafBlock(), this.getLeafType());
                     }
                 }
             }
