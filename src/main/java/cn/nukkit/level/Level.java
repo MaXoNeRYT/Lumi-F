@@ -1708,27 +1708,25 @@ public class Level implements ChunkManager, Metadatable {
         return updateQueue.getPendingBlockUpdates(boundingBox);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb) {
         return this.getCollisionBlocks(bb, false);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst) {
         return getCollisionBlocks(bb, targetFirst, false);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck) {
         return getCollisionBlocks(bb, targetFirst, ignoreCollidesCheck, block -> block.getId() != 0);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck, Predicate<Block> condition) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck, Predicate<Block> condition) {
         int minX = NukkitMath.floorDouble(bb.getMinX());
         int minY = NukkitMath.floorDouble(bb.getMinY());
         int minZ = NukkitMath.floorDouble(bb.getMinZ());
         int maxX = NukkitMath.ceilDouble(bb.getMaxX());
         int maxY = NukkitMath.ceilDouble(bb.getMaxY());
         int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
-
-        List<Block> collides = new ArrayList<>();
 
         if (targetFirst) {
             for (int z = minZ; z <= maxZ; ++z) {
@@ -1742,18 +1740,26 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
         } else {
+            int capacity = Math.max(0, maxX - minX + 1) * Math.max(0, maxY - minY + 1) * Math.max(0, maxZ - minZ + 1);
+            if (capacity == 0) {
+                return Block.EMPTY_ARRAY;
+            }
+            Block[] collides = new Block[capacity];
+            int count = 0;
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
                         Block block = this.getBlock(x, y, z, false);
                         if (block != null && condition.test(block) && (ignoreCollidesCheck || block.collidesWithBB(bb))) {
-                            collides.add(block);
+                            collides[count++] = block;
                         }
                     }
                 }
             }
+            return count == capacity ? collides : Arrays.copyOf(collides, count);
         }
-        return collides.toArray(new Block[0]);
+
+        return Block.EMPTY_ARRAY;
     }
 
     public boolean hasCollisionBlocks(AxisAlignedBB bb) {
