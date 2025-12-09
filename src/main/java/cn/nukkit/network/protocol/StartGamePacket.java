@@ -304,19 +304,11 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.isTrial);
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            if (protocol >= ProtocolInfo.v1_16_210) {
-                if (protocol < ProtocolInfo.v1_21_90) {
-                    this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
-                }
-                this.putVarInt(0); // RewindHistorySize
-                this.putBoolean(this.isServerAuthoritativeBlockBreaking); // isServerAuthoritativeBlockBreaking
-            } else {
-                this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
-            }
-        } else {
-            this.putBoolean(this.isMovementServerAuthoritative);
+        if (protocol < ProtocolInfo.v1_21_90) {
+            this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
         }
+        this.putVarInt(0); // RewindHistorySize
+        this.putBoolean(this.isServerAuthoritativeBlockBreaking); // isServerAuthoritativeBlockBreaking
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
         if (this.blockDefinitions != null && !this.blockDefinitions.isEmpty()) {
@@ -340,22 +332,20 @@ public class StartGamePacket extends DataPacket {
             this.putBoolean(this.isOnlySpawningV1Villagers);
         } else if (protocol >= ProtocolInfo.v1_16_0) {
             this.putBoolean(false); // isInventoryServerAuthoritative
-            if (protocol >= ProtocolInfo.v1_16_230_50) {
-                this.putString(""); // serverEngine
-                try {
-                    this.put(NBTIO.writeNetwork(this.playerPropertyData));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                this.putLLong(0L); // BlockRegistryChecksum
-                this.put(EMPTY_UUID); // worldTemplateId
-                this.putBoolean(this.clientSideGenerationEnabled);
-                this.putBoolean(this.blockNetworkIdsHashed);
-                if (protocol >= ProtocolInfo.v1_20_0_23) {
-                    this.putBoolean(this.networkPermissions.isServerAuthSounds());
-                    if(protocol >= ProtocolInfo.v1_21_100) {
-                        this.putBoolean(this.tickDeathSystemsEnabled);
-                    }
+            this.putString(""); // serverEngine
+            try {
+                this.put(NBTIO.writeNetwork(this.playerPropertyData));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            this.putLLong(0L); // BlockRegistryChecksum
+            this.put(EMPTY_UUID); // worldTemplateId
+            this.putBoolean(this.clientSideGenerationEnabled);
+            this.putBoolean(this.blockNetworkIdsHashed);
+            if (protocol >= ProtocolInfo.v1_20_0_23) {
+                this.putBoolean(this.networkPermissions.isServerAuthSounds());
+                if(protocol >= ProtocolInfo.v1_21_100) {
+                    this.putBoolean(this.tickDeathSystemsEnabled);
                 }
             }
         }

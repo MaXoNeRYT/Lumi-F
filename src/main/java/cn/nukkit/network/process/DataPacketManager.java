@@ -5,7 +5,7 @@ import cn.nukkit.network.process.processor.common.*;
 import cn.nukkit.network.process.processor.common.CommandRequestProcessor;
 import cn.nukkit.network.process.processor.common.SetLocalPlayerAsInitializedProcessor;
 import cn.nukkit.network.process.processor.common.LecternUpdateProcessor;
-import cn.nukkit.network.process.processor.v422.FilterTextProcessor_v422;
+import cn.nukkit.network.process.processor.common.FilterTextProcessor;
 import cn.nukkit.network.process.processor.common.RequestAbilityProcessor;
 import cn.nukkit.network.process.processor.common.RequestNetworkSettingsProcessor;
 import cn.nukkit.network.protocol.DataPacket;
@@ -187,12 +187,8 @@ public final class DataPacketManager {
                 SetPlayerGameTypeProcessor.INSTANCE,
                 TextProcessor.INSTANCE,
                 RequestAbilityProcessor.INSTANCE,
-                RequestNetworkSettingsProcessor.INSTANCE
-        );
-
-        registerProcessor(
-                ProtocolInfo.v1_16_200,
-                FilterTextProcessor_v422.INSTANCE
+                RequestNetworkSettingsProcessor.INSTANCE,
+                FilterTextProcessor.INSTANCE
         );
     }
 }
