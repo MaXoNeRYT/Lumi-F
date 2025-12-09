@@ -16,9 +16,4 @@ public class ItemRaiserArmorTrimSmithingTemplate extends StringItemBase implemen
     public ItemTrimPatternType getPattern() {
         return ItemTrimPatternType.RAISER_ARMOR_TRIM_ARMOR_TRIM;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_80;
-    }
 }

@@ -1,4 +1,4 @@
-package cn.nukkit.network.process.processor.v554;
+package cn.nukkit.network.process.processor.common;
 
 import cn.nukkit.Player;
 import cn.nukkit.PlayerHandle;
@@ -19,9 +19,9 @@ import org.jetbrains.annotations.NotNull;
  */
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestNetworkSettingsProcessor_v554 extends DataPacketProcessor<RequestNetworkSettingsPacket> {
+public class RequestNetworkSettingsProcessor extends DataPacketProcessor<RequestNetworkSettingsPacket> {
 
-    public static final RequestNetworkSettingsProcessor_v554 INSTANCE = new RequestNetworkSettingsProcessor_v554();
+    public static final RequestNetworkSettingsProcessor INSTANCE = new RequestNetworkSettingsProcessor();
 
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull RequestNetworkSettingsPacket pk) {
@@ -39,7 +39,7 @@ public class RequestNetworkSettingsProcessor_v554 extends DataPacketProcessor<Re
 
         NetworkSettingsPacket settingsPacket = new NetworkSettingsPacket();
         PacketCompressionAlgorithm algorithm;
-        if (player.getServer().getSettings().network().compression().useSnappyCompression() && player.protocol >= ProtocolInfo.v1_19_30_23) {
+        if (player.getServer().getSettings().network().compression().useSnappyCompression()) {
             algorithm = PacketCompressionAlgorithm.SNAPPY;
         } else {
             algorithm = PacketCompressionAlgorithm.ZLIB;
@@ -72,10 +72,5 @@ public class RequestNetworkSettingsProcessor_v554 extends DataPacketProcessor<Re
     @Override
     public Class<? extends DataPacket> getPacketClass() {
         return RequestNetworkSettingsPacket.class;
-    }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_19_30_23;
     }
 }

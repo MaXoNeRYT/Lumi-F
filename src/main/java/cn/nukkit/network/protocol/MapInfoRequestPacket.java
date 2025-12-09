@@ -33,18 +33,16 @@ public class MapInfoRequestPacket extends DataPacket {
     public void decode() throws DataPacketDecodeException {
         mapId = this.getVarLong();
 
-        if (this.protocol >= ProtocolInfo.v1_19_20) {
-            int count = (int) this.getUnsignedVarInt();
-            if(count > MAX_MAP_PIXELS) {
-                throw new DataPacketDecodeException("Too many pixels!");
-            }
+        int count = (int) this.getUnsignedVarInt();
+        if(count > MAX_MAP_PIXELS) {
+            throw new DataPacketDecodeException("Too many pixels!");
+        }
 
-            for (int i = 0; i < count; i++) {
-                MapPixel pixel = new MapPixel();
-                pixel.pixel = this.getInt();
-                pixel.index = this.getLShort();
-                this.pixels.add(pixel);
-            }
+        for (int i = 0; i < count; i++) {
+            MapPixel pixel = new MapPixel();
+            pixel.pixel = this.getInt();
+            pixel.index = this.getLShort();
+            this.pixels.add(pixel);
         }
     }
 

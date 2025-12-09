@@ -95,7 +95,7 @@ public class RuntimeItemMapping {
 
             //高版本"minecraft:wool"的名称改为"minecraft:white_wool"
             //他们的legacyId均为35，这里避免冲突忽略"minecraft:wool"
-            if (protocolId >= ProtocolInfo.v1_19_63 && "minecraft:wool".equalsIgnoreCase(identifier)) {
+            if ("minecraft:wool".equalsIgnoreCase(identifier)) {
                 continue;
             }
 

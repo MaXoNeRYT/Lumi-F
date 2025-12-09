@@ -110,7 +110,7 @@ public class BatchingHelper {
             try {
                 byte[] bytes = Binary.appendBytes(batched.getBuffer());
                 BatchPacket pk = new BatchPacket();
-                if (Server.getInstance().getSettings().network().compression().useSnappyCompression() && protocolId >= ProtocolInfo.v1_19_30_23) {
+                if (Server.getInstance().getSettings().network().compression().useSnappyCompression()) {
                     pk.payload = SnappyCompression.compress(bytes);
                 } else if (protocolId >= ProtocolInfo.v1_16_0) {
                     pk.payload = Zlib.deflateRaw(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());

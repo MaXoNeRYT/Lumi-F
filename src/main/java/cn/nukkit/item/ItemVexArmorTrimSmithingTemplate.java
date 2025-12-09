@@ -16,9 +16,4 @@ public class ItemVexArmorTrimSmithingTemplate extends StringItemBase implements 
     public ItemTrimPatternType getPattern() {
         return ItemTrimPatternType.VEX_ARMOR_TRIM;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_80;
-    }
 }

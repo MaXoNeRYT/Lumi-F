@@ -384,9 +384,7 @@ public class BinaryStream {
         this.putBoolean(skin.isPersona());
         this.putBoolean(skin.isCapeOnClassic());
         this.putBoolean(skin.isPrimaryUser());
-        if (protocol >= ProtocolInfo.v1_19_63) {
-            this.putBoolean(skin.isOverridingPlayerAppearance());
-        }
+        this.putBoolean(skin.isOverridingPlayerAppearance());
     }
 
     public void putImage(SerializedImage image) {
@@ -466,9 +464,7 @@ public class BinaryStream {
         skin.setPersona(this.getBoolean());
         skin.setCapeOnClassic(this.getBoolean());
         skin.setPrimaryUser(this.getBoolean());
-        if (protocol >= ProtocolInfo.v1_19_63) {
-            skin.setOverridingPlayerAppearance(this.getBoolean());
-        }
+        skin.setOverridingPlayerAppearance(this.getBoolean());
         return skin;
     }
 
@@ -702,16 +698,8 @@ public class BinaryStream {
             this.getVarInt(); // netId
         }
 
-        int blockRuntimeId = this.getVarInt();// blockRuntimeId
+        this.getVarInt();// blockRuntimeId
         //TODO 在1.21.30会得到错误数据
-        if (protocolId < ProtocolInfo.v1_19_0_31) {
-            if (id != null && id < 256 && id != 166) { // ItemBlock
-                int fullId = GlobalBlockPalette.getLegacyFullId(protocolId, blockRuntimeId);
-                if (fullId != -1) {
-                    damage = fullId & Block.DATA_MASK;
-                }
-            }
-        }
 
         byte[] bytes = this.getByteArray();
         ByteBuf buf = AbstractByteBufAllocator.DEFAULT.ioBuffer(bytes.length);

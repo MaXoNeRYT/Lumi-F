@@ -198,13 +198,9 @@ public class StartGamePacket extends DataPacket {
         this.putVarInt(this.difficulty);
         this.putBlockVector3(this.spawnX, this.spawnY, this.spawnZ);
         this.putBoolean(this.hasAchievementsDisabled);
-        if (protocol >= ProtocolInfo.v1_19_10) {
-            this.putVarInt(this.editorWorldType);
-            if (protocol >= ProtocolInfo.v1_19_80) {
-                this.putBoolean(this.createdInEditor);
-                this.putBoolean(this.exportedFromEditor);
-            }
-        }
+        this.putVarInt(this.editorWorldType);
+        this.putBoolean(this.createdInEditor);
+        this.putBoolean(this.exportedFromEditor);
         this.putVarInt(this.dayCycleStopTime);
         if (protocol >= 388) {
             this.putVarInt(this.eduEditionOffer);
@@ -277,13 +273,9 @@ public class StartGamePacket extends DataPacket {
                 this.putBoolean(this.isWorldTemplateOptionLocked);
                 if (protocol >= 361) {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
-                    if (protocol >= ProtocolInfo.v1_19_20) {
-                        this.putBoolean(this.isDisablingPersonas);
-                        this.putBoolean(this.isDisablingCustomSkins);
-                        if (protocol >= ProtocolInfo.v1_19_60) {
-                            this.putBoolean(this.emoteChatMuted);
-                        }
-                    }
+                    this.putBoolean(this.isDisablingPersonas);
+                    this.putBoolean(this.isDisablingCustomSkins);
+                    this.putBoolean(this.emoteChatMuted);
                     this.putString(this.vanillaVersion);
                 }
             }
@@ -294,16 +286,14 @@ public class StartGamePacket extends DataPacket {
                 this.putString(""); // buttonName
                 this.putString(""); // linkUri
                 this.putBoolean(/*Server.getInstance().enableExperimentMode*/ false); //Force Experimental Gameplay (exclusive to debug clients)
-                if (protocol >= ProtocolInfo.v1_19_20) {
-                    this.putByte(this.chatRestrictionLevel);
-                    this.putBoolean(this.disablePlayerInteractions);
-                    if (protocol >= ProtocolInfo.v1_21_0) {
-                        this.putString(this.serverId);
-                        this.putString(this.worldId);
-                        this.putString(this.scenarioId);
-                        if (protocol >= ProtocolInfo.v1_21_90) {
-                            this.putString(""); // OwnerId
-                        }
+                this.putByte(this.chatRestrictionLevel);
+                this.putBoolean(this.disablePlayerInteractions);
+                if (protocol >= ProtocolInfo.v1_21_0) {
+                    this.putString(this.serverId);
+                    this.putString(this.worldId);
+                    this.putString(this.scenarioId);
+                    if (protocol >= ProtocolInfo.v1_21_90) {
+                        this.putString(""); // OwnerId
                     }
                 }
             }
@@ -352,28 +342,19 @@ public class StartGamePacket extends DataPacket {
             this.putBoolean(false); // isInventoryServerAuthoritative
             if (protocol >= ProtocolInfo.v1_16_230_50) {
                 this.putString(""); // serverEngine
-                if (protocol >= ProtocolInfo.v1_19_0_29) {
-                    try {
-                        this.put(NBTIO.writeNetwork(this.playerPropertyData));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                try {
+                    this.put(NBTIO.writeNetwork(this.playerPropertyData));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
                 this.putLLong(0L); // BlockRegistryChecksum
-                if (protocol >= ProtocolInfo.v1_19_0_29) {
-                    //this.putUUID(new UUID(0, 0)); // worldTemplateId
-                    this.put(EMPTY_UUID); // worldTemplateId
-                    if (protocol >= ProtocolInfo.v1_19_20) {
-                        this.putBoolean(this.clientSideGenerationEnabled);
-                        if (protocol >= ProtocolInfo.v1_19_80) {
-                            this.putBoolean(this.blockNetworkIdsHashed);
-                            if (protocol >= ProtocolInfo.v1_20_0_23) {
-                                this.putBoolean(this.networkPermissions.isServerAuthSounds());
-                                if(protocol >= ProtocolInfo.v1_21_100) {
-                                    this.putBoolean(this.tickDeathSystemsEnabled);
-                                }
-                            }
-                        }
+                this.put(EMPTY_UUID); // worldTemplateId
+                this.putBoolean(this.clientSideGenerationEnabled);
+                this.putBoolean(this.blockNetworkIdsHashed);
+                if (protocol >= ProtocolInfo.v1_20_0_23) {
+                    this.putBoolean(this.networkPermissions.isServerAuthSounds());
+                    if(protocol >= ProtocolInfo.v1_21_100) {
+                        this.putBoolean(this.tickDeathSystemsEnabled);
                     }
                 }
             }

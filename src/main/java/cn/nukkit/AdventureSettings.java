@@ -77,94 +77,74 @@ public class AdventureSettings implements Cloneable {
      * @param reset reset in air ticks
      */
     void update(boolean reset) {
-        if (this.player.protocol >= ProtocolInfo.v1_19_30_23) {
-            UpdateAbilitiesPacket packet = new UpdateAbilitiesPacket();
-            packet.setEntityId(player.getId());
-            packet.setCommandPermission(player.isOp() ? UpdateAbilitiesPacket.CommandPermission.OPERATOR : UpdateAbilitiesPacket.CommandPermission.NORMAL);
-            packet.setPlayerPermission(player.isOp() && !player.isSpectator() ? UpdateAbilitiesPacket.PlayerPermission.OPERATOR : UpdateAbilitiesPacket.PlayerPermission.MEMBER);
+        UpdateAbilitiesPacket packet = new UpdateAbilitiesPacket();
+        packet.setEntityId(player.getId());
+        packet.setCommandPermission(player.isOp() ? UpdateAbilitiesPacket.CommandPermission.OPERATOR : UpdateAbilitiesPacket.CommandPermission.NORMAL);
+        packet.setPlayerPermission(player.isOp() && !player.isSpectator() ? UpdateAbilitiesPacket.PlayerPermission.OPERATOR : UpdateAbilitiesPacket.PlayerPermission.MEMBER);
 
-            AbilityLayer layer = new AbilityLayer();
-            layer.setLayerType(AbilityLayer.Type.BASE);
-            layer.getAbilitiesSet().addAll(PlayerAbility.VALUES);
+        AbilityLayer layer = new AbilityLayer();
+        layer.setLayerType(AbilityLayer.Type.BASE);
+        layer.getAbilitiesSet().addAll(PlayerAbility.VALUES);
 
-            // TODO Multiversion 移除低版本不支持的内容
-            if (player.protocol < ProtocolInfo.v1_19_70) {
-                layer.getAbilitiesSet().remove(PlayerAbility.PRIVILEGED_BUILDER);
+        // TODO Multiversion 移除低版本不支持的内容
+
+        for (Type type : Type.values()) {
+            if (type.isAbility() && this.get(type) && player.protocol >= type.protocol) {
+                layer.getAbilityValues().add(type.getAbility());
             }
+        }
+
+        // Because we send speed
+        layer.getAbilityValues().add(PlayerAbility.WALK_SPEED);
+        layer.getAbilityValues().add(PlayerAbility.FLY_SPEED);
+        if (player.protocol >= ProtocolInfo.v1_21_60) {
+            layer.getAbilitiesSet().add(PlayerAbility.VERTICAL_FLY_SPEED);
+        }
+
+        if (player.isCreative()) { // Make sure player can interact with creative menu
+            layer.getAbilityValues().add(PlayerAbility.INSTABUILD);
+        }
+
+        if (player.isOp()) {
+            layer.getAbilityValues().add(PlayerAbility.OPERATOR_COMMANDS);
+        }
+
+        layer.setWalkSpeed(player.getWalkSpeed());
+        layer.setFlySpeed(player.getFlySpeed());
+        layer.setVerticalFlySpeed(player.getVerticalFlySpeed());
+        packet.getAbilityLayers().add(layer);
+
+        if (player.isSpectator()) {
+            AbilityLayer spectator = new AbilityLayer();
+            spectator.setLayerType(AbilityLayer.Type.SPECTATOR);
+
+            spectator.getAbilitiesSet().addAll(PlayerAbility.VALUES);
+            spectator.getAbilitiesSet().remove(PlayerAbility.FLY_SPEED); //不要设置速度，这会导致视角出错
+            spectator.getAbilitiesSet().remove(PlayerAbility.WALK_SPEED);
+            spectator.getAbilitiesSet().remove(PlayerAbility.VERTICAL_FLY_SPEED);
 
             for (Type type : Type.values()) {
                 if (type.isAbility() && this.get(type) && player.protocol >= type.protocol) {
-                    layer.getAbilityValues().add(type.getAbility());
+                    spectator.getAbilityValues().add(type.getAbility());
                 }
-            }
-
-            // Because we send speed
-            layer.getAbilityValues().add(PlayerAbility.WALK_SPEED);
-            layer.getAbilityValues().add(PlayerAbility.FLY_SPEED);
-            if (player.protocol >= ProtocolInfo.v1_21_60) {
-                layer.getAbilitiesSet().add(PlayerAbility.VERTICAL_FLY_SPEED);
-            }
-
-            if (player.isCreative()) { // Make sure player can interact with creative menu
-                layer.getAbilityValues().add(PlayerAbility.INSTABUILD);
             }
 
             if (player.isOp()) {
                 layer.getAbilityValues().add(PlayerAbility.OPERATOR_COMMANDS);
             }
 
-            layer.setWalkSpeed(player.getWalkSpeed());
-            layer.setFlySpeed(player.getFlySpeed());
-            layer.setVerticalFlySpeed(player.getVerticalFlySpeed());
-            packet.getAbilityLayers().add(layer);
-
-            if (player.protocol >= ProtocolInfo.v1_19_80 && player.isSpectator()) {
-                AbilityLayer spectator = new AbilityLayer();
-                spectator.setLayerType(AbilityLayer.Type.SPECTATOR);
-
-                spectator.getAbilitiesSet().addAll(PlayerAbility.VALUES);
-                spectator.getAbilitiesSet().remove(PlayerAbility.FLY_SPEED); //不要设置速度，这会导致视角出错
-                spectator.getAbilitiesSet().remove(PlayerAbility.WALK_SPEED);
-                spectator.getAbilitiesSet().remove(PlayerAbility.VERTICAL_FLY_SPEED);
-
-                for (Type type : Type.values()) {
-                    if (type.isAbility() && this.get(type) && player.protocol >= type.protocol) {
-                        spectator.getAbilityValues().add(type.getAbility());
-                    }
-                }
-
-                if (player.isOp()) {
-                    layer.getAbilityValues().add(PlayerAbility.OPERATOR_COMMANDS);
-                }
-
-                packet.getAbilityLayers().add(spectator);
-            }
-
-            UpdateAdventureSettingsPacket adventurePacket = new UpdateAdventureSettingsPacket();
-            adventurePacket.setAutoJump(get(Type.AUTO_JUMP));
-            adventurePacket.setImmutableWorld(get(Type.WORLD_IMMUTABLE));
-            adventurePacket.setNoMvP(get(Type.NO_MVP));
-            adventurePacket.setNoPvM(get(Type.NO_PVM));
-            adventurePacket.setShowNameTags(get(Type.SHOW_NAME_TAGS));
-
-            player.dataPacket(packet);
-            player.dataPacket(adventurePacket);
-        } else {
-            AdventureSettingsPacket pk = new AdventureSettingsPacket();
-            for (Type t : Type.values()) {
-                if (t.getId() <= 0) {
-                    continue;
-                }
-                pk.setFlag(t.getId(), get(t));
-            }
-
-            pk.commandPermission = (player.isOp() && player.showAdmin() ? AdventureSettingsPacket.PERMISSION_OPERATOR : AdventureSettingsPacket.PERMISSION_NORMAL);
-            pk.playerPermission = (player.isOp() && player.showAdmin() && !player.isSpectator() ? Player.PERMISSION_OPERATOR : Player.PERMISSION_MEMBER);
-            pk.entityUniqueId = player.getId();
-
-            //Server.broadcastPacket(player.getViewers().values(), pk);
-            player.dataPacket(pk);
+            packet.getAbilityLayers().add(spectator);
         }
+
+        UpdateAdventureSettingsPacket adventurePacket = new UpdateAdventureSettingsPacket();
+        adventurePacket.setAutoJump(get(Type.AUTO_JUMP));
+        adventurePacket.setImmutableWorld(get(Type.WORLD_IMMUTABLE));
+        adventurePacket.setNoMvP(get(Type.NO_MVP));
+        adventurePacket.setNoPvM(get(Type.NO_PVM));
+        adventurePacket.setShowNameTags(get(Type.SHOW_NAME_TAGS));
+
+        player.dataPacket(packet);
+        player.dataPacket(adventurePacket);
 
         if (reset) {
             player.resetInAirTicks();
@@ -193,7 +173,7 @@ public class AdventureSettings implements Cloneable {
         OPERATOR(AdventureSettingsPacket.OPERATOR, PlayerAbility.OPERATOR_COMMANDS, false),
         TELEPORT(AdventureSettingsPacket.TELEPORT, PlayerAbility.TELEPORT, false),
         BUILD(AdventureSettingsPacket.BUILD, PlayerAbility.BUILD, true),
-        PRIVILEGED_BUILDER(0, PlayerAbility.PRIVILEGED_BUILDER, false, ProtocolInfo.v1_19_70),
+        PRIVILEGED_BUILDER(0, PlayerAbility.PRIVILEGED_BUILDER, false),
 
         @Deprecated //1.19.30弃用
         DEFAULT_LEVEL_PERMISSIONS(AdventureSettingsPacket.DEFAULT_LEVEL_PERMISSIONS, null, false);

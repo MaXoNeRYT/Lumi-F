@@ -92,7 +92,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         stream.put(buf);
         try {
             BatchPacket batched = new BatchPacket();
-            if (Server.getInstance().getSettings().network().compression().useSnappyCompression() && protocol >= ProtocolInfo.v1_19_30_23) {
+            if (Server.getInstance().getSettings().network().compression().useSnappyCompression()) {
                 batched.payload = SnappyCompression.compress(stream.getBuffer());
             } else if (protocol >= ProtocolInfo.v1_16_0) {
                 batched.payload = Zlib.deflateRaw(stream.getBuffer(), level);

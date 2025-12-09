@@ -85,7 +85,7 @@ public class CraftingDataPacket extends DataPacket {
         this.putUnsignedVarInt(protocol >= ProtocolInfo.v1_20_0_23 ? entries.size() + 1 : entries.size());//1.20.0+ 有额外的smithing_trim
 
         for (Recipe recipe : entries) {
-            this.putVarInt(recipe.getType().getNetworkType(protocol));
+            this.putVarInt(recipe.getType().getNetworkType());
             switch (recipe.getType()) {
                 case SHAPELESS:
                     ShapelessRecipe shapeless = (ShapelessRecipe) recipe;
@@ -183,7 +183,7 @@ public class CraftingDataPacket extends DataPacket {
 
         // Identical smithing_trim recipe sent by BDS that uses tag-descriptors, as the client seems to ignore the
         // approach of using many default-descriptors (which we do for smithing_transform)
-        this.putVarInt(RecipeType.SMITHING_TRIM.getNetworkType(protocol));
+        this.putVarInt(RecipeType.SMITHING_TRIM.getNetworkType());
         this.putString("minecraft:smithing_armor_trim");
         new ItemTagDescriptor(ItemTags.TRIM_TEMPLATES, "minecraft:trim_templates").putRecipe(this, protocol);
         new ItemTagDescriptor(ItemTags.TRIMMABLE_ARMORS, "minecraft:trimmable_armors").putRecipe(this, protocol);

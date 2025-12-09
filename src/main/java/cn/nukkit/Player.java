@@ -624,15 +624,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void spawnTo(Player player) {
         if (this.spawned && player.spawned &&
                 this.isAlive() && player.isAlive()
-                && player.getLevel() == this.level && player.canSee(this) &&
-                (!this.isSpectator() || (player.protocol >= ProtocolInfo.v1_19_30)) &&
-                this.showToOthers) {
-            super.spawnTo(player);
-            if (this.isSpectator()) {
-                UpdatePlayerGameTypePacket pk = new UpdatePlayerGameTypePacket();
-                pk.gameType = GameType.from(getClientFriendlyGamemode(gamemode));
-                pk.entityId = this.getId();
-                player.dataPacket(pk);
+                && player.getLevel() == this.level && player.canSee(this)) {
+            this.isSpectator();
+            if (this.showToOthers) {
+                super.spawnTo(player);
+                if (this.isSpectator()) {
+                    UpdatePlayerGameTypePacket pk = new UpdatePlayerGameTypePacket();
+                    pk.gameType = GameType.from(getClientFriendlyGamemode(gamemode));
+                    pk.entityId = this.getId();
+                    player.dataPacket(pk);
+                }
             }
         }
     }
@@ -1062,12 +1063,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (this.protocol >= ProtocolInfo.v1_19_10) {
-            for (BlockEntity blockEntity : this.level.getChunkBlockEntities(x, z).values()) {
-                if (!(blockEntity instanceof BlockEntityItemFrame) && !(blockEntity instanceof BlockEntityCampfire))
-                    continue;
-                ((BlockEntitySpawnable) blockEntity).spawnTo(this);
-            }
+        for (BlockEntity blockEntity : this.level.getChunkBlockEntities(x, z).values()) {
+            if (!(blockEntity instanceof BlockEntityItemFrame) && !(blockEntity instanceof BlockEntityCampfire))
+                continue;
+            ((BlockEntitySpawnable) blockEntity).spawnTo(this);
         }
 
         if (this.dimensionFix560) {
@@ -1524,13 +1523,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     private int getClientFriendlyGamemode(int gamemode) {
         gamemode &= 0x03;
-        if (gamemode == Player.SPECTATOR) {
-            //1.19.30+使用真正的旁观模式
-            if (this.protocol >= ProtocolInfo.v1_19_30) {
-                return GameType.SPECTATOR.ordinal();
-            }
-            return Player.CREATIVE;
-        }
         return gamemode;
     }
 
@@ -1582,7 +1574,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.gamemode = gamemode;
 
-        List<Player> updatePlayers = this.hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_19_30).filter(p -> p != this).toList();
+        List<Player> updatePlayers = this.hasSpawned.values().stream().filter(p -> p != this).toList();
         ArrayList<Player> spawnPlayers = new ArrayList<>(this.hasSpawned.values());
         spawnPlayers.removeAll(updatePlayers);
 
@@ -2926,12 +2918,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inventory.sendHeldItemIfNotAir(this);
 
             // BDS sends armor trim templates and materials before the CraftingDataPacket
-            if (this.protocol >= ProtocolInfo.v1_19_80) {
-                TrimDataPacket trimDataPacket = new TrimDataPacket();
-                trimDataPacket.getMaterials().addAll(TrimFactory.trimMaterials);
-                trimDataPacket.getPatterns().addAll(TrimFactory.trimPatterns);
-                this.dataPacket(trimDataPacket);
-            }
+            TrimDataPacket trimDataPacket = new TrimDataPacket();
+            trimDataPacket.getMaterials().addAll(TrimFactory.trimMaterials);
+            trimDataPacket.getPatterns().addAll(TrimFactory.trimPatterns);
+            this.dataPacket(trimDataPacket);
             if (this.protocol < ProtocolInfo.v1_21_60) {
                 this.sendRecipeList();
             }
@@ -3854,9 +3844,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     case InteractPacket.ACTION_OPEN_INVENTORY:
                         if (!this.inventoryOpen) {
                             if (this.riding instanceof EntityChestBoat && this.riding == targetEntity) {
-                                if (this.protocol >= ProtocolInfo.v1_19_0) {
-                                    this.addWindow(((InventoryHolder) targetEntity).getInventory());
-                                }
+                                this.addWindow(((InventoryHolder) targetEntity).getInventory());
                             } else if (this.protocol >= 407) {
                                 if (this.inventory.open(this)) {
                                     this.inventoryOpen = true;
@@ -5349,10 +5337,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void sendToast(String title, String content) {
         title = Strings.isNullOrEmpty(title) ? " " : title;
         content = Strings.isNullOrEmpty(content) ? " " : content;
-        if (this.protocol < ProtocolInfo.v1_19_0) {
-            this.sendTitle(title, content);
-            return;
-        }
         ToastRequestPacket pk = new ToastRequestPacket();
         pk.title = title;
         pk.content = content;
@@ -5814,15 +5798,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (showMessages && !ev.getDeathMessage().toString().isEmpty()) {
                 this.server.broadcast(ev.getDeathMessage(), Server.BROADCAST_CHANNEL_USERS);
 
-                if (this.protocol >= ProtocolInfo.v1_19_10) {
-                    DeathInfoPacket pk = new DeathInfoPacket();
-                    if (ev.getDeathMessage() instanceof TranslationContainer) {
-                        pk.messageTranslationKey = this.server.getLanguage().translateString(ev.getDeathMessage().getText(), ((TranslationContainer) ev.getDeathMessage()).getParameters(), null);
-                    } else {
-                        pk.messageTranslationKey = ev.getDeathMessage().getText();
-                    }
-                    this.dataPacket(pk);
+                DeathInfoPacket pk = new DeathInfoPacket();
+                if (ev.getDeathMessage() instanceof TranslationContainer) {
+                    pk.messageTranslationKey = this.server.getLanguage().translateString(ev.getDeathMessage().getText(), ((TranslationContainer) ev.getDeathMessage()).getParameters(), null);
+                } else {
+                    pk.messageTranslationKey = ev.getDeathMessage().getText();
                 }
+                this.dataPacket(pk);
             }
 
             RespawnPacket pk = new RespawnPacket();
@@ -6835,7 +6817,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         try {
             byte[] bytes = batched.getBuffer();
             BatchPacket compress = new BatchPacket();
-            if (Server.getInstance().getSettings().network().compression().useSnappyCompression() && protocol >= ProtocolInfo.v1_19_30_23) {
+            if (Server.getInstance().getSettings().network().compression().useSnappyCompression()) {
                 compress.payload = SnappyCompression.compress(bytes);
             } else if (protocol >= ProtocolInfo.v1_16_0) {
                 compress.payload = Zlib.deflateRaw(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());
@@ -6878,9 +6860,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         chunkPublisherUpdatePacket.radius = this.chunkRadius << 4;
         this.dataPacket(chunkPublisherUpdatePacket);
 
-        if (this.protocol >= ProtocolInfo.v1_19_50_20) {
-            this.dimensionFix560 = true;
-        }
+        this.dimensionFix560 = true;
     }
 
     @Override
@@ -7637,28 +7617,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setLockCameraInput(boolean lockCameraInput) {
         if (this.lockCameraInput != lockCameraInput) {
             this.lockCameraInput = lockCameraInput;
-            if (this.protocol >= ProtocolInfo.v1_19_50) {
-                this.needSendUpdateClientInputLocksPacket = true;
-            }
+            this.needSendUpdateClientInputLocksPacket = true;
         }
     }
 
     public void setLockMovementInput(boolean lockMovementInput) {
         if (this.lockMovementInput != lockMovementInput) {
             this.lockMovementInput = lockMovementInput;
-            if (this.protocol >= ProtocolInfo.v1_19_50) {
-                this.needSendUpdateClientInputLocksPacket = true;
-            } else {
-                this.setImmobile(lockMovementInput);
-            }
+            this.needSendUpdateClientInputLocksPacket = true;
         }
     }
 
     protected void sendUpdateClientInputLocksPacket() {
-        if (this.protocol < ProtocolInfo.v1_19_50) {
-            return;
-        }
-
         UpdateClientInputLocksPacket packet = new UpdateClientInputLocksPacket();
         if (this.lockCameraInput) {
             packet.lockComponentData |= UpdateClientInputLocksPacket.FLAG_CAMERA;
