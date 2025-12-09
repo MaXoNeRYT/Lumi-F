@@ -73,9 +73,7 @@ public class AddPlayerPacket extends DataPacket {
         this.putLFloat(this.yaw);
         this.putLFloat(this.yaw);
         this.putSlot(protocol, this.item);
-        if (protocol >= ProtocolInfo.v1_18_30) {
-            this.putVarInt(this.gameType);
-        }
+        this.putVarInt(this.gameType);
         this.put(Binary.writeMetadata(protocol, this.metadata));
         if (protocol > 274) {
             if (protocol < ProtocolInfo.v1_19_10) {

@@ -5023,7 +5023,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             message = TextFormat.clean(message, true);
         }
 
-        int maxMsgLength = this.protocol >= ProtocolInfo.v1_18_0 ? 512 : 255;
+        int maxMsgLength = 512;
 
         for (String msg : message.split("\n")) {
             if (!msg.trim().isEmpty() && msg.length() <= maxMsgLength) {
@@ -5334,9 +5334,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @param itemCategory the item category
      */
     public void setItemCoolDown(int coolDown, String itemCategory) {
-        if (this.protocol < ProtocolInfo.v1_18_10) {
-            return;
-        }
         PlayerStartItemCoolDownPacket pk = new PlayerStartItemCoolDownPacket();
         pk.setCoolDownDuration(coolDown);
         pk.setItemCategory(itemCategory);

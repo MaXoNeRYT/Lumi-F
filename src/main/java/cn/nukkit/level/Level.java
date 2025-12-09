@@ -4863,12 +4863,6 @@ public class Level implements ChunkManager, Metadatable {
             return ProtocolInfo.v1_19_20;
         } else if (protocol >= ProtocolInfo.v1_19_0_29) { //调色板 物品运行时id
             return ProtocolInfo.v1_19_0;
-        } else if (protocol >= ProtocolInfo.v1_18_30) { //调色板 物品运行时id
-            return ProtocolInfo.v1_18_30;
-        } else if (protocol >= ProtocolInfo.v1_18_10_26) { //调色板修改
-            return ProtocolInfo.v1_18_10;
-        } else if (protocol >= ProtocolInfo.v1_18_0) { //世界高度改变
-            return ProtocolInfo.v1_18_0;
         } else if (protocol >= ProtocolInfo.v1_17_40) {
             return ProtocolInfo.v1_17_40;
         } else if (protocol >= ProtocolInfo.v1_17_30) {
@@ -4899,10 +4893,6 @@ public class Level implements ChunkManager, Metadatable {
             if (player >= ProtocolInfo.v1_17_10) if (player < ProtocolInfo.v1_17_30) return true;
         if (chunk == ProtocolInfo.v1_17_30) if (player == ProtocolInfo.v1_17_30) return true;
         if (chunk == ProtocolInfo.v1_17_40) if (player == ProtocolInfo.v1_17_40) return true;
-        if (chunk == ProtocolInfo.v1_18_0) if (player == ProtocolInfo.v1_18_0) return true;
-        if (chunk == ProtocolInfo.v1_18_10)
-            if (player >= ProtocolInfo.v1_18_10_26) if (player < ProtocolInfo.v1_18_30) return true;
-        if (chunk == ProtocolInfo.v1_18_30) if (player == ProtocolInfo.v1_18_30) return true;
         if (chunk == ProtocolInfo.v1_19_0)
             if (player >= ProtocolInfo.v1_19_0_29) if (player < ProtocolInfo.v1_19_20) return true;
         if (chunk == ProtocolInfo.v1_19_20)

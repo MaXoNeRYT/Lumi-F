@@ -184,11 +184,7 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(this.pitch);
 
         /* Level settings start */
-        if (protocol >= ProtocolInfo.v1_18_30) {
-            this.putLLong(this.seed);
-        }else {
-            this.putVarInt(this.seed);
-        }
+        this.putLLong(this.seed);
         if (protocol >= 407) {
             this.putLShort(0x00); // SpawnBiomeType - Default
             this.putString(protocol >= ProtocolInfo.v1_16_100 ? "plains" : ""); // UserDefinedBiomeName
@@ -358,27 +354,25 @@ public class StartGamePacket extends DataPacket {
             this.putBoolean(false); // isInventoryServerAuthoritative
             if (protocol >= ProtocolInfo.v1_16_230_50) {
                 this.putString(""); // serverEngine
-                if (protocol >= ProtocolInfo.v1_18_0) {
-                    if (protocol >= ProtocolInfo.v1_19_0_29) {
-                        try {
-                            this.put(NBTIO.writeNetwork(this.playerPropertyData));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                if (protocol >= ProtocolInfo.v1_19_0_29) {
+                    try {
+                        this.put(NBTIO.writeNetwork(this.playerPropertyData));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    this.putLLong(0L); // BlockRegistryChecksum
-                    if (protocol >= ProtocolInfo.v1_19_0_29) {
-                        //this.putUUID(new UUID(0, 0)); // worldTemplateId
-                        this.put(EMPTY_UUID); // worldTemplateId
-                        if (protocol >= ProtocolInfo.v1_19_20) {
-                            this.putBoolean(this.clientSideGenerationEnabled);
-                            if (protocol >= ProtocolInfo.v1_19_80) {
-                                this.putBoolean(this.blockNetworkIdsHashed);
-                                if (protocol >= ProtocolInfo.v1_20_0_23) {
-                                    this.putBoolean(this.networkPermissions.isServerAuthSounds());
-                                    if(protocol >= ProtocolInfo.v1_21_100) {
-                                        this.putBoolean(this.tickDeathSystemsEnabled);
-                                    }
+                }
+                this.putLLong(0L); // BlockRegistryChecksum
+                if (protocol >= ProtocolInfo.v1_19_0_29) {
+                    //this.putUUID(new UUID(0, 0)); // worldTemplateId
+                    this.put(EMPTY_UUID); // worldTemplateId
+                    if (protocol >= ProtocolInfo.v1_19_20) {
+                        this.putBoolean(this.clientSideGenerationEnabled);
+                        if (protocol >= ProtocolInfo.v1_19_80) {
+                            this.putBoolean(this.blockNetworkIdsHashed);
+                            if (protocol >= ProtocolInfo.v1_20_0_23) {
+                                this.putBoolean(this.networkPermissions.isServerAuthSounds());
+                                if(protocol >= ProtocolInfo.v1_21_100) {
+                                    this.putBoolean(this.tickDeathSystemsEnabled);
                                 }
                             }
                         }
