@@ -164,9 +164,6 @@ public abstract class Particle extends Vector3 {
         if (protocol < ProtocolInfo.v1_20_60 && id >= 19) {
             id -= 1;
         }
-        if (protocol < ProtocolInfo.v1_17_10 && id >= 9) {
-            id -= 1;
-        }
         if (protocol < ProtocolInfo.v1_16_220 && id > 28) {
             id -= 2;
         }

@@ -270,25 +270,6 @@ public class AddEntityPacket extends DataPacket {
                     return "minecraft:rabbit";
                 }
 
-                if (this.protocol < ProtocolInfo.v1_17_0) {
-                    if (this.type == EntityGoat.NETWORK_ID) {
-                        return "minecraft:sheep";
-                    }
-                    if (this.type == EntityAxolotl.NETWORK_ID) {
-                        return "minecraft:tropicalfish";
-                    }
-                    if (this.type == EntityGlowSquid.NETWORK_ID) {
-                        return "minecraft:squid";
-                    }
-
-                    if (this.protocol < ProtocolInfo.v1_16_0) {
-                        if (this.type == EntityPiglin.NETWORK_ID || this.type == EntityPiglinBrute.NETWORK_ID) {
-                            return "minecraft:zombie_pigman";
-                        } else if (this.type == EntityHoglin.NETWORK_ID || this.type == EntityStrider.NETWORK_ID || this.type == EntityZoglin.NETWORK_ID) {
-                            return "minecraft:pig";
-                        }
-                    }
-                }
             }
         }
 

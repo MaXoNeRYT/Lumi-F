@@ -352,15 +352,8 @@ public class BinaryStream {
 
         this.putImage(skin.getCapeData());
         this.putString(skin.getGeometryData());
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            this.putString(skin.getGeometryDataEngineVersion());
-        }
+        this.putString(skin.getGeometryDataEngineVersion());
         this.putString(skin.getAnimationData());
-        if (protocol < ProtocolInfo.v1_17_30) {
-            this.putBoolean(skin.isPremium());
-            this.putBoolean(skin.isPersona());
-            this.putBoolean(skin.isCapeOnClassic());
-        }
         this.putString(skin.getCapeId());
         this.putString(skin.getFullSkinId());
         this.putString(skin.getArmSize());
@@ -387,14 +380,12 @@ public class BinaryStream {
             }
         }
 
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            this.putBoolean(skin.isPremium());
-            this.putBoolean(skin.isPersona());
-            this.putBoolean(skin.isCapeOnClassic());
-            this.putBoolean(skin.isPrimaryUser());
-            if (protocol >= ProtocolInfo.v1_19_63) {
-                this.putBoolean(skin.isOverridingPlayerAppearance());
-            }
+        this.putBoolean(skin.isPremium());
+        this.putBoolean(skin.isPersona());
+        this.putBoolean(skin.isCapeOnClassic());
+        this.putBoolean(skin.isPrimaryUser());
+        if (protocol >= ProtocolInfo.v1_19_63) {
+            this.putBoolean(skin.isOverridingPlayerAppearance());
         }
     }
 
@@ -443,15 +434,8 @@ public class BinaryStream {
 
         skin.setCapeData(this.getImage(Skin.SINGLE_SKIN_SIZE));
         skin.setGeometryData(this.getString());
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            skin.setGeometryDataEngineVersion(this.getString());
-        }
+        skin.setGeometryDataEngineVersion(this.getString());
         skin.setAnimationData(this.getString());
-        if (protocol < ProtocolInfo.v1_17_30) {
-            skin.setPremium(this.getBoolean());
-            skin.setPersona(this.getBoolean());
-            skin.setCapeOnClassic(this.getBoolean());
-        }
         skin.setCapeId(this.getString());
         skin.setFullSkinId(this.getString());
         skin.setArmSize(this.getString());
@@ -478,14 +462,12 @@ public class BinaryStream {
             skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
         }
 
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            skin.setPremium(this.getBoolean());
-            skin.setPersona(this.getBoolean());
-            skin.setCapeOnClassic(this.getBoolean());
-            skin.setPrimaryUser(this.getBoolean());
-            if (protocol >= ProtocolInfo.v1_19_63) {
-                skin.setOverridingPlayerAppearance(this.getBoolean());
-            }
+        skin.setPremium(this.getBoolean());
+        skin.setPersona(this.getBoolean());
+        skin.setCapeOnClassic(this.getBoolean());
+        skin.setPrimaryUser(this.getBoolean());
+        if (protocol >= ProtocolInfo.v1_19_63) {
+            skin.setOverridingPlayerAppearance(this.getBoolean());
         }
         return skin;
     }

@@ -455,10 +455,6 @@ public class Utils {
             case ProtocolInfo.v1_16_210 -> "1.16.210";
             case ProtocolInfo.v1_16_220 -> "1.16.220";
             case ProtocolInfo.v1_16_230_50 -> "1.16.230";
-            case ProtocolInfo.v1_17_0 -> "1.17.0";
-            case ProtocolInfo.v1_17_10 -> "1.17.10";
-            case ProtocolInfo.v1_17_30 -> "1.17.30";
-            case ProtocolInfo.v1_17_40 -> "1.17.40";
             case ProtocolInfo.v1_19_0_29, ProtocolInfo.v1_19_0_31, ProtocolInfo.v1_19_0 -> "1.19.0";
             case ProtocolInfo.v1_19_10 -> "1.19.10";
             case ProtocolInfo.v1_19_20 -> "1.19.20";

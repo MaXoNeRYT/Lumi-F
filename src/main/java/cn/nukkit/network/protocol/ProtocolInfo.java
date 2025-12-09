@@ -18,10 +18,6 @@ public interface ProtocolInfo {
     int v1_16_210 = 428;
     int v1_16_220 = 431;
     int v1_16_230_50 = 433;
-    int v1_17_0 = 440;
-    int v1_17_10 = 448;
-    int v1_17_30 = 465;
-    int v1_17_40 = 471;;
     int v1_19_0_29 = 524;
     int v1_19_0_31 = 526;
     int v1_19_0 = 527;

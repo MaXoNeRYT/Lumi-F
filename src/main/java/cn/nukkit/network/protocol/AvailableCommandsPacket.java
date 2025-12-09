@@ -507,11 +507,7 @@ public class AvailableCommandsPacket extends DataPacket {
             this.putString(name);
             this.putString(data.description);
             // Commands\Flags
-            if (protocol >= ProtocolInfo.v1_17_10) {
-                this.putLShort(data.flags);
-            } else {
-                this.putByte((byte) data.flags);
-            }
+            this.putLShort(data.flags);
             // Commands\PermissionLevel
             this.putByte((byte) data.permission);
 

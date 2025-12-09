@@ -2838,11 +2838,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         try {
             if (this.protocol >= ProtocolInfo.v1_16_100) {
-                if (this.protocol >= ProtocolInfo.v1_17_0) {
-                    //注册实体属性
-                    for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
-                        this.dataPacket(pk);
-                    }
+                //注册实体属性
+                for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
+                    this.dataPacket(pk);
                 }
                 ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
                 if (this.protocol >= ProtocolInfo.v1_21_60) {
@@ -7441,7 +7439,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean isMovementServerAuthoritative() {
-        return this.server.getSettings().general().serverAuthoritativeMovement() == ServerAuthoritativeMovement.SERVER_AUTH && this.protocol >= ProtocolInfo.v1_17_0;
+        return this.server.getSettings().general().serverAuthoritativeMovement() == ServerAuthoritativeMovement.SERVER_AUTH;
     }
 
     public boolean isServerAuthoritativeBlockBreaking() {

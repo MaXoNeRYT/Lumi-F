@@ -60,7 +60,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
         if (this.protocol >= ProtocolInfo.v1_21_90) {
             this.putBoolean(this.forceDisableVibrantVisuals);
         }
-        if (this.protocol >= ProtocolInfo.v1_17_10 && this.protocol < ProtocolInfo.v1_21_30) {
+        if (this.protocol < ProtocolInfo.v1_21_30) {
             this.putBoolean(this.forceServerPacks);
         }
         if (this.protocol >= ProtocolInfo.v1_21_50) {
