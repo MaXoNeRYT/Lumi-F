@@ -57,7 +57,6 @@ public class ItemLegacyRegistry implements IRegistry<Integer, Class<?>, Class<?>
         register(GOLD_SHOVEL, ItemShovelGold.class); //284
         register(GOLD_PICKAXE, ItemPickaxeGold.class); //285
         register(GOLD_AXE, ItemAxeGold.class); //286
-        register(GUNPOWDER, ItemGunpowder.class); //289
         register(WOODEN_HOE, ItemHoeWood.class); //290
         register(STONE_HOE, ItemHoeStone.class); //291
         register(IRON_HOE, ItemHoeIron.class); //292

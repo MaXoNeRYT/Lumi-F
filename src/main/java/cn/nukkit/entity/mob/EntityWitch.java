@@ -126,7 +126,7 @@ public class EntityWitch extends EntityWalkingMob {
                     drops.add(Item.get(Item.GLOWSTONE_DUST, 0, Utils.rand(0, 2)));
                     break;
                 case 3:
-                    drops.add(Item.get(Item.GUNPOWDER, 0, Utils.rand(0, 2)));
+                    drops.add(Item.get(ItemNamespaceId.GUNPOWDER, 0, Utils.rand(0, 2)));
                     break;
                 case 4:
                     drops.add(Item.get(Item.REDSTONE, 0, Utils.rand(0, 2)));

@@ -85,6 +85,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(GOAT_HORN, ItemGoatHorn::new);
         register(GRAY_DYE, ItemDyeGray::new);
         register(GREEN_DYE, ItemDyeGreen::new);
+        register(GUNPOWDER, ItemGunpowder::new);
         register(GUSTER_BANNER_PATTERN, ItemBannerPatternGuster::new);
         register(GUSTER_POTTERY_SHERD, ItemGusterPotterySherd::new);
         register(HEARTBREAK_POTTERY_SHERD, ItemHeartbreakPotterySherd::new);

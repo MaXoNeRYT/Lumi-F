@@ -41,7 +41,6 @@ public interface ItemID {
     int GOLDEN_PICKAXE = 285;
     int GOLD_AXE = 286;
     int GOLDEN_AXE = 286;
-    int GUNPOWDER = 289;
     int WOODEN_HOE = 290;
     int STONE_HOE = 291;
     int IRON_HOE = 292;
