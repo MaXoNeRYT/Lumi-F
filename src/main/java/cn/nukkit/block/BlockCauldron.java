@@ -207,7 +207,7 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
                 }
             }
         } else if (!isEmpty() && !cauldron.hasPotion()) {
-            if (item.getNamespaceId().equals(ItemNamespaceId.DYE)) {
+            if (item instanceof ItemDye) {
                 if (player.isSurvival() || player.isAdventure()) {
                     item.setCount(item.getCount() - 1);
                     player.getInventory().setItemInHand(item);

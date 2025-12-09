@@ -58,7 +58,7 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
     }
 
     public boolean hasPotion() {
-        return getPotionId() != POTION_TYPE_EMPTY;
+        return (getPotionId() & 0xFFFF) != POTION_TYPE_EMPTY;
     }
 
     public void setPotionType(int potionType) {
