@@ -19,6 +19,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.item.*;
+import cn.nukkit.item.material.tags.ItemTags;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.LavaParticle;
@@ -323,11 +324,7 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
     }
 
     private boolean isLeatherArmor(Item item) {
-        return item.getNamespaceId().equals(ItemNamespaceId.LEATHER_HELMET) ||
-                item.getNamespaceId().equals(ItemNamespaceId.LEATHER_CHESTPLATE) ||
-                item.getNamespaceId().equals(ItemNamespaceId.LEATHER_LEGGINGS) ||
-                item.getNamespaceId().equals(ItemNamespaceId.LEATHER_BOOTS) ||
-                item.getNamespaceId().equals(ItemNamespaceId.LEATHER_HORSE_ARMOR);
+        return item.hasItemTag(ItemTags.LEATHER_TIER) || item.getNamespaceId().equals(ItemNamespaceId.LEATHER_HORSE_ARMOR);
     }
 
     public boolean onLavaActivate(@NotNull Item item, Player player) {
