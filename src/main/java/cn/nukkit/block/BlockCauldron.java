@@ -2,7 +2,11 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.customblock.properties.BlockProperties;
+import cn.nukkit.block.customblock.properties.EnumBlockProperty;
+import cn.nukkit.block.customblock.properties.IntBlockProperty;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.block.properties.enums.CauldronLiquid;
 import cn.nukkit.block.properties.enums.PotionType;
 import cn.nukkit.blockentity.BlockEntity;
@@ -29,12 +33,16 @@ import cn.nukkit.network.protocol.LevelEventPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author CreeperFace (Nukkit Project)
  */
-public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<BlockEntityCauldron> {
+public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<BlockEntityCauldron>, BlockPropertiesHelper {
+
+    private static final IntBlockProperty FILL_LEVEL = new IntBlockProperty("fill_level", false, 6);
+    private static final EnumBlockProperty<CauldronLiquid> CAULDRON_LIQUID = new EnumBlockProperty<>("cauldron_liquid", false, CauldronLiquid.class);
+
+    private static final BlockProperties PROPERTIES = new BlockProperties(FILL_LEVEL, CAULDRON_LIQUID);
 
     public BlockCauldron() {
         super(0);
@@ -42,6 +50,11 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
 
     public BlockCauldron(int meta) {
         super(meta);
+    }
+
+    @Override
+    public BlockProperties getBlockProperties() {
+        return PROPERTIES;
     }
 
     @Override
@@ -87,45 +100,28 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
     }
 
     public boolean isFull() {
-        return (this.getDamage() & 0x06) == 0x06;
+        return getFillLevel() >= 6;
     }
 
     public boolean isEmpty() {
-        return this.getDamage() == 0x00;
+        return getFillLevel() == 0;
     }
 
     public int getFillLevel() {
-        return (getDamage() & 0x6) >> 1;
+        return this.getIntValue(FILL_LEVEL);
     }
 
     public void setFillLevel(int fillLevel) {
-        fillLevel = MathHelper.clamp(fillLevel, 0, 3);
-        int newDamage = (this.getDamage() & ~0x6) | (fillLevel << 1);
-        if (newDamage != this.getDamage()) {
-            this.setDamage(newDamage);
-            this.level.setBlock(this, this, false, false);
-        }
+        fillLevel = MathHelper.clamp(fillLevel, 0, 6);
+        this.setPropertyValue(FILL_LEVEL, fillLevel);
     }
 
     public CauldronLiquid getCauldronLiquid() {
-        int damage = this.getDamage();
-        if ((damage & 0x8) != 0) {
-            return CauldronLiquid.LAVA;
-        }
-        return CauldronLiquid.WATER;
+        return this.getPropertyValue(CAULDRON_LIQUID);
     }
 
     public void setCauldronLiquid(CauldronLiquid liquid) {
-        int newDamage = this.getDamage();
-        if (Objects.requireNonNull(liquid) == CauldronLiquid.LAVA) {
-            newDamage |= 0x8;
-        } else {
-            newDamage &= ~0x8;
-        }
-        if (newDamage != this.getDamage()) {
-            this.setDamage(newDamage);
-            this.level.setBlock(this, this, false, false);
-        }
+        this.setPropertyValue(CAULDRON_LIQUID, liquid);
     }
 
     @Override
@@ -232,7 +228,7 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
                     compoundTag.putInt("customColor", cauldron.getCustomColor().getRGB());
                     item.setCompoundTag(compoundTag);
                     player.getInventory().setItemInHand(item);
-                    setFillLevel(NukkitMath.clamp(getFillLevel() - 2, 0, 6));
+                    setFillLevel(getFillLevel() - 1);
                     this.level.setBlock(this, this, true, true);
                     this.level.addSound(add(0.5, 0.5, 0.5), Sound.CAULDRON_DYEARMOR);
                 } else if (item.hasCompoundTag() && item.getNamedTag().exist("customColor")) {
@@ -241,7 +237,7 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
                     item.setCompoundTag(compoundTag);
                     player.getInventory().setItemInHand(item);
 
-                    setFillLevel(NukkitMath.clamp(getFillLevel() - 2, 0, 6));
+                    setFillLevel(getFillLevel() - 1);
                     this.level.setBlock(this, this, true, true);
                     this.getLevel().addSound(this.add(0.5, 1, 0.5), Sound.CAULDRON_TAKEWATER);
                 }
