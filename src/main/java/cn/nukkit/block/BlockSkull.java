@@ -112,8 +112,6 @@ public abstract class BlockSkull extends BlockTransparentMeta implements Faceabl
         BlockEntitySkull blockEntity = (BlockEntitySkull) BlockEntity.createBlockEntity(BlockEntity.SKULL, this.getChunk(), nbt);
         blockEntity.spawnToAll();
 
-        // TODO: 2016/2/3 SPAWN WITHER
-
         return true;
     }
 
