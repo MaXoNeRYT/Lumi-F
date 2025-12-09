@@ -472,7 +472,7 @@ public class BinaryStream {
         return this.getSlot(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
-    private Item getSlot(int protocolId) {
+    public Item getSlot(int protocolId) {
         int runtimeId = this.getVarInt();
         if (runtimeId == 0) {
             return Item.get(Item.AIR, 0, 0);
@@ -648,7 +648,7 @@ public class BinaryStream {
         this.putSlot(protocolId, item, false);
     }
 
-    private void putSlot(int protocolId, Item item, boolean instanceItem) {
+    public void putSlot(int protocolId, Item item, boolean instanceItem) {
         if (item == null || item.getId() == Item.AIR) {
             this.putByte((byte) 0);
             return;
