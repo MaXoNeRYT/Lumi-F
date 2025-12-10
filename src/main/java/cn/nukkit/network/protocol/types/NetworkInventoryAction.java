@@ -1,16 +1,18 @@
 package cn.nukkit.network.protocol.types;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.BlockSkull;
+import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
-import cn.nukkit.item.ItemLapisLazuli;
+import cn.nukkit.item.*;
 import cn.nukkit.network.protocol.InventoryTransactionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.ToString;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author CreeperFace
@@ -147,10 +149,12 @@ public class NetworkInventoryAction {
                     this.inventorySlot += 36;
                     this.windowId = ContainerIds.INVENTORY;
                     if (this.newItem == null ||
-                            (this.inventorySlot == 36 && !this.newItem.canBePutInHelmetSlot() && !this.oldItem.canBePutInHelmetSlot()) ||
+                            (this.inventorySlot == 36 && !this.newItem.canBePutInHelmetSlot() && !this.oldItem.canBePutInHelmetSlot() &&
+                                    !((this.newItem instanceof ItemBlock itemBlockNew && itemBlockNew.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCK)) ||
+                                            (this.oldItem instanceof ItemBlock itemBlockOld && itemBlockOld.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCK)))) ||
                             (this.inventorySlot == 37 && !this.newItem.isChestplate() && !this.oldItem.isChestplate()) ||
                             (this.inventorySlot == 38 && !this.newItem.isLeggings() && !this.oldItem.isLeggings()) ||
-                            (this.inventorySlot == 39 && !this.newItem.isBoots()) && !this.oldItem.isBoots()) {
+                            (this.inventorySlot == 39 && !this.newItem.isBoots() && !this.oldItem.isBoots())) {
                         player.getServer().getLogger().error("Player " + player.getName() + " tried to set an invalid armor item");
                         return null;
                     }
