@@ -2441,7 +2441,7 @@ public class Level implements ChunkManager, Metadatable {
             breakTime -= 0.15;
 
             Item[] eventDrops;
-            if (isSilkTouch && target.canSilkTouch() || target.isDropOriginal(player)) {
+            if (isSilkTouch && target.canSilkTouch()) {
                 eventDrops = new Item[]{target.toItem()};
             } else {
                 eventDrops = target.getDrops(player, item);

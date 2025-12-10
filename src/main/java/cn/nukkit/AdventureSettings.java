@@ -17,7 +17,7 @@ import java.util.Map;
  * Nukkit Project
  */
 public class AdventureSettings implements Cloneable {
-
+    //TODO: Refactor and maybe get rid off of this class
 
     /**
      * This constant is used to identify flags that should be set on the second field. In a sensible world, these
