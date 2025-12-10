@@ -1708,27 +1708,25 @@ public class Level implements ChunkManager, Metadatable {
         return updateQueue.getPendingBlockUpdates(boundingBox);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb) {
         return this.getCollisionBlocks(bb, false);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst) {
         return getCollisionBlocks(bb, targetFirst, false);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck) {
         return getCollisionBlocks(bb, targetFirst, ignoreCollidesCheck, block -> block.getId() != 0);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck, Predicate<Block> condition) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck, Predicate<Block> condition) {
         int minX = NukkitMath.floorDouble(bb.getMinX());
         int minY = NukkitMath.floorDouble(bb.getMinY());
         int minZ = NukkitMath.floorDouble(bb.getMinZ());
         int maxX = NukkitMath.ceilDouble(bb.getMaxX());
         int maxY = NukkitMath.ceilDouble(bb.getMaxY());
         int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
-
-        List<Block> collides = new ArrayList<>();
 
         if (targetFirst) {
             for (int z = minZ; z <= maxZ; ++z) {
@@ -1742,18 +1740,26 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
         } else {
+            int capacity = Math.max(0, maxX - minX + 1) * Math.max(0, maxY - minY + 1) * Math.max(0, maxZ - minZ + 1);
+            if (capacity == 0) {
+                return Block.EMPTY_ARRAY;
+            }
+            Block[] collides = new Block[capacity];
+            int count = 0;
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
                         Block block = this.getBlock(x, y, z, false);
                         if (block != null && condition.test(block) && (ignoreCollidesCheck || block.collidesWithBB(bb))) {
-                            collides.add(block);
+                            collides[count++] = block;
                         }
                     }
                 }
             }
+            return count == capacity ? collides : Arrays.copyOf(collides, count);
         }
-        return collides.toArray(new Block[0]);
+
+        return Block.EMPTY_ARRAY;
     }
 
     public boolean hasCollisionBlocks(AxisAlignedBB bb) {
@@ -2236,6 +2242,15 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
         return true;
+    }
+
+    public void breakBlock(@NotNull Block block) {
+        if(block.isValid() && block.level == this) {
+            this.setBlock(block, Block.get(Block.AIR));
+            Position position = block.add(0.5, 0.5, 0.5);
+            this.addParticle(new DestroyBlockParticle(position, block));
+            this.getVibrationManager().callVibrationEvent(new VibrationEvent(null, position, VanillaVibrationTypes.BLOCK_DESTROY));
+        }
     }
 
     private void addBlockChange(int x, int y, int z) {
@@ -2753,49 +2768,6 @@ public class Level implements ChunkManager, Metadatable {
                         }
                         return null;
                     }
-                }
-            } else if (item.getBlock() instanceof BlockSkull && item.getDamage() == 1) {
-                if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
-                    Block first, second;
-
-                    if (!(((first = block.getSide(BlockFace.EAST)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)) instanceof BlockSkull && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)) instanceof BlockSkull && second.toItem().getDamage() == 1))) {
-                        return null;
-                    }
-
-                    block = block.getSide(BlockFace.DOWN);
-
-                    Block first2, second2;
-
-                    if (!((first2 = block.getSide(BlockFace.EAST)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.WEST)).getId() == Item.SOUL_SAND || (first2 = block.getSide(BlockFace.NORTH)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.SOUTH)).getId() == Item.SOUL_SAND)) {
-                        return null;
-                    }
-
-                    block.getLevel().setBlock(first, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(second, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(first2, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(second2, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(block, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
-
-                    Position spawnPos = block.add(0.5, -1, 0.5);
-
-                    CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_WITHER, player);
-                    server.getPluginManager().callEvent(ev);
-
-                    if (ev.isCancelled()) {
-                        return null;
-                    }
-
-                    if (!player.isCreative()) {
-                        item.setCount(item.getCount() - 1);
-                        player.getInventory().setItemInHand(item);
-                    }
-
-                    EntityWither wither = (EntityWither) Entity.createEntity("Wither", spawnPos);
-                    wither.stayTime = 220;
-                    wither.spawnToAll();
-                    this.addSoundToViewers(wither, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
-                    return null;
                 }
             }
         }
