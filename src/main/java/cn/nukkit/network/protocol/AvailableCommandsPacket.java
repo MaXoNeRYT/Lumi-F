@@ -83,11 +83,6 @@ public class AvailableCommandsPacket extends DataPacket {
             .shift(32, 6)
             .insert(37, CommandParam.EQUIPMENT_SLOTS)
             .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_527 = COMMAND_PARAMS_503.toBuilder()
-            .shift(7, 1)
-            .insert(7, CommandParam.COMPARE_OPERATOR)
-            .insert(23, CommandParam.INT_RANGE)
-            .build();
     private static final TypeMap<CommandParam> COMMAND_PARAMS_575 = TypeMap.builder(CommandParam.class)
             .insert(0, CommandParam.UNKNOWN)
             .insert(1, CommandParam.INT)
@@ -235,20 +230,8 @@ public class AvailableCommandsPacket extends DataPacket {
             return COMMAND_PARAMS_662;
         } else if (protocol >= ProtocolInfo.v1_20_10_21) {
             return COMMAND_PARAMS_594;
-        } else if (protocol >= ProtocolInfo.v1_19_80) {
-            return COMMAND_PARAMS_582;
-        } else if (protocol >= ProtocolInfo.v1_19_70_24) {
-            return COMMAND_PARAMS_575;
-        } else if (protocol >= ProtocolInfo.v1_19_0_29) {
-            return COMMAND_PARAMS_527;
-        } else if (protocol >= ProtocolInfo.v1_18_30) {
-            return COMMAND_PARAMS_503;
-        } else if (protocol >= ProtocolInfo.v1_16_210) {
-            return COMMAND_PARAMS_428;
-        } else if (protocol >= ProtocolInfo.v1_16_100) {
-            return COMMAND_PARAMS_419;
         } else {
-            return COMMAND_PARAMS_388;
+            return COMMAND_PARAMS_582;
         }
     }
 
@@ -513,11 +496,7 @@ public class AvailableCommandsPacket extends DataPacket {
             this.putString(name);
             this.putString(data.description);
             // Commands\Flags
-            if (protocol >= ProtocolInfo.v1_17_10) {
-                this.putLShort(data.flags);
-            } else {
-                this.putByte((byte) data.flags);
-            }
+            this.putLShort(data.flags);
             // Commands\PermissionLevel
             this.putByte((byte) data.permission);
 

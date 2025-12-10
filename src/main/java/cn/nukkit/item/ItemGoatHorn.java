@@ -67,9 +67,4 @@ public class ItemGoatHorn extends StringItemBase {
             case 7 -> player.getLevel().addSound(player, Sound.HORN_CALL_7);
         }
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_0;
-    }
 }

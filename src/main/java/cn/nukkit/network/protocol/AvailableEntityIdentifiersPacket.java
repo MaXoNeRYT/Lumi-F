@@ -41,11 +41,7 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
     public void encode() {
         this.reset();
         if (Server.getInstance().getSettings().features().enableExperimentMode()) { //自定义实体
-            if (this.protocol <= ProtocolInfo.v1_16_0) {
-                this.put(EntityManager.get().getNetworkTagCachedOld());
-            } else {
-                this.put(EntityManager.get().getNetworkTagCached());
-            }
+            this.put(EntityManager.get().getNetworkTagCached());
         }else {
             if (this.identifiers == null) {
                 this.identifiers = Entity.getEntityIdentifiersCache(this.protocol);

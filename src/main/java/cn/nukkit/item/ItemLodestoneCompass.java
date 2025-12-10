@@ -15,9 +15,4 @@ public class ItemLodestoneCompass extends Item {
     public ItemLodestoneCompass(Integer meta, int count) {
         super(LODESTONE_COMPASS, meta, count, "Lodestone Compass");
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

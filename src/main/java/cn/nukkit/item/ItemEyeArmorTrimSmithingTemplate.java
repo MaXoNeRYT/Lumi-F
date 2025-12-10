@@ -16,9 +16,4 @@ public class ItemEyeArmorTrimSmithingTemplate extends StringItemBase implements 
     public ItemTrimPatternType getPattern() {
         return ItemTrimPatternType.EYE_ARMOR_TRIM;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_80;
-    }
 }

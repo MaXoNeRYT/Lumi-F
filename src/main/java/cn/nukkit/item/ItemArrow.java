@@ -37,9 +37,6 @@ public class ItemArrow extends Item {
         if (damage <= 42) {
             return true;
         }
-        if (damage == 43) {
-            return protocolId >= ProtocolInfo.v1_16_0;
-        }
         return protocolId >= ProtocolInfo.v1_21_0;
     }
 }

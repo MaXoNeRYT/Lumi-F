@@ -85,7 +85,7 @@ public class CraftingDataPacket extends DataPacket {
         this.putUnsignedVarInt(protocol >= ProtocolInfo.v1_20_0_23 ? entries.size() + 1 : entries.size());//1.20.0+ 有额外的smithing_trim
 
         for (Recipe recipe : entries) {
-            this.putVarInt(recipe.getType().getNetworkType(protocol));
+            this.putVarInt(recipe.getType().getNetworkType());
             switch (recipe.getType()) {
                 case SHAPELESS:
                     ShapelessRecipe shapeless = (ShapelessRecipe) recipe;
@@ -97,7 +97,7 @@ public class CraftingDataPacket extends DataPacket {
                         ingredient.putRecipe(this, protocol);
                     }
                     this.putUnsignedVarInt(1); // Results length
-                    this.putSlot(protocol, shapeless.getResult(), protocol >= ProtocolInfo.v1_16_100);
+                    this.putSlot(protocol, shapeless.getResult(), true);
                     this.putUUID(shapeless.getId());
                     if (protocol >= 354) {
                         this.putString(CRAFTING_TAG_CRAFTING_TABLE);
@@ -140,7 +140,7 @@ public class CraftingDataPacket extends DataPacket {
                     outputs.addAll(shaped.getExtraResults());
                     this.putUnsignedVarInt(outputs.size());
                     for (Item output : outputs) {
-                        this.putSlot(protocol, output, protocol >= ProtocolInfo.v1_16_100);
+                        this.putSlot(protocol, output, true);
                     }
                     this.putUUID(shaped.getId());
                     if (protocol >= 354) {
@@ -167,23 +167,21 @@ public class CraftingDataPacket extends DataPacket {
                     if (recipe.getType() == RecipeType.FURNACE_DATA) {
                         this.putVarInt(input.getDamage());
                     }
-                    this.putSlot(protocol, furnace.getResult(), protocol >= ProtocolInfo.v1_16_100);
+                    this.putSlot(protocol, furnace.getResult(), true);
                     if (protocol >= 354) {
                         this.putString(CRAFTING_TAG_FURNACE);
                     }
                     break;
                 case MULTI:
-                    if (protocol >= ProtocolInfo.v1_16_0) { // ??
-                        this.putUUID(((MultiRecipe) recipe).getId());
-                        this.putUnsignedVarInt(((MultiRecipe) recipe).getNetworkId());
-                        break;
-                    }
+                    this.putUUID(((MultiRecipe) recipe).getId());
+                    this.putUnsignedVarInt(((MultiRecipe) recipe).getNetworkId());
+                    break;
             }
         }
 
         // Identical smithing_trim recipe sent by BDS that uses tag-descriptors, as the client seems to ignore the
         // approach of using many default-descriptors (which we do for smithing_transform)
-        this.putVarInt(RecipeType.SMITHING_TRIM.getNetworkType(protocol));
+        this.putVarInt(RecipeType.SMITHING_TRIM.getNetworkType());
         this.putString("minecraft:smithing_armor_trim");
         new ItemTagDescriptor(ItemTags.TRIM_TEMPLATES, "minecraft:trim_templates").putRecipe(this, protocol);
         new ItemTagDescriptor(ItemTags.TRIMMABLE_ARMORS, "minecraft:trimmable_armors").putRecipe(this, protocol);
@@ -213,9 +211,7 @@ public class CraftingDataPacket extends DataPacket {
                 this.putVarInt(recipe.getResult().getNetworkId(protocol));
             }
 
-            if (protocol >= ProtocolInfo.v1_17_30) {
-                this.putUnsignedVarInt(0); // Material reducers size
-            }
+            this.putUnsignedVarInt(0); // Material reducers size
         }
 
         this.putBoolean(cleanRecipes);

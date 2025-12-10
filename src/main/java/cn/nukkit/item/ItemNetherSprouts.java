@@ -17,9 +17,4 @@ public class ItemNetherSprouts extends Item {
         super(NETHER_SPROUTS, 0, count, "Nether Sprouts");
         block = Block.get(NETHER_SPROUTS_BLOCK);
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

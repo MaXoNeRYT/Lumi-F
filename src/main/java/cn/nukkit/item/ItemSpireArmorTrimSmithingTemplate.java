@@ -16,9 +16,4 @@ public class ItemSpireArmorTrimSmithingTemplate extends StringItemBase implement
     public ItemTrimPatternType getPattern() {
         return ItemTrimPatternType.SPIRE_ARMOR_TRIM;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_80;
-    }
 }

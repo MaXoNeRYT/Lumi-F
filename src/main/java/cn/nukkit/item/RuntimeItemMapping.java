@@ -95,12 +95,7 @@ public class RuntimeItemMapping {
 
             //高版本"minecraft:wool"的名称改为"minecraft:white_wool"
             //他们的legacyId均为35，这里避免冲突忽略"minecraft:wool"
-            if (protocolId >= ProtocolInfo.v1_19_63 && "minecraft:wool".equalsIgnoreCase(identifier)) {
-                continue;
-            }
-
-            if (this.protocolId < ProtocolInfo.v1_16_100) {
-                this.registerOldItem(identifier, runtimeId);
+            if ("minecraft:wool".equalsIgnoreCase(identifier)) {
                 continue;
             }
 
@@ -284,20 +279,11 @@ public class RuntimeItemMapping {
         return new ArrayList<>(customItems);
     }
 
-    private void registerOldItem(String identifier, int legacyId) {
-        int fullId = this.getFullId(legacyId, 0);
-        LegacyEntry legacyEntry = new LegacyEntry(legacyId, false, 0);
-
-        this.runtime2Legacy.put(legacyId, legacyEntry);
-        this.identifier2Legacy.put(identifier, legacyEntry);
-        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false));
-    }
-
     public void generatePalette() {
         BinaryStream paletteBuffer = new BinaryStream();
         int size = 0;
         for (RuntimeEntry entry : this.itemPaletteEntries) {
-            if (entry.isCustomItem() && (!Server.getInstance().getSettings().features().enableExperimentMode() || protocolId < ProtocolInfo.v1_16_100)) {
+            if (entry.isCustomItem() && (!Server.getInstance().getSettings().features().enableExperimentMode())) {
                 break;
             }
             size++;
@@ -305,7 +291,7 @@ public class RuntimeItemMapping {
         paletteBuffer.putUnsignedVarInt(size);
         for (RuntimeEntry entry : this.itemPaletteEntries) {
             if (entry.isCustomItem()) {
-                if (Server.getInstance().getSettings().features().enableExperimentMode() && protocolId >= ProtocolInfo.v1_16_100) {
+                if (Server.getInstance().getSettings().features().enableExperimentMode()) {
                     paletteBuffer.putString(entry.getIdentifier());
                     paletteBuffer.putLShort(entry.getRuntimeId());
                     paletteBuffer.putBoolean(true); // Component item
@@ -313,9 +299,7 @@ public class RuntimeItemMapping {
             } else {
                 paletteBuffer.putString(entry.getIdentifier());
                 paletteBuffer.putLShort(entry.getRuntimeId());
-                if (this.protocolId >= ProtocolInfo.v1_16_100) {
-                    paletteBuffer.putBoolean(false); // Component item
-                }
+                paletteBuffer.putBoolean(false); // Component item
             }
         }
         this.itemPalette = paletteBuffer.getBuffer();

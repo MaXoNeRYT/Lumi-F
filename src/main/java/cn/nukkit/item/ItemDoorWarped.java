@@ -18,9 +18,4 @@ public class ItemDoorWarped extends Item {
         super(WARPED_DOOR, 0, count, "Warped Door");
         this.block = Block.get(BlockID.WARPED_DOOR_BLOCK);
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

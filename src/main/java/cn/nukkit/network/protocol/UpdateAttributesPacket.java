@@ -44,14 +44,10 @@ public class UpdateAttributesPacket extends DataPacket {
                 }
                 this.putLFloat(entry.getDefaultValue());
                 this.putString(entry.getName());
-                if (protocol >= ProtocolInfo.v1_19_20) {
-                    this.putUnsignedVarInt(0); // Modifiers
-                }
+                this.putUnsignedVarInt(0); // Modifiers
             }
         }
 
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            this.putUnsignedVarInt(this.frame);
-        }
+        this.putUnsignedVarInt(this.frame);
     }
 }

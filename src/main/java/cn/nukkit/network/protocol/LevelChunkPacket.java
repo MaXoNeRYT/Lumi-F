@@ -47,17 +47,13 @@ public class LevelChunkPacket extends DataPacket {
         if (protocol >= ProtocolInfo.v1_20_60) {
             this.putVarInt(this.dimension);
         }
-        if (protocol >= ProtocolInfo.v1_18_0) {
-            if (!this.requestSubChunks) {
-                this.putUnsignedVarInt(this.subChunkCount);
-            } else if (this.subChunkLimit < 0) {
-                this.putUnsignedVarInt(-1);
-            } else {
-                this.putUnsignedVarInt(-2);
-                this.putUnsignedVarInt(this.subChunkLimit);
-            }
-        } else {
+        if (!this.requestSubChunks) {
             this.putUnsignedVarInt(this.subChunkCount);
+        } else if (this.subChunkLimit < 0) {
+            this.putUnsignedVarInt(-1);
+        } else {
+            this.putUnsignedVarInt(-2);
+            this.putUnsignedVarInt(this.subChunkLimit);
         }
         this.putBoolean(cacheEnabled);
         if (this.cacheEnabled) {

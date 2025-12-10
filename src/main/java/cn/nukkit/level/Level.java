@@ -2441,7 +2441,7 @@ public class Level implements ChunkManager, Metadatable {
             breakTime -= 0.15;
 
             Item[] eventDrops;
-            if (isSilkTouch && target.canSilkTouch() || target.isDropOriginal(player)) {
+            if (isSilkTouch && target.canSilkTouch()) {
                 eventDrops = new Item[]{target.toItem()};
             } else {
                 eventDrops = target.getDrops(player, item);
@@ -4274,18 +4274,6 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addEntityMovement(Entity entity, double x, double y, double z, double yaw, double pitch, double headYaw) {
-        MoveEntityAbsolutePacket pk = new MoveEntityAbsolutePacket();
-        pk.eid = entity.getId();
-        pk.x = x;
-        pk.y = y;
-        pk.z = z;
-        pk.yaw = yaw;
-        pk.headYaw = headYaw;
-        pk.pitch = pitch;
-        pk.onGround = entity.onGround;
-
-        entity.getViewers().values().stream().filter(p -> p.protocol < ProtocolInfo.v1_16_100).forEach(p -> p.dataPacket(pk));
-
         MoveEntityDeltaPacket pk2 = new MoveEntityDeltaPacket();
         pk2.eid = entity.getId();
         if (entity.lastX != x) {
@@ -4316,7 +4304,7 @@ public class Level implements ChunkManager, Metadatable {
             pk2.flags |= MoveEntityDeltaPacket.FLAG_ON_GROUND;
         }
 
-        entity.getViewers().values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_16_100).forEach(p -> p.dataPacket(pk2));
+        entity.getViewers().values().forEach(p -> p.dataPacket(pk2));
     }
 
     public boolean isRaining() {
@@ -4823,69 +4811,11 @@ public class Level implements ChunkManager, Metadatable {
             return ProtocolInfo.v1_20_10;
         } else if (protocol >= ProtocolInfo.v1_20_0_23) {
             return ProtocolInfo.v1_20_0;
-        } else if (protocol >= ProtocolInfo.v1_19_80) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_80;
-        } else if (protocol >= ProtocolInfo.v1_19_70_24) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_70;
-        } else if (protocol >= ProtocolInfo.v1_19_60) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_60;
-        } else if (protocol >= ProtocolInfo.v1_19_50_20) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_50;
-        } else if (protocol >= ProtocolInfo.v1_19_20) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_20;
-        } else if (protocol >= ProtocolInfo.v1_19_0_29) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_0;
-        } else if (protocol >= ProtocolInfo.v1_18_30) { //调色板 物品运行时id
-            return ProtocolInfo.v1_18_30;
-        } else if (protocol >= ProtocolInfo.v1_18_10_26) { //调色板修改
-            return ProtocolInfo.v1_18_10;
-        } else if (protocol >= ProtocolInfo.v1_18_0) { //世界高度改变
-            return ProtocolInfo.v1_18_0;
-        } else if (protocol >= ProtocolInfo.v1_17_40) {
-            return ProtocolInfo.v1_17_40;
-        } else if (protocol >= ProtocolInfo.v1_17_30) {
-            return ProtocolInfo.v1_17_30;
-        } else if (protocol >= ProtocolInfo.v1_17_10) {
-            return ProtocolInfo.v1_17_10;
-        } else if (protocol >= ProtocolInfo.v1_17_0) {
-            return ProtocolInfo.v1_17_0;
-        } else if (protocol >= ProtocolInfo.v1_16_210) {
-            return ProtocolInfo.v1_16_210;
-        } else if (protocol >= ProtocolInfo.v1_16_100) {
-            return ProtocolInfo.v1_16_100;
-        } else if (protocol >= ProtocolInfo.v1_16_0 && protocol <= ProtocolInfo.v1_16_100_52) {
-            return ProtocolInfo.v1_16_0;
         }
         throw new IllegalArgumentException("Invalid chunk protocol: " + protocol);
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        if (chunk == ProtocolInfo.v1_16_0)
-            if (player >= ProtocolInfo.v1_16_0) if (player <= ProtocolInfo.v1_16_100_52) return true;
-        if (chunk == ProtocolInfo.v1_16_100)
-            if (player >= ProtocolInfo.v1_16_100) if (player < ProtocolInfo.v1_16_210) return true;
-        if (chunk == ProtocolInfo.v1_16_210)
-            if (player >= ProtocolInfo.v1_16_210) if (player < ProtocolInfo.v1_17_0) return true;
-        if (chunk == ProtocolInfo.v1_17_0) if (player == ProtocolInfo.v1_17_0) return true;
-        if (chunk == ProtocolInfo.v1_17_10)
-            if (player >= ProtocolInfo.v1_17_10) if (player < ProtocolInfo.v1_17_30) return true;
-        if (chunk == ProtocolInfo.v1_17_30) if (player == ProtocolInfo.v1_17_30) return true;
-        if (chunk == ProtocolInfo.v1_17_40) if (player == ProtocolInfo.v1_17_40) return true;
-        if (chunk == ProtocolInfo.v1_18_0) if (player == ProtocolInfo.v1_18_0) return true;
-        if (chunk == ProtocolInfo.v1_18_10)
-            if (player >= ProtocolInfo.v1_18_10_26) if (player < ProtocolInfo.v1_18_30) return true;
-        if (chunk == ProtocolInfo.v1_18_30) if (player == ProtocolInfo.v1_18_30) return true;
-        if (chunk == ProtocolInfo.v1_19_0)
-            if (player >= ProtocolInfo.v1_19_0_29) if (player < ProtocolInfo.v1_19_20) return true;
-        if (chunk == ProtocolInfo.v1_19_20)
-            if (player >= ProtocolInfo.v1_19_20) if (player < ProtocolInfo.v1_19_50) return true;
-        if (chunk == ProtocolInfo.v1_19_50)
-            if (player >= ProtocolInfo.v1_19_50_20) if (player < ProtocolInfo.v1_19_60) return true;
-        if (chunk == ProtocolInfo.v1_19_60)
-            if (player >= ProtocolInfo.v1_19_60) if (player < ProtocolInfo.v1_19_70) return true;
-        if (chunk == ProtocolInfo.v1_19_70)
-            if (player >= ProtocolInfo.v1_19_70_24) if (player < ProtocolInfo.v1_19_80) return true;
-        if (chunk == ProtocolInfo.v1_19_80) if (player == ProtocolInfo.v1_19_80) return true;
         if (chunk == ProtocolInfo.v1_20_0)
             if (player >= ProtocolInfo.v1_20_0_23) if (player < ProtocolInfo.v1_20_10_21) return true;
         if (chunk == ProtocolInfo.v1_20_10)

@@ -84,10 +84,7 @@ public class PlayerAuthInputPacket extends DataPacket {
 
         this.inputMode = InputMode.fromOrdinal((int) this.getUnsignedVarInt());
         this.playMode = ClientPlayMode.fromOrdinal((int) this.getUnsignedVarInt());
-        if (this.protocol >= ProtocolInfo.v1_19_0_29) {
-            this.interactionModel = AuthInteractionModel.fromOrdinal((int) this.getUnsignedVarInt());
-        }
-
+        this.interactionModel = AuthInteractionModel.fromOrdinal((int) this.getUnsignedVarInt());
         if (protocol >= ProtocolInfo.v1_21_40) {
             this.interactRotation = this.getVector2f();
         } else {
@@ -125,22 +122,20 @@ public class PlayerAuthInputPacket extends DataPacket {
             }
         }
 
-        if (protocol >= ProtocolInfo.v1_19_70_24) {
-            if (protocol >= ProtocolInfo.v1_20_60 && this.inputData.contains(AuthInputAction.IN_CLIENT_PREDICTED_IN_VEHICLE)) {
-                if (protocol >= ProtocolInfo.v1_20_70) {
-                    this.vehicleRotation = this.getVector2f();
-                }
-                this.predictedVehicle = this.getVarLong();
+        if (protocol >= ProtocolInfo.v1_20_60 && this.inputData.contains(AuthInputAction.IN_CLIENT_PREDICTED_IN_VEHICLE)) {
+            if (protocol >= ProtocolInfo.v1_20_70) {
+                this.vehicleRotation = this.getVector2f();
             }
+            this.predictedVehicle = this.getVarLong();
+        }
 
-            this.analogMoveVector = this.getVector2f();
+        this.analogMoveVector = this.getVector2f();
 
-            if (protocol >= ProtocolInfo.v1_21_40) {
-                this.cameraOrientation = this.getVector3f();
-            }
-            if (protocol >= ProtocolInfo.v1_21_50) {
-                this.rawMoveVector = this.getVector2f();
-            }
+        if (protocol >= ProtocolInfo.v1_21_40) {
+            this.cameraOrientation = this.getVector3f();
+        }
+        if (protocol >= ProtocolInfo.v1_21_50) {
+            this.rawMoveVector = this.getVector2f();
         }
     }
 

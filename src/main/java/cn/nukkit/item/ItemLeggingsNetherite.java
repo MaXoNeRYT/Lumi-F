@@ -40,9 +40,4 @@ public class ItemLeggingsNetherite extends ItemArmor {
     public int getToughness() {
         return 2;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

@@ -411,7 +411,7 @@ public abstract class Entity extends Location implements Metadatable {
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping766, ProtocolInfo.v1_21_50); //1.21.50-1.21.70
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping800, ProtocolInfo.v1_21_80); //1.21.80-latest
 
-        initEntityIdentifiers(ProtocolInfo.v1_19_80, AvailableEntityIdentifiersPacket.TAG);
+        initEntityIdentifiers(ProtocolInfo.v1_20_0_23, AvailableEntityIdentifiersPacket.TAG);
     }
 
     public final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
@@ -1215,7 +1215,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     private static int correctEntityIdentifiersProtocol(int protocolId) {
         //Currently empty because all protocols are using 1.19.80 identifier map
-        return ProtocolInfo.v1_19_80;
+        return ProtocolInfo.v1_20_0_23;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
@@ -1836,9 +1836,6 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.checkBlockCollision();
         int minY = level.getMinBlockY() - 18;
-        if (this.isPlayer && ((Player) this).protocol < ProtocolInfo.v1_18_0) {
-            minY = -18;
-        }
         if (this.y <= minY && this.isAlive()) {
             if (this.isPlayer) {
                 if (((Player) this).getGamemode() != Player.CREATIVE) this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));

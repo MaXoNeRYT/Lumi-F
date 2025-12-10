@@ -11,36 +11,6 @@ import java.util.List;
  */
 public interface ProtocolInfo {
 
-    int v1_16_0 = 407;
-    int v1_16_100_52 = 411;
-    int v1_16_100 = 419;
-    int v1_16_200 = 422;
-    int v1_16_210 = 428;
-    int v1_16_220 = 431;
-    int v1_16_230_50 = 433;
-    int v1_17_0 = 440;
-    int v1_17_10 = 448;
-    int v1_17_30 = 465;
-    int v1_17_40 = 471;
-    int v1_18_0 = 475;
-    int v1_18_10_26 = 485;
-    int v1_18_10 = 486;
-    int v1_18_30 = 503;
-    int v1_19_0_29 = 524;
-    int v1_19_0_31 = 526;
-    int v1_19_0 = 527;
-    int v1_19_10 = 534;
-    int v1_19_20 = 544;
-    int v1_19_30_23 = 553;
-    int v1_19_30 = 554;
-    int v1_19_40 = 557;
-    int v1_19_50_20 = 558;
-    int v1_19_50 = 560;
-    int v1_19_60 = 567;
-    int v1_19_63 = 568;
-    int v1_19_70_24 = 574;
-    int v1_19_70 = 575;
-    int v1_19_80 = 582;
     int v1_20_0_23 = 588;
     int v1_20_0 = 589;
     int v1_20_10_21 = 593;
@@ -137,7 +107,6 @@ public interface ProtocolInfo {
     byte CRAFTING_DATA_PACKET = 0x34;
     byte CRAFTING_EVENT_PACKET = 0x35;
     byte GUI_DATA_PICK_ITEM_PACKET = 0x36;
-    byte ADVENTURE_SETTINGS_PACKET = 0x37;
     byte BLOCK_ENTITY_DATA_PACKET = 0x38;
     byte PLAYER_INPUT_PACKET = 0x39;
     byte FULL_CHUNK_DATA_PACKET = 0x3a;
@@ -198,7 +167,6 @@ public interface ProtocolInfo {
     byte SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET = 0x71;
     byte UPDATE_SOFT_ENUM_PACKET = 0x72;
     byte NETWORK_STACK_LATENCY_PACKET = 0x73;
-    byte SCRIPT_CUSTOM_EVENT_PACKET = 0x75;
     byte SPAWN_PARTICLE_EFFECT_PACKET = 0x76;
     byte AVAILABLE_ENTITY_IDENTIFIERS_PACKET = 0x77;
     byte LEVEL_SOUND_EVENT_PACKET_V2 = 0x78;

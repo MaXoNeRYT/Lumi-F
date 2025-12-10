@@ -44,7 +44,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
         try {
             TAG_544 = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("gamedata/biome/definitions/biome_definitions_554.dat"));
             BiomeDefinitionListPacket pk = new BiomeDefinitionListPacket();
-            pk.protocol = ProtocolInfo.v1_19_20;
+            pk.protocol = ProtocolInfo.v1_20_0_23;
             pk.tryEncode();
             CACHED_PACKET_544 = pk.compress(Deflater.BEST_COMPRESSION);
         } catch (Exception e) {

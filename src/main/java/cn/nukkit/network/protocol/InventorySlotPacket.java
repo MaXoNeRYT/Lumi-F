@@ -60,9 +60,6 @@ public class InventorySlotPacket extends DataPacket {
         } else if (this.protocol >= ProtocolInfo.v1_21_20) {
             this.putUnsignedVarInt(this.containerNameData == null || this.containerNameData.getDynamicId() == null ? 0 : this.containerNameData.getDynamicId());
         }
-        if (protocol >= 407 && protocol < ProtocolInfo.v1_16_220) {
-            this.putVarInt(networkId);
-        }
         this.putSlot(protocol, this.item);
     }
 }
