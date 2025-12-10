@@ -30,9 +30,4 @@ public class ItemHoeNetherite extends ItemTool {
     public int getMaxDurability() {
         return ItemTool.DURABILITY_NETHERITE;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

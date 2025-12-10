@@ -27,12 +27,7 @@ public class PalettedBlockStorage {
     }
 
     public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version, int protocol) {
-        int runtimeId;
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0); // Air is first
-        } else {
-            runtimeId = 0;
-        }
+        int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0); // Air is first
         return new PalettedBlockStorage(version, runtimeId);
     }
 

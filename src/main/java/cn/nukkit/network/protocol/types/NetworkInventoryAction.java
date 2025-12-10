@@ -157,7 +157,7 @@ public class NetworkInventoryAction {
                 }
 
                 // ID 124 with slot 14/15 is enchant inventory
-                if (this.windowId == ContainerIds.UI && player.protocol >= ProtocolInfo.v1_16_0) {
+                if (this.windowId == ContainerIds.UI) {
                     switch (this.inventorySlot) {
                         case PlayerUIComponent.CREATED_ITEM_OUTPUT_UI_SLOT:
                             if (player.getWindowById(Player.ANVIL_WINDOW_ID) != null) {

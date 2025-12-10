@@ -21,9 +21,7 @@ public class HurtArmorPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        if (protocol >= ProtocolInfo.v1_16_0) {
-            this.putVarInt(this.cause);
-        }
+        this.putVarInt(this.cause);
         this.putVarInt(this.damage);
         this.putUnsignedVarLong(this.armorSlots);
     }

@@ -420,7 +420,7 @@ public class BinaryStream {
             SerializedImage image = this.getImage(Skin.SKIN_128_128_SIZE);
             int type = this.getLInt();
             float frames = this.getLFloat();
-            int expression = protocol >= ProtocolInfo.v1_16_100 ? this.getLInt() : 0;
+            int expression = this.getLInt();
             skin.getAnimations().add(new SkinAnimation(image, type, frames, expression));
         }
 
@@ -772,16 +772,11 @@ public class BinaryStream {
             damage = -1;
         }
 
-        int id;
-        if (protocolId < ProtocolInfo.v1_16_100) {
-            id = runtimeId;
-        } else {
-            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
-            LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
-            id = legacyEntry.getLegacyId();
-            if (legacyEntry.isHasDamage()) {
-                damage = legacyEntry.getDamage();
-            }
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+        LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
+        int id = legacyEntry.getLegacyId();
+        if (legacyEntry.isHasDamage()) {
+            damage = legacyEntry.getDamage();
         }
 
         int count = this.getVarInt();
@@ -1005,11 +1000,9 @@ public class BinaryStream {
         this.putEntityUniqueId(link.toEntityUniquieId);
         this.putByte(link.type);
         this.putBoolean(link.immediate);
-        if (protocol >= ProtocolInfo.v1_16_0) {
-            this.putBoolean(link.riderInitiated);
-            if (protocol >= ProtocolInfo.v1_21_20) {
-                this.putLFloat(link.vehicleAngularVelocity);
-            }
+        this.putBoolean(link.riderInitiated);
+        if (protocol >= ProtocolInfo.v1_21_20) {
+            this.putLFloat(link.vehicleAngularVelocity);
         }
     }
 

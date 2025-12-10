@@ -112,10 +112,8 @@ public class BatchingHelper {
                 BatchPacket pk = new BatchPacket();
                 if (Server.getInstance().getSettings().network().compression().useSnappyCompression()) {
                     pk.payload = SnappyCompression.compress(bytes);
-                } else if (protocolId >= ProtocolInfo.v1_16_0) {
-                    pk.payload = Zlib.deflateRaw(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());
                 } else {
-                    pk.payload = Zlib.deflatePre16Packet(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());
+                    pk.payload = Zlib.deflateRaw(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());
                 }
                 for (Player player : finalTargets) {
                     CompressionProvider compressionProvider = player.getNetworkSession().getCompression();

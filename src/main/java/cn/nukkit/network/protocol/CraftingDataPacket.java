@@ -97,7 +97,7 @@ public class CraftingDataPacket extends DataPacket {
                         ingredient.putRecipe(this, protocol);
                     }
                     this.putUnsignedVarInt(1); // Results length
-                    this.putSlot(protocol, shapeless.getResult(), protocol >= ProtocolInfo.v1_16_100);
+                    this.putSlot(protocol, shapeless.getResult(), true);
                     this.putUUID(shapeless.getId());
                     if (protocol >= 354) {
                         this.putString(CRAFTING_TAG_CRAFTING_TABLE);
@@ -140,7 +140,7 @@ public class CraftingDataPacket extends DataPacket {
                     outputs.addAll(shaped.getExtraResults());
                     this.putUnsignedVarInt(outputs.size());
                     for (Item output : outputs) {
-                        this.putSlot(protocol, output, protocol >= ProtocolInfo.v1_16_100);
+                        this.putSlot(protocol, output, true);
                     }
                     this.putUUID(shaped.getId());
                     if (protocol >= 354) {
@@ -167,17 +167,15 @@ public class CraftingDataPacket extends DataPacket {
                     if (recipe.getType() == RecipeType.FURNACE_DATA) {
                         this.putVarInt(input.getDamage());
                     }
-                    this.putSlot(protocol, furnace.getResult(), protocol >= ProtocolInfo.v1_16_100);
+                    this.putSlot(protocol, furnace.getResult(), true);
                     if (protocol >= 354) {
                         this.putString(CRAFTING_TAG_FURNACE);
                     }
                     break;
                 case MULTI:
-                    if (protocol >= ProtocolInfo.v1_16_0) { // ??
-                        this.putUUID(((MultiRecipe) recipe).getId());
-                        this.putUnsignedVarInt(((MultiRecipe) recipe).getNetworkId());
-                        break;
-                    }
+                    this.putUUID(((MultiRecipe) recipe).getId());
+                    this.putUnsignedVarInt(((MultiRecipe) recipe).getNetworkId());
+                    break;
             }
         }
 

@@ -48,8 +48,6 @@ public class UpdateAttributesPacket extends DataPacket {
             }
         }
 
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            this.putUnsignedVarInt(this.frame);
-        }
+        this.putUnsignedVarInt(this.frame);
     }
 }

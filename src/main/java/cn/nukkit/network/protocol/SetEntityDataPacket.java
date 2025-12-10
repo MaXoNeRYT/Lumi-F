@@ -36,18 +36,16 @@ public class SetEntityDataPacket extends DataPacket {
         this.reset();
         this.putEntityRuntimeId(this.eid);
         this.put(Binary.writeMetadata(protocol, this.metadata));
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            this.putUnsignedVarInt(this.syncedProperties.intProperties().length);
-            for (int i = 0, len = this.syncedProperties.intProperties().length; i < len; ++i) {
-                this.putUnsignedVarInt(i);
-                this.putVarInt(this.syncedProperties.intProperties()[i]);
-            }
-            this.putUnsignedVarInt(this.syncedProperties.floatProperties().length);
-            for (int i = 0, len = this.syncedProperties.floatProperties().length; i < len; ++i) {
-                this.putUnsignedVarInt(i);
-                this.putLFloat(this.syncedProperties.floatProperties()[i]);
-            }
-            this.putUnsignedVarLong(this.frame);
+        this.putUnsignedVarInt(this.syncedProperties.intProperties().length);
+        for (int i = 0, len = this.syncedProperties.intProperties().length; i < len; ++i) {
+            this.putUnsignedVarInt(i);
+            this.putVarInt(this.syncedProperties.intProperties()[i]);
         }
+        this.putUnsignedVarInt(this.syncedProperties.floatProperties().length);
+        for (int i = 0, len = this.syncedProperties.floatProperties().length; i < len; ++i) {
+            this.putUnsignedVarInt(i);
+            this.putLFloat(this.syncedProperties.floatProperties()[i]);
+        }
+        this.putUnsignedVarLong(this.frame);
     }
 }

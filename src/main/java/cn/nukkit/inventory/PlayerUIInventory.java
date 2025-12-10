@@ -63,9 +63,6 @@ public class PlayerUIInventory extends BaseInventory {
         for (Player p : target) {
             if (p == this.getHolder()) {
                 pk.inventoryId = ContainerIds.UI;
-                if (p.protocol < ProtocolInfo.v1_16_0) {
-                    p.dataPacket(pk);
-                }
             } else {
                 int id;
 
@@ -74,13 +71,8 @@ public class PlayerUIInventory extends BaseInventory {
                     continue;
                 }
                 pk.inventoryId = id;
-                if (p.protocol < ProtocolInfo.v1_16_0) {
-                    p.dataPacket(pk);
-                }
             }
-            if (p.protocol >= ProtocolInfo.v1_16_0) {
-                p.dataPacket(pk);
-            }
+            p.dataPacket(pk);
         }
     }
 
@@ -97,9 +89,6 @@ public class PlayerUIInventory extends BaseInventory {
         for (Player p : target) {
             if (p == this.getHolder()) {
                 pk.inventoryId = ContainerIds.UI;
-                if (p.protocol < ProtocolInfo.v1_16_0) {
-                    p.dataPacket(pk);
-                }
             } else {
                 int id;
 
@@ -108,9 +97,6 @@ public class PlayerUIInventory extends BaseInventory {
                     continue;
                 }
                 pk.inventoryId = id;
-                if (p.protocol < ProtocolInfo.v1_16_0) {
-                    p.dataPacket(pk);
-                }
             }
             /*if (p.protocol >= ProtocolInfo.v1_16_0) {
                 p.dataPacket(pk);

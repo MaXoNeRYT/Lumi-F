@@ -1612,22 +1612,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.isSpectator()) {
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SILENT, true, false);
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, false);
-
-            if (this.protocol < ProtocolInfo.v1_16_0) {
-                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-                this.dataPacket(inventoryContentPacket);
-            }
         } else {
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SILENT, false, false);
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, true);
-
-            if (this.protocol < ProtocolInfo.v1_16_0) {
-                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-                inventoryContentPacket.slots = Registries.CREATIVE_ITEM.get(this.protocol).getItems().toArray(Item.EMPTY_ARRAY);
-                this.dataPacket(inventoryContentPacket);
-            }
         }
 
         this.resetFallDistance();
@@ -2584,10 +2571,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void checkNetwork() {
-        if (this.protocol < ProtocolInfo.v1_16_100 && !this.isOnline()) {
-            return;
-        }
-
         if (!this.isOnline()) {
             return;
         }
@@ -2851,65 +2834,61 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setDataProperty(new ByteEntityData(DATA_ALWAYS_SHOW_NAMETAG, 1), false);
 
         try {
-            if (this.protocol >= ProtocolInfo.v1_16_100) {
-                //注册实体属性
-                for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
-                    this.dataPacket(pk);
+            //注册实体属性
+            for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
+                this.dataPacket(pk);
+            }
+            ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
+            if (this.protocol >= ProtocolInfo.v1_21_60) {
+                Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
+                Set<Entry<String, CustomItemDefinition>> itemDefinitions = Registries.ITEM.getCustomItemDefinition().entrySet();
+                List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
+                entries.addAll(vanillaItems);
+                if (this.server.getSettings().features().enableExperimentMode() && !itemDefinitions.isEmpty()) {
+                    for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
+                        try {
+                            Item item = Item.get(entry.getKey());
+                            entries.add(new ItemComponentPacket.ItemDefinition(
+                                    entry.getKey(),
+                                    item.getNetworkId(this.protocol),
+                                    true,
+                                    1,
+                                    entry.getValue().getNbt(this.protocol)
+                            ));
+                        } catch (Exception e) {
+                            log.error("ItemComponentPacket encoding error", e);
+                        }
+                    }
                 }
-                ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
-                if (this.protocol >= ProtocolInfo.v1_21_60) {
-                    Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
-                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Registries.ITEM.getCustomItemDefinition().entrySet();
-                    List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
-                    entries.addAll(vanillaItems);
-                    if (this.server.getSettings().features().enableExperimentMode() && !itemDefinitions.isEmpty()) {
-                        for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
-                            try {
-                                Item item = Item.get(entry.getKey());
-                                entries.add(new ItemComponentPacket.ItemDefinition(
-                                        entry.getKey(),
-                                        item.getNetworkId(this.protocol),
-                                        true,
-                                        1,
-                                        entry.getValue().getNbt(this.protocol)
-                                ));
-                            } catch (Exception e) {
-                                log.error("ItemComponentPacket encoding error", e);
-                            }
+                itemComponentPacket.setEntries(entries);
+            } else {
+                if (this.server.getSettings().features().enableExperimentMode() && !Registries.ITEM.getCustomItemDefinition().isEmpty()) {
+                    Map<String, CustomItemDefinition> itemDefinition = Registries.ITEM.getCustomItemDefinition();
+                    List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
+                    int i = 0;
+                    for (var entry : itemDefinition.entrySet()) {
+                        try {
+                            Item item = Item.get(entry.getKey());
+                            entries.add(new ItemComponentPacket.ItemDefinition(
+                                    entry.getKey(),
+                                    item.getNetworkId(this.protocol),
+                                    true,
+                                    1,
+                                    entry.getValue().getNbt(this.protocol).putShort("minecraft:identifier", i)
+                            ));
+                            i++;
+                        } catch (Exception e) {
+                            log.error("ItemComponentPacket encoding error", e);
                         }
                     }
                     itemComponentPacket.setEntries(entries);
-                } else {
-                    if (this.server.getSettings().features().enableExperimentMode() && !Registries.ITEM.getCustomItemDefinition().isEmpty()) {
-                        Map<String, CustomItemDefinition> itemDefinition = Registries.ITEM.getCustomItemDefinition();
-                        List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
-                        int i = 0;
-                        for (var entry : itemDefinition.entrySet()) {
-                            try {
-                                Item item = Item.get(entry.getKey());
-                                entries.add(new ItemComponentPacket.ItemDefinition(
-                                        entry.getKey(),
-                                        item.getNetworkId(this.protocol),
-                                        true,
-                                        1,
-                                        entry.getValue().getNbt(this.protocol).putShort("minecraft:identifier", i)
-                                ));
-                                i++;
-                            } catch (Exception e) {
-                                log.error("ItemComponentPacket encoding error", e);
-                            }
-                        }
-                        itemComponentPacket.setEntries(entries);
-                    }
                 }
-                this.dataPacket(itemComponentPacket);
             }
+            this.dataPacket(itemComponentPacket);
             this.dataPacket(BiomeDefinitionListPacket.getCachedPacket(this.protocol));
             this.dataPacket(new AvailableEntityIdentifiersPacket());
 
-            if (this.protocol >= ProtocolInfo.v1_16_100) {
-                this.sendSpawnPos((int) this.x, (int) this.y, (int) this.z, this.level.getDimension());
-            }
+            this.sendSpawnPos((int) this.x, (int) this.y, (int) this.z, this.level.getDimension());
             this.getLevel().sendTime(this);
 
             SetDifficultyPacket difficultyPacket = new SetDifficultyPacket();
@@ -2929,13 +2908,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.sendFullPlayerListData(this);
             this.sendAttributes();
 
-            if (this.protocol < ProtocolInfo.v1_16_0 && this.gamemode == Player.SPECTATOR) {
-                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
-                this.dataPacket(inventoryContentPacket);
-            } else {
-                this.inventory.sendCreativeContents();
-            }
+            this.inventory.sendCreativeContents();
             this.sendAllInventories();
             this.inventory.sendHeldItemIfNotAir(this);
 
@@ -3041,12 +3014,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.unverifiedUsername = TextFormat.clean(loginPacket.username);
                     }
                     case REPLACING -> {
-                        if (protocol >= ProtocolInfo.v1_16_0) {
-                            this.unverifiedUsername = TextFormat.clean(loginPacket.username).replace(" ", "_");
-                        } else {
-                            // There are compatibility issues in <1.16, ignore
-                            this.unverifiedUsername = TextFormat.clean(loginPacket.username);
-                        }
+                        this.unverifiedUsername = TextFormat.clean(loginPacket.username).replace(" ", "_");
                     }
                     default -> this.unverifiedUsername = TextFormat.clean(loginPacket.username);
                 }
@@ -4056,19 +4024,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         }
 
-                        if (this.protocol >= ProtocolInfo.v1_16_0) {
-                            Inventory inventory = this.getWindowById(ANVIL_WINDOW_ID);
-                            if (inventory instanceof AnvilInventory) {
-                                ((AnvilInventory) inventory).setCost(-entityEventPacket.data);
-                            }
-                            break;
-                        }
-
-                        int levels = entityEventPacket.data; // Sent as negative number of levels lost
-                        if (this.expLevel > 0 && this.expLevel - levels > 0  && levels < 0) {
-                            this.setExperience(this.exp, this.expLevel + levels);
+                        Inventory inventory = this.getWindowById(ANVIL_WINDOW_ID);
+                        if (inventory instanceof AnvilInventory) {
+                            ((AnvilInventory) inventory).setCost(-entityEventPacket.data);
                         }
                         break;
+
                 }
                 break;
             case ProtocolInfo.CONTAINER_CLOSE_PACKET:
@@ -4318,7 +4279,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.craftingTransaction = null;
                     }
                     return;
-                } else if (this.protocol >= ProtocolInfo.v1_16_0 && transactionPacket.isEnchantingPart) {
+                } else if (transactionPacket.isEnchantingPart) {
                     if (this.enchantTransaction == null) {
                         this.enchantTransaction = new EnchantTransaction(this, actions);
                     } else {
@@ -4331,7 +4292,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.enchantTransaction = null;
                     }
                     return;
-                } else if (this.protocol >= ProtocolInfo.v1_16_0 && transactionPacket.isRepairItemPart) {
+                } else if (transactionPacket.isRepairItemPart) {
                     Sound sound = null;
                     if (SmithingTransaction.isIn(actions)) {
                         if (this.smithingTransaction == null) {
@@ -4430,13 +4391,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         return;
                     } else {
                         this.server.getLogger().debug("Got unexpected normal inventory action with incomplete crafting transaction from " + this.username + ", refusing to execute crafting");
-                        if (this.protocol >= ProtocolInfo.v1_16_0) {
-                            this.removeAllWindows(false);
-                            this.needSendInventory = true;
-                        }
+                        this.removeAllWindows(false);
+                        this.needSendInventory = true;
                         this.craftingTransaction = null;
                     }
-                } else if (this.protocol >= ProtocolInfo.v1_16_0 && this.enchantTransaction != null) {
+                } else if (this.enchantTransaction != null) {
                     if (enchantTransaction.checkForEnchantPart(actions)) {
                         for (InventoryAction action : actions) {
                             enchantTransaction.addAction(action);
@@ -4448,7 +4407,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.needSendInventory = true;
                         this.enchantTransaction = null;
                     }
-                } else if (this.protocol >= ProtocolInfo.v1_16_0 && this.repairItemTransaction != null) {
+                } else if (this.repairItemTransaction != null) {
                     if (RepairItemTransaction.checkForRepairItemPart(actions)) {
                         for (InventoryAction action : actions) {
                             this.repairItemTransaction.addAction(action);
@@ -4460,7 +4419,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.needSendInventory = true;
                         this.repairItemTransaction = null;
                     }
-                } else if (this.protocol >= ProtocolInfo.v1_16_0 && this.smithingTransaction != null) {
+                } else if (this.smithingTransaction != null) {
                     if (SmithingTransaction.isIn(actions)) {
                         for (InventoryAction action : actions) {
                             this.smithingTransaction.addAction(action);
@@ -5047,11 +5006,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void emote(EmotePacket emote) {
-        for (Player player : this.getViewers().values()) {
-            if (player.protocol >= ProtocolInfo.v1_16_0) {
-                player.dataPacket(emote);
-            }
-        }
+        this.getViewers().values().forEach(player -> player.dataPacket(emote));
     }
 
     public boolean kick() {
@@ -6842,10 +6797,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             BatchPacket compress = new BatchPacket();
             if (Server.getInstance().getSettings().network().compression().useSnappyCompression()) {
                 compress.payload = SnappyCompression.compress(bytes);
-            } else if (protocol >= ProtocolInfo.v1_16_0) {
-                compress.payload = Zlib.deflateRaw(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());
             } else {
-                compress.payload = Zlib.deflatePre16Packet(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());
+                compress.payload = Zlib.deflateRaw(bytes, Server.getInstance().getSettings().network().compression().compressionLevel());
             }
             return compress;
         } catch (Exception e) {

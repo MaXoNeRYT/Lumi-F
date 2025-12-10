@@ -448,8 +448,6 @@ public class Utils {
      */
     public static String getVersionByProtocol(int protocol) {
         return switch (protocol) {
-            case ProtocolInfo.v1_16_0 -> "1.16.0";
-            case ProtocolInfo.v1_16_100 -> "1.16.100";
             case ProtocolInfo.v1_20_0_23, ProtocolInfo.v1_20_0 -> "1.20.0";
             case ProtocolInfo.v1_20_10_21, ProtocolInfo.v1_20_10 -> "1.20.10";
             case ProtocolInfo.v1_20_30_24, ProtocolInfo.v1_20_30 -> "1.20.30";

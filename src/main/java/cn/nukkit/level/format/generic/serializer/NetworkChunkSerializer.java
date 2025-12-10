@@ -68,10 +68,6 @@ public class NetworkChunkSerializer {
 
             // Border blocks
             stream.putByte((byte) 0);
-            if (protocolId < ProtocolInfo.v1_16_100) {
-                // There is no extra data anymore but idk when it was removed
-                stream.putVarInt(0);
-            }
             stream.put(blockEntities);
 
             callback.accept(new NetworkChunkSerializerCallback(protocolId, stream, networkChunkData.getChunkSections()));

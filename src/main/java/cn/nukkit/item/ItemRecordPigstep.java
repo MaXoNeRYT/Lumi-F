@@ -23,9 +23,4 @@ public class ItemRecordPigstep extends ItemRecord {
     public String getSoundId() {
         return "record.pigstep";
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

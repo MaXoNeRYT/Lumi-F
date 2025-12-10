@@ -187,7 +187,7 @@ public class StartGamePacket extends DataPacket {
         this.putLLong(this.seed);
         if (protocol >= 407) {
             this.putLShort(0x00); // SpawnBiomeType - Default
-            this.putString(protocol >= ProtocolInfo.v1_16_100 ? "plains" : ""); // UserDefinedBiomeName
+            this.putString("plains"); // UserDefinedBiomeName
         }
         this.putVarInt(this.dimension);
         this.putVarInt(this.generator);
@@ -229,18 +229,16 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
         this.putGameRules(protocol, gameRules, true);
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            if (Server.getInstance().getSettings().features().enableExperimentMode() && !this.experiments.isEmpty()) {
-                this.putLInt(this.experiments.size()); // Experiment count
-                for (ExperimentData experiment : this.experiments) {
-                    this.putString(experiment.getName());
-                    this.putBoolean(experiment.isEnabled());
-                }
-                this.putBoolean(true); // Were experiments previously toggled
-            } else {
-                this.putLInt(0); // Experiment count
-                this.putBoolean(false); // Were experiments previously toggled
+        if (Server.getInstance().getSettings().features().enableExperimentMode() && !this.experiments.isEmpty()) {
+            this.putLInt(this.experiments.size()); // Experiment count
+            for (ExperimentData experiment : this.experiments) {
+                this.putString(experiment.getName());
+                this.putBoolean(experiment.isEnabled());
             }
+            this.putBoolean(true); // Were experiments previously toggled
+        } else {
+            this.putLInt(0); // Experiment count
+            this.putBoolean(false); // Were experiments previously toggled
         }
         this.putBoolean(this.bonusChest);
         if (protocol > 201) {
@@ -279,22 +277,20 @@ public class StartGamePacket extends DataPacket {
                     this.putString(this.vanillaVersion);
                 }
             }
-            if (protocol >= ProtocolInfo.v1_16_0) {
-                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world width
-                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world height
-                this.putBoolean(false); // Nether type
-                this.putString(""); // buttonName
-                this.putString(""); // linkUri
-                this.putBoolean(/*Server.getInstance().enableExperimentMode*/ false); //Force Experimental Gameplay (exclusive to debug clients)
-                this.putByte(this.chatRestrictionLevel);
-                this.putBoolean(this.disablePlayerInteractions);
-                if (protocol >= ProtocolInfo.v1_21_0) {
-                    this.putString(this.serverId);
-                    this.putString(this.worldId);
-                    this.putString(this.scenarioId);
-                    if (protocol >= ProtocolInfo.v1_21_90) {
-                        this.putString(""); // OwnerId
-                    }
+            this.putLInt(16); // Limited world width
+            this.putLInt(16); // Limited world height
+            this.putBoolean(false); // Nether type
+            this.putString(""); // buttonName
+            this.putString(""); // linkUri
+            this.putBoolean(/*Server.getInstance().enableExperimentMode*/ false); //Force Experimental Gameplay (exclusive to debug clients)
+            this.putByte(this.chatRestrictionLevel);
+            this.putBoolean(this.disablePlayerInteractions);
+            if (protocol >= ProtocolInfo.v1_21_0) {
+                this.putString(this.serverId);
+                this.putString(this.worldId);
+                this.putString(this.scenarioId);
+                if (protocol >= ProtocolInfo.v1_21_90) {
+                    this.putString(""); // OwnerId
                 }
             }
         }
@@ -328,25 +324,21 @@ public class StartGamePacket extends DataPacket {
             this.put(RuntimeItems.getMapping(protocol).getItemPalette());
         }
         this.putString(this.multiplayerCorrelationId);
-        if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
-            this.putBoolean(this.isOnlySpawningV1Villagers);
-        } else if (protocol >= ProtocolInfo.v1_16_0) {
-            this.putBoolean(false); // isInventoryServerAuthoritative
-            this.putString(""); // serverEngine
-            try {
-                this.put(NBTIO.writeNetwork(this.playerPropertyData));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            this.putLLong(0L); // BlockRegistryChecksum
-            this.put(EMPTY_UUID); // worldTemplateId
-            this.putBoolean(this.clientSideGenerationEnabled);
-            this.putBoolean(this.blockNetworkIdsHashed);
-            if (protocol >= ProtocolInfo.v1_20_0_23) {
-                this.putBoolean(this.networkPermissions.isServerAuthSounds());
-                if(protocol >= ProtocolInfo.v1_21_100) {
-                    this.putBoolean(this.tickDeathSystemsEnabled);
-                }
+        this.putBoolean(false); // isInventoryServerAuthoritative
+        this.putString(""); // serverEngine
+        try {
+            this.put(NBTIO.writeNetwork(this.playerPropertyData));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        this.putLLong(0L); // BlockRegistryChecksum
+        this.put(EMPTY_UUID); // worldTemplateId
+        this.putBoolean(this.clientSideGenerationEnabled);
+        this.putBoolean(this.blockNetworkIdsHashed);
+        if (protocol >= ProtocolInfo.v1_20_0_23) {
+            this.putBoolean(this.networkPermissions.isServerAuthSounds());
+            if(protocol >= ProtocolInfo.v1_21_100) {
+                this.putBoolean(this.tickDeathSystemsEnabled);
             }
         }
     }

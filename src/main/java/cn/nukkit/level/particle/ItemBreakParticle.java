@@ -21,17 +21,12 @@ public class ItemBreakParticle extends Particle {
 
     @Override
     public DataPacket[] mvEncode(int protocol) {
-        int runtimeId = this.item.getId();
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            runtimeId = item.getNetworkId(protocol);
-        }
-
         LevelEventPacket packet = new LevelEventPacket();
         packet.evid = (short) (LevelEventPacket.EVENT_ADD_PARTICLE_MASK | getMultiversionId(protocol, Particle.TYPE_ITEM_BREAK));
         packet.x = (float) this.x;
         packet.y = (float) this.y;
         packet.z = (float) this.z;
-        packet.data = (runtimeId << 16 | item.getDamage());
+        packet.data = (item.getNetworkId(protocol) << 16 | item.getDamage());
         packet.protocol = protocol;
         packet.tryEncode();
         return new DataPacket[]{packet};
