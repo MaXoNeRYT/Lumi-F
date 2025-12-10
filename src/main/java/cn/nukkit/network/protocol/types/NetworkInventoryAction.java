@@ -2,12 +2,10 @@ package cn.nukkit.network.protocol.types;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.BlockSkull;
+import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
-import cn.nukkit.item.ItemLapisLazuli;
-import cn.nukkit.item.ItemNamespaceId;
+import cn.nukkit.item.*;
 import cn.nukkit.network.protocol.InventoryTransactionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.ToString;
@@ -158,20 +156,10 @@ public class NetworkInventoryAction {
                 if (this.windowId == ContainerIds.ARMOR) {
                     this.inventorySlot += 36;
                     this.windowId = ContainerIds.INVENTORY;
-                    Set<String> helmetItems = Set.of(
-                            ItemNamespaceId.CARVED_PUMPKIN,
-                            ItemNamespaceId.SKELETON_SKULL,
-                            ItemNamespaceId.SKULL,
-                            ItemNamespaceId.WITHER_SKELETON_SKULL,
-                            ItemNamespaceId.ZOMBIE_HEAD,
-                            ItemNamespaceId.CREEPER_HEAD,
-                            ItemNamespaceId.DRAGON_HEAD,
-                            ItemNamespaceId.PIGLIN_HEAD,
-                            ItemNamespaceId.PLAYER_HEAD
-                    );
-
                     if (this.newItem == null ||
-                            (this.inventorySlot == 36 && !this.newItem.canBePutInHelmetSlot() && !this.oldItem.canBePutInHelmetSlot() && !helmetItems.contains(this.newItem.getNamespaceId(player.protocol)) && !helmetItems.contains(this.oldItem.getNamespaceId(player.protocol))) ||
+                            (this.inventorySlot == 36 && !this.newItem.canBePutInHelmetSlot() && !this.oldItem.canBePutInHelmetSlot() &&
+                                    !((this.newItem instanceof ItemBlock itemBlockNew && itemBlockNew.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCKS)) ||
+                                            (this.oldItem instanceof ItemBlock itemBlockOld && itemBlockOld.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCKS)))) ||
                             (this.inventorySlot == 37 && !this.newItem.isChestplate() && !this.oldItem.isChestplate()) ||
                             (this.inventorySlot == 38 && !this.newItem.isLeggings() && !this.oldItem.isLeggings()) ||
                             (this.inventorySlot == 39 && !this.newItem.isBoots() && !this.oldItem.isBoots())) {

@@ -227,4 +227,16 @@ public interface BlockInternalTags {
             BlockTypes.CHERRY_SAPLING,
             BlockTypes.PALE_OAK_SAPLING
     ));
+
+    BlockTag WEARABLE_BLOCKS = BlockTags.register("lumi:wearable", new SimpleBlockTag(
+            BlockTypes.ZOMBIE_HEAD,
+            BlockTypes.PIGLIN_HEAD,
+            BlockTypes.CREEPER_HEAD,
+            BlockTypes.DRAGON_HEAD,
+            BlockTypes.PLAYER_HEAD,
+            BlockTypes.SKULL,
+            BlockTypes.SKELETON_SKULL,
+            BlockTypes.WITHER_SKELETON_SKULL,
+            BlockTypes.CARVED_PUMPKIN
+    ));
 }
