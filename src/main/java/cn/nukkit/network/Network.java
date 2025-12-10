@@ -384,8 +384,6 @@ public class Network {
                 .registerPacket(ProtocolInfo.ADD_PAINTING_PACKET, AddPaintingPacket.class)
                 .registerPacket(ProtocolInfo.TICK_SYNC_PACKET, TickSyncPacket.class)
                 .registerPacket(ProtocolInfo.ADD_PLAYER_PACKET, AddPlayerPacket.class)
-                // TODO remove deprecated packet
-//                .registerPacket(ProtocolInfo.ADVENTURE_SETTINGS_PACKET, AdventureSettingsPacket.class)
                 .registerPacket(ProtocolInfo.ANIMATE_PACKET, AnimatePacket.class)
                 .registerPacket(ProtocolInfo.ANVIL_DAMAGE_PACKET, AnvilDamagePacket.class)
                 .registerPacket(ProtocolInfo.AVAILABLE_COMMANDS_PACKET, AvailableCommandsPacket.class)
@@ -476,8 +474,6 @@ public class Network {
                 .registerPacket(ProtocolInfo.NETWORK_CHUNK_PUBLISHER_UPDATE_PACKET, NetworkChunkPublisherUpdatePacket.class)
                 .registerPacket(ProtocolInfo.AVAILABLE_ENTITY_IDENTIFIERS_PACKET, AvailableEntityIdentifiersPacket.class)
                 .registerPacket(ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V2, LevelSoundEventPacket.class)
-                // TODO remove deprecated packet
-//                .registerPacket(ProtocolInfo.SCRIPT_CUSTOM_EVENT_PACKET, ScriptCustomEventPacket.class)
                 .registerPacket(ProtocolInfo.SPAWN_PARTICLE_EFFECT_PACKET, SpawnParticleEffectPacket.class)
                 .registerPacket(ProtocolInfo.BIOME_DEFINITION_LIST_PACKET, BiomeDefinitionListPacket.class)
                 .registerPacket(ProtocolInfo.LEVEL_SOUND_EVENT_PACKET, LevelSoundEventPacket.class)

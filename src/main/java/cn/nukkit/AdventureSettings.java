@@ -1,11 +1,11 @@
 package cn.nukkit;
 
-import cn.nukkit.network.protocol.AdventureSettingsPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.UpdateAbilitiesPacket;
 import cn.nukkit.network.protocol.UpdateAdventureSettingsPacket;
 import cn.nukkit.network.protocol.types.AbilityLayer;
 import cn.nukkit.network.protocol.types.PlayerAbility;
+import lombok.Getter;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -18,11 +18,33 @@ import java.util.Map;
  */
 public class AdventureSettings implements Cloneable {
 
-    public static final int PERMISSION_NORMAL = 0;
-    public static final int PERMISSION_OPERATOR = 1;
-    public static final int PERMISSION_HOST = 2;
-    public static final int PERMISSION_AUTOMATION = 3;
-    public static final int PERMISSION_ADMIN = 4;
+
+    /**
+     * This constant is used to identify flags that should be set on the second field. In a sensible world, these
+     * flags would all be set on the same packet field, but as of MCPE 1.2, the new abilities flags have for some
+     * reason been assigned a separate field.
+     */
+    public static final int BITFLAG_SECOND_SET = 65536;
+
+    public static final int WORLD_IMMUTABLE = 0x01;
+    public static final int NO_PVM = 0x02;
+    public static final int NO_MVP = 0x04;
+    public static final int SHOW_NAME_TAGS = 0x10;
+    public static final int AUTO_JUMP = 0x20;
+    public static final int ALLOW_FLIGHT = 0x40;
+    public static final int NO_CLIP = 0x80;
+    public static final int WORLD_BUILDER = 0x100;
+    public static final int FLYING = 0x200;
+    public static final int MUTED = 0x400;
+    public static final int MINE = 0x01 | BITFLAG_SECOND_SET;
+    public static final int DOORS_AND_SWITCHES = 0x02 | BITFLAG_SECOND_SET;
+    public static final int OPEN_CONTAINERS = 0x04 | BITFLAG_SECOND_SET;
+    public static final int ATTACK_PLAYERS = 0x08 | BITFLAG_SECOND_SET;
+    public static final int ATTACK_MOBS = 0x10 | BITFLAG_SECOND_SET;
+    public static final int OPERATOR = 0x20 | BITFLAG_SECOND_SET;
+    public static final int TELEPORT = 0x80 | BITFLAG_SECOND_SET;
+    public static final int BUILD = 0x100 | BITFLAG_SECOND_SET;
+    public static final int DEFAULT_LEVEL_PERMISSIONS = 0x200 | BITFLAG_SECOND_SET;
 
     private final Map<Type, Boolean> values = new EnumMap<>(Type.class);
 
@@ -87,7 +109,6 @@ public class AdventureSettings implements Cloneable {
         layer.getAbilitiesSet().addAll(PlayerAbility.VALUES);
 
         // TODO Multiversion 移除低版本不支持的内容
-
         for (Type type : Type.values()) {
             if (type.isAbility() && this.get(type) && player.protocol >= type.protocol) {
                 layer.getAbilityValues().add(type.getAbility());
@@ -155,33 +176,35 @@ public class AdventureSettings implements Cloneable {
      * List of adventure settings
      */
     public enum Type {
-        WORLD_IMMUTABLE(AdventureSettingsPacket.WORLD_IMMUTABLE, null, false),
-        NO_PVM(AdventureSettingsPacket.NO_PVM, null, false),
-        NO_MVP(AdventureSettingsPacket.NO_MVP, PlayerAbility.INVULNERABLE, false),
-        SHOW_NAME_TAGS(AdventureSettingsPacket.SHOW_NAME_TAGS, null, false),
-        AUTO_JUMP(AdventureSettingsPacket.AUTO_JUMP, null, true),
-        ALLOW_FLIGHT(AdventureSettingsPacket.ALLOW_FLIGHT, PlayerAbility.MAY_FLY, false),
-        NO_CLIP(AdventureSettingsPacket.NO_CLIP, PlayerAbility.NO_CLIP, false),
-        WORLD_BUILDER(AdventureSettingsPacket.WORLD_BUILDER, PlayerAbility.WORLD_BUILDER, false),
-        FLYING(AdventureSettingsPacket.FLYING, PlayerAbility.FLYING, false),
-        MUTED(AdventureSettingsPacket.MUTED, PlayerAbility.MUTED, false),
-        MINE(AdventureSettingsPacket.MINE, PlayerAbility.MINE, true),
-        DOORS_AND_SWITCHED(AdventureSettingsPacket.DOORS_AND_SWITCHES, PlayerAbility.DOORS_AND_SWITCHES, true),
-        OPEN_CONTAINERS(AdventureSettingsPacket.OPEN_CONTAINERS, PlayerAbility.OPEN_CONTAINERS, true),
-        ATTACK_PLAYERS(AdventureSettingsPacket.ATTACK_PLAYERS, PlayerAbility.ATTACK_PLAYERS, true),
-        ATTACK_MOBS(AdventureSettingsPacket.ATTACK_MOBS, PlayerAbility.ATTACK_MOBS, true),
-        OPERATOR(AdventureSettingsPacket.OPERATOR, PlayerAbility.OPERATOR_COMMANDS, false),
-        TELEPORT(AdventureSettingsPacket.TELEPORT, PlayerAbility.TELEPORT, false),
-        BUILD(AdventureSettingsPacket.BUILD, PlayerAbility.BUILD, true),
+        WORLD_IMMUTABLE(AdventureSettings.WORLD_IMMUTABLE, null, false),
+        NO_PVM(AdventureSettings.NO_PVM, null, false),
+        NO_MVP(AdventureSettings.NO_MVP, PlayerAbility.INVULNERABLE, false),
+        SHOW_NAME_TAGS(AdventureSettings.SHOW_NAME_TAGS, null, false),
+        AUTO_JUMP(AdventureSettings.AUTO_JUMP, null, true),
+        ALLOW_FLIGHT(AdventureSettings.ALLOW_FLIGHT, PlayerAbility.MAY_FLY, false),
+        NO_CLIP(AdventureSettings.NO_CLIP, PlayerAbility.NO_CLIP, false),
+        WORLD_BUILDER(AdventureSettings.WORLD_BUILDER, PlayerAbility.WORLD_BUILDER, false),
+        FLYING(AdventureSettings.FLYING, PlayerAbility.FLYING, false),
+        MUTED(AdventureSettings.MUTED, PlayerAbility.MUTED, false),
+        MINE(AdventureSettings.MINE, PlayerAbility.MINE, true),
+        DOORS_AND_SWITCHED(AdventureSettings.DOORS_AND_SWITCHES, PlayerAbility.DOORS_AND_SWITCHES, true),
+        OPEN_CONTAINERS(AdventureSettings.OPEN_CONTAINERS, PlayerAbility.OPEN_CONTAINERS, true),
+        ATTACK_PLAYERS(AdventureSettings.ATTACK_PLAYERS, PlayerAbility.ATTACK_PLAYERS, true),
+        ATTACK_MOBS(AdventureSettings.ATTACK_MOBS, PlayerAbility.ATTACK_MOBS, true),
+        OPERATOR(AdventureSettings.OPERATOR, PlayerAbility.OPERATOR_COMMANDS, false),
+        TELEPORT(AdventureSettings.TELEPORT, PlayerAbility.TELEPORT, false),
+        BUILD(AdventureSettings.BUILD, PlayerAbility.BUILD, true),
         PRIVILEGED_BUILDER(0, PlayerAbility.PRIVILEGED_BUILDER, false),
 
         @Deprecated //1.19.30弃用
-        DEFAULT_LEVEL_PERMISSIONS(AdventureSettingsPacket.DEFAULT_LEVEL_PERMISSIONS, null, false);
+        DEFAULT_LEVEL_PERMISSIONS(AdventureSettings.DEFAULT_LEVEL_PERMISSIONS, null, false);
 
+        @Getter
         private final int id;
+        @Getter
         private final PlayerAbility ability;
         private final boolean defaultValue;
-        private int protocol;
+        private final int protocol;
 
         Type(int id, PlayerAbility ability, boolean defaultValue) {
             this(id, ability, defaultValue, -1);
@@ -195,25 +218,12 @@ public class AdventureSettings implements Cloneable {
         }
 
         /**
-         * Get ID
-         *
-         * @return ID
-         */
-        public int getId() {
-            return id;
-        }
-
-        /**
          * Get default value
          *
          * @return default value
          */
         public boolean getDefaultValue() {
             return this.defaultValue;
-        }
-
-        public PlayerAbility getAbility() {
-            return this.ability;
         }
 
         public boolean isAbility() {
