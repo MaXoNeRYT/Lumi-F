@@ -158,8 +158,8 @@ public class NetworkInventoryAction {
                     this.windowId = ContainerIds.INVENTORY;
                     if (this.newItem == null ||
                             (this.inventorySlot == 36 && !this.newItem.canBePutInHelmetSlot() && !this.oldItem.canBePutInHelmetSlot() &&
-                                    !((this.newItem instanceof ItemBlock itemBlockNew && itemBlockNew.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCKS)) ||
-                                            (this.oldItem instanceof ItemBlock itemBlockOld && itemBlockOld.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCKS)))) ||
+                                    !((this.newItem instanceof ItemBlock itemBlockNew && itemBlockNew.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCK)) ||
+                                            (this.oldItem instanceof ItemBlock itemBlockOld && itemBlockOld.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCK)))) ||
                             (this.inventorySlot == 37 && !this.newItem.isChestplate() && !this.oldItem.isChestplate()) ||
                             (this.inventorySlot == 38 && !this.newItem.isLeggings() && !this.oldItem.isLeggings()) ||
                             (this.inventorySlot == 39 && !this.newItem.isBoots() && !this.oldItem.isBoots())) {
