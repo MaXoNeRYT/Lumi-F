@@ -13,9 +13,11 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.AVAILABLE_ENTITY_IDENTIFIERS_PACKET;
 
     public static final byte[] TAG; //582
+    public static final byte[] TAG_898;
 
     static {
         TAG = loadEntityIdentifiers(582);
+        TAG_898 = loadEntityIdentifiers(898);
     }
 
     private static byte[] loadEntityIdentifiers(int protocol) {

@@ -1,5 +1,7 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.math.Vector3f;
+import cn.nukkit.utils.BinaryStream;
 import lombok.ToString;
 
 @ToString
@@ -14,11 +16,18 @@ public class InteractPacket extends DataPacket {
 
     public int action;
     public long target;
+    /**
+     * @since 898
+     */
+    private Vector3f mousePosition;
 
     @Override
     public void decode() {
         this.action = this.getByte();
         this.target = this.getEntityRuntimeId();
+        if (protocol >= ProtocolInfo.v1_21_130) {
+            this.mousePosition = this.getOptional(null, BinaryStream::getVector3f);
+        }
     }
 
     @Override
@@ -26,6 +35,9 @@ public class InteractPacket extends DataPacket {
         this.reset();
         this.putByte((byte) this.action);
         this.putEntityRuntimeId(this.target);
+        if (protocol >= ProtocolInfo.v1_21_130) {
+            this.putOptionalNull(this.mousePosition, BinaryStream::putVector3f);
+        }
     }
 
     @Override

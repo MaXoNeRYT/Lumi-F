@@ -412,6 +412,7 @@ public abstract class Entity extends Location implements Metadatable {
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping800, ProtocolInfo.v1_21_80); //1.21.80-latest
 
         initEntityIdentifiers(ProtocolInfo.v1_20_0_23, AvailableEntityIdentifiersPacket.TAG);
+        initEntityIdentifiers(ProtocolInfo.v1_21_130, AvailableEntityIdentifiersPacket.TAG_898);
     }
 
     public final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
@@ -1214,7 +1215,9 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     private static int correctEntityIdentifiersProtocol(int protocolId) {
-        //Currently empty because all protocols are using 1.19.80 identifier map
+        if (protocolId >= ProtocolInfo.v1_21_130) {
+            return ProtocolInfo.v1_21_130;
+        }
         return ProtocolInfo.v1_20_0_23;
     }
 

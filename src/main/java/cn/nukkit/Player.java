@@ -2782,7 +2782,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         infoPacket.mustAccept = this.server.getSettings().general().forceResources();
         this.dataPacket(infoPacket);
     }
-
     protected void completeLoginSequence() {
         if (this.loggedIn) {
             this.server.getLogger().debug("(BUG) Tried to call completeLoginSequence but player is already logged in");
@@ -3304,11 +3303,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (inputY >= -1.001 && inputY <= 1.001) {
                         ((EntityMinecartAbstract) riding).setCurrentSpeed(inputY);
                     }
-                } else if (this.riding instanceof EntityBoat && authPacket.getInputData().contains(AuthInputAction.IN_CLIENT_PREDICTED_IN_VEHICLE)) {
-                    if (this.riding.getId() == authPacket.getPredictedVehicle() && this.riding.isControlling(this)) {
-                        if (this.temporalVector.setComponents(authPacket.getPosition().getX(), authPacket.getPosition().getY(), authPacket.getPosition().getZ()).distanceSquared(this.riding) < 100) {
-                            ((EntityBoat) this.riding).onInput(authPacket.getPosition().getX(), authPacket.getPosition().getY(), authPacket.getPosition().getZ(), authPacket.getHeadYaw());
-                            ignoreCoordinateMove = true;
+                } else if (this.riding instanceof EntityBoat) {
+                    if (this.protocol >= ProtocolInfo.v1_21_130) {
+                        if (this.riding.isControlling(this)) {
+                            if (this.temporalVector.setComponents(authPacket.getPosition().getX(), authPacket.getPosition().getY(), authPacket.getPosition().getZ()).distanceSquared(this.riding) < 100) {
+                                ((EntityBoat) this.riding).onPlayerInput(this, authPacket.getMotion().getX(), authPacket.getMotion().getY());
+                                ignoreCoordinateMove = true;
+                            }
+                        }
+                    } else {
+                        if (authPacket.getInputData().contains(AuthInputAction.IN_CLIENT_PREDICTED_IN_VEHICLE)) {
+                            if (this.riding.getId() == authPacket.getPredictedVehicle() && this.riding.isControlling(this)) {
+                                if (this.temporalVector.setComponents(authPacket.getPosition().getX(), authPacket.getPosition().getY(), authPacket.getPosition().getZ()).distanceSquared(this.riding) < 100) {
+                                    ((EntityBoat) this.riding).onInput(authPacket.getPosition().getX(), authPacket.getPosition().getY(), authPacket.getPosition().getZ(), authPacket.getHeadYaw());
+                                    ignoreCoordinateMove = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -3985,7 +3995,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     case ROW_RIGHT:
                     case ROW_LEFT:
                         if (this.riding instanceof EntityBoat) {
-                            ((EntityBoat) this.riding).onPaddle(animation, ((AnimatePacket) packet).rowingTime);
+                            if (this.protocol >= ProtocolInfo.v1_21_130) {
+                                ((EntityBoat) this.riding).onPaddle(animation, 1); // Paddle time got removed from packet. Needs debugging!!
+                            } else {
+                                ((EntityBoat) this.riding).onPaddle(animation, ((AnimatePacket) packet).rowingTime);
+                            }
                         }
                         break;
                 }
@@ -3996,6 +4010,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 animatePacket.eid = this.getId();
                 animatePacket.action = animationEvent.getAnimationType();
+                animatePacket.swingSource = SwingSource.EVENT;
                 Server.broadcastPacket(this.getViewers().values(), animatePacket);
                 break;
             case ProtocolInfo.ENTITY_EVENT_PACKET:

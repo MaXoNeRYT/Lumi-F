@@ -279,8 +279,6 @@ public final class BlockTypes {
 
     public static final BlockType BOAT = register("minecraft:boat", 823);
 
-    public static final BlockType BONE = register("minecraft:bone", 441);
-
     public static final BlockType BONE_BLOCK = register("minecraft:bone_block", 216);
 
     public static final BlockType BOOK = register("minecraft:book", 413);
@@ -290,8 +288,6 @@ public final class BlockTypes {
     public static final BlockType BORDER_BLOCK = register("minecraft:border_block", 212);
 
     public static final BlockType BOW = register("minecraft:bow", 324);
-
-    public static final BlockType BOWL = register("minecraft:bowl", 346);
 
     public static final BlockType BRAIN_CORAL = register("minecraft:brain_coral", -581);
 
@@ -492,8 +488,6 @@ public final class BlockTypes {
     public static final BlockType CLOCK = register("minecraft:clock", 419);
 
     public static final BlockType CLOSED_EYEBLOSSOM = register("minecraft:closed_eyeblossom", -1019);
-
-    public static final BlockType COAL = register("minecraft:coal", 326);
 
     public static final BlockType COAL_BLOCK = register("minecraft:coal_block", 173);
 
@@ -1251,8 +1245,6 @@ public final class BlockTypes {
 
     public static final BlockType FARMLAND = register("minecraft:farmland", 60);
 
-    public static final BlockType FEATHER = register("minecraft:feather", 352);
-
     public static final BlockType FENCE = register("minecraft:fence", 782);
 
     public static final BlockType FENCE_GATE = register("minecraft:fence_gate", 107);
@@ -1421,8 +1413,6 @@ public final class BlockTypes {
 
     public static final BlockType GRINDSTONE = register("minecraft:grindstone", -195);
 
-    public static final BlockType GUNPOWDER = register("minecraft:gunpowder", 353);
-
     public static final BlockType HANGING_ROOTS = register("minecraft:hanging_roots", -319);
 
     public static final BlockType HARD_BLACK_STAINED_GLASS = register("minecraft:hard_black_stained_glass", -702);
@@ -1546,8 +1536,6 @@ public final class BlockTypes {
     public static final BlockType INFO_UPDATE = register("minecraft:info_update", 248);
 
     public static final BlockType INFO_UPDATE2 = register("minecraft:info_update2", 249);
-
-    public static final BlockType INK_SAC = register("minecraft:ink_sac", 439);
 
     public static final BlockType INVISIBLE_BEDROCK = register("minecraft:invisible_bedrock", 95);
 
@@ -1846,10 +1834,6 @@ public final class BlockTypes {
     public static final BlockType LODESTONE = register("minecraft:lodestone", -222);
 
     public static final BlockType LODESTONE_COMPASS = register("minecraft:lodestone_compass", 639);
-
-    public static final BlockType LOG = register("minecraft:log", 781);
-
-    public static final BlockType LOG2 = register("minecraft:log2", 804);
 
     public static final BlockType LOOM = register("minecraft:loom", -204);
 
@@ -2793,8 +2777,6 @@ public final class BlockTypes {
 
     public static final BlockType STONECUTTER_BLOCK = register("minecraft:stonecutter_block", -197);
 
-    public static final BlockType STRING = register("minecraft:string", 351);
-
     public static final BlockType STRIPPED_ACACIA_LOG = register("minecraft:stripped_acacia_log", -8);
 
     public static final BlockType STRIPPED_ACACIA_WOOD = register("minecraft:stripped_acacia_wood", -823);
@@ -2844,8 +2826,6 @@ public final class BlockTypes {
     public static final BlockType STRUCTURE_BLOCK = register("minecraft:structure_block", 252);
 
     public static final BlockType STRUCTURE_VOID = register("minecraft:structure_void", 217);
-
-    public static final BlockType SUGAR = register("minecraft:sugar", 442);
 
     public static final BlockType SUGAR_CANE = register("minecraft:sugar_cane", 411);
 
@@ -3200,8 +3180,6 @@ public final class BlockTypes {
     public static final BlockType WITHER_ROSE = register("minecraft:wither_rose", -216);
 
     public static final BlockType WITHER_SKELETON_SKULL = register("minecraft:wither_skeleton_skull", -965);
-
-    public static final BlockType WOOD = register("minecraft:wood", 811);
 
     public static final BlockType WOODEN_AXE = register("minecraft:wooden_axe", 335);
 

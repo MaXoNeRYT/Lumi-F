@@ -3,9 +3,9 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.command.data.*;
 import cn.nukkit.network.protocol.types.CommandParam;
 import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.utils.SequencedHashSet;
 import com.google.gson.Gson;
 import lombok.ToString;
+import org.cloudburstmc.protocol.common.util.SequencedHashSet;
 import org.cloudburstmc.protocol.common.util.TypeMap;
 
 import java.util.ArrayList;
@@ -39,50 +39,6 @@ public class AvailableCommandsPacket extends DataPacket {
 
 
     //各个版本的参数
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_291 = TypeMap.builder(CommandParam.class)
-            .insert(1, CommandParam.INT)
-            .insert(2, CommandParam.FLOAT)
-            .insert(3, CommandParam.VALUE)
-            .insert(4, CommandParam.WILDCARD_INT)
-            .insert(5, CommandParam.OPERATOR)
-            .insert(6, CommandParam.TARGET)
-            .insert(7, CommandParam.WILDCARD_TARGET)
-            .insert(24, CommandParam.STRING)
-            .insert(26, CommandParam.POSITION)
-            .insert(29, CommandParam.MESSAGE)
-            .insert(31, CommandParam.TEXT)
-            .insert(34, CommandParam.JSON)
-            .insert(41, CommandParam.COMMAND)
-            .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_313 = COMMAND_PARAMS_291.toBuilder()
-            .shift(24, 2)
-            .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_332 = COMMAND_PARAMS_313.toBuilder()
-            .insert(15, CommandParam.FILE_PATH)
-            .shift(26, 2)
-            .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_340 = COMMAND_PARAMS_332.toBuilder()
-            .shift(15, -1)
-            .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_388 = COMMAND_PARAMS_340.toBuilder()
-            .shift(27, 2)
-            .shift(31, 7)
-            .insert(37, CommandParam.BLOCK_POSITION)
-            .shift(46, 1)
-            .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_419 = COMMAND_PARAMS_388.toBuilder()
-            .shift(7, 1)
-            .shift(30, 1)
-            .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_428 = COMMAND_PARAMS_419.toBuilder()
-            .shift(2, 1)
-            .shift(57, 6)
-            .insert(60, CommandParam.BLOCK_STATES)
-            .build();
-    private static final TypeMap<CommandParam> COMMAND_PARAMS_503 = COMMAND_PARAMS_428.toBuilder()
-            .shift(32, 6)
-            .insert(37, CommandParam.EQUIPMENT_SLOTS)
-            .build();
     private static final TypeMap<CommandParam> COMMAND_PARAMS_575 = TypeMap.builder(CommandParam.class)
             .insert(0, CommandParam.UNKNOWN)
             .insert(1, CommandParam.INT)
@@ -222,6 +178,8 @@ public class AvailableCommandsPacket extends DataPacket {
     public Map<String, CommandDataVersions> commands;
 //    public final Map<String, List<String>> softEnums = new HashMap<>();
 
+    private static final String[] PERMISSION_LEVEL = {"any", "gamedirectors", "admin", "host", "owner", "internal"};
+
     public static TypeMap<CommandParam> getCommandParams(int protocol) {
         //TODO Multiversion
         if (protocol >= ProtocolInfo.v1_21_0) {
@@ -242,116 +200,7 @@ public class AvailableCommandsPacket extends DataPacket {
 
     @Override
     public void decode() {
-        /*commands = new HashMap<>();
-
-        List<String> enumValues = new ArrayList<>();
-        List<String> postFixes = new ArrayList<>();
-        List<CommandEnum> enums = new ArrayList<>();
-
-        int len = (int) getUnsignedVarInt();
-        while (len-- > 0) {
-            enumValues.add(getString());
-        }
-
-        len = (int) getUnsignedVarInt();
-        while (len-- > 0) {
-            postFixes.add(getString());
-        }
-
-        ToIntFunction<BinaryStream> indexReader;
-        if (enumValues.size() < 256) {
-            indexReader = READ_BYTE;
-        } else if (enumValues.size() < 65536) {
-            indexReader = READ_SHORT;
-        } else {
-            indexReader = READ_INT;
-        }
-
-        len = (int) getUnsignedVarInt();
-        while (len-- > 0) {
-            String enumName = getString();
-            int enumLength = (int) getUnsignedVarInt();
-
-            List<String> values = new ArrayList<>();
-
-            while (enumLength-- > 0) {
-                int index = indexReader.applyAsInt(this);
-
-                String enumValue;
-
-                if (index < 0 || (enumValue = enumValues.get(index)) == null) {
-                    throw new IllegalStateException("Enum value not found for index " + index);
-                }
-
-                values.add(enumValue);
-            }
-
-            enums.add(new CommandEnum(enumName, values));
-        }
-
-        len = (int) getUnsignedVarInt();
-
-        while (len-- > 0) {
-            String name = getString();
-            String description = getString();
-            int flags = getByte();
-            int permission = getByte();
-            CommandEnum alias = null;
-
-            int aliasIndex = getLInt();
-            if (aliasIndex >= 0) {
-                alias = enums.get(aliasIndex);
-            }
-
-            Map<String, CommandOverload> overloads = new HashMap<>();
-
-            int length = (int) getUnsignedVarInt();
-            while (length-- > 0) {
-                CommandOverload overload = new CommandOverload();
-
-                int paramLen = (int) getUnsignedVarInt();
-
-                overload.input.parameters = new CommandParameter[paramLen];
-                for (int i = 0; i < paramLen; i++) {
-                    String paramName = getString();
-                    int type = getLInt();
-                    boolean optional = getBoolean();
-
-                    CommandParameter parameter = new CommandParameter(paramName, optional);
-
-                    if ((type & ARG_FLAG_POSTFIX) != 0) {
-                        parameter.postFix = postFixes.get(type & 0xffff);
-                    } else if ((type & ARG_FLAG_VALID) == 0) {
-                        throw new IllegalStateException("Invalid parameter type received");
-                    } else {
-                        int index = type & 0xffff;
-                        if ((type & ARG_FLAG_ENUM) != 0) {
-                            parameter.enumData = enums.get(index);
-                        } else if ((type & ARG_FLAG_SOFT_ENUM) != 0) {
-                            // TODO: soft enums
-                        } else {
-                            throw new IllegalStateException("Unknown parameter type!");
-                        }
-                    }
-
-                    overload.input.parameters[i] = parameter;
-                }
-
-                overloads.put(Integer.toString(length), overload);
-            }
-
-            CommandData data = new CommandData();
-            data.aliases = alias;
-            data.overloads = overloads;
-            data.description = description;
-            data.flags = flags;
-            data.permission = permission;
-
-            CommandDataVersions versions = new CommandDataVersions();
-            versions.versions.add(data);
-
-            this.commands.put(name, versions);
-        }*/
+        this.decodeUnsupported();
     }
 
     @Override
@@ -441,9 +290,9 @@ public class AvailableCommandsPacket extends DataPacket {
         postFixes.forEach(this::putString);
 
         ObjIntConsumer<BinaryStream> indexWriter;
-        if (enumValues.size() <= 256) {
+        if (enumValues.size() < 256) {
             indexWriter = WRITE_BYTE;
-        } else if (enumValues.size() <= 65536) {
+        } else if (enumValues.size() < 65536) {
             indexWriter = WRITE_SHORT;
         } else {
             indexWriter = WRITE_INT;
@@ -464,7 +313,11 @@ public class AvailableCommandsPacket extends DataPacket {
                     throw new IllegalStateException("Enum value '" + val + "' not found");
                 }
 
-                indexWriter.accept(this, i);
+                if (this.protocol < ProtocolInfo.v1_21_130) {
+                    indexWriter.accept(this, i);
+                } else {
+                    this.putLInt(i);
+                }
             }
         });
 
@@ -481,8 +334,13 @@ public class AvailableCommandsPacket extends DataPacket {
                     int second = subCommandValues.indexOf(value.getSecond());
                     checkArgument(second > -1, "Invalid enum value detected: " + value.getSecond());
 
-                    this.putLShort(first);
-                    this.putLShort(second);
+                    if (this.protocol < ProtocolInfo.v1_21_130) {
+                        this.putLShort(first);
+                        this.putLShort(second);
+                    } else {
+                        this.putUnsignedVarInt(first);
+                        this.putUnsignedVarInt(second);
+                    }
                 }
             }
         }
@@ -498,7 +356,11 @@ public class AvailableCommandsPacket extends DataPacket {
             // Commands\Flags
             this.putLShort(data.flags);
             // Commands\PermissionLevel
-            this.putByte((byte) data.permission);
+            if (protocol < ProtocolInfo.v1_21_130) {
+                putByte((byte) data.permission);
+            } else {
+                putString(PERMISSION_LEVEL[data.permission]);
+            }
 
             // Commands\AliasesOffset
             this.putLInt(data.aliases == null ? -1 : enums.indexOf(data.aliases));
@@ -509,7 +371,11 @@ public class AvailableCommandsPacket extends DataPacket {
                 for (ChainedSubCommandData subcommand : data.subcommands) {
                     int index = subCommandData.indexOf(subcommand);
                     checkArgument(index > -1, "Invalid subcommand index: " + subcommand);
-                    this.putLShort(index);
+                    if (protocol < ProtocolInfo.v1_21_130) {
+                        this.putLShort(index);
+                    } else {
+                        this.putLInt(index);
+                    }
                 }
             }
 
@@ -570,7 +436,7 @@ public class AvailableCommandsPacket extends DataPacket {
             type |= ARG_FLAG_VALID;
             if (parameter.enumData != null) {
                 if (parameter.enumData.isSoft()) {
-                    type = softEnums.indexOf(parameter.enumData) | ARG_FLAG_SOFT_ENUM;
+                    type = softEnums.indexOf(parameter.enumData) | ARG_FLAG_SOFT_ENUM | ARG_FLAG_VALID;
                 } else {
                     int i = enums.indexOf(parameter.enumData);
                     if (i < 0) {
