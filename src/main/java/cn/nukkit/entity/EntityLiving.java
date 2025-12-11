@@ -33,6 +33,7 @@ import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
+import cn.nukkit.network.protocol.types.SwingSource;
 
 import java.util.*;
 
@@ -155,6 +156,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 if (source.isApplicable(EntityDamageEvent.DamageModifier.CRITICAL)) {
                     AnimatePacket animate = new AnimatePacket();
                     animate.action = AnimatePacket.Action.CRITICAL_HIT;
+                    animate.swingSource = SwingSource.ATTACK;
                     animate.eid = getId();
                     animate.data = 55;
 

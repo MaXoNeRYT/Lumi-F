@@ -2782,7 +2782,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         infoPacket.mustAccept = this.server.getSettings().general().forceResources();
         this.dataPacket(infoPacket);
     }
-
     protected void completeLoginSequence() {
         if (this.loggedIn) {
             this.server.getLogger().debug("(BUG) Tried to call completeLoginSequence but player is already logged in");
@@ -3996,6 +3995,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 animatePacket.eid = this.getId();
                 animatePacket.action = animationEvent.getAnimationType();
+                animatePacket.swingSource = SwingSource.EVENT;
                 Server.broadcastPacket(this.getViewers().values(), animatePacket);
                 break;
             case ProtocolInfo.ENTITY_EVENT_PACKET:
