@@ -7,6 +7,7 @@ import cn.nukkit.network.process.DataPacketProcessor;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.SettingsCommandPacket;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -14,6 +15,7 @@ import java.util.Locale;
 /**
  * @author SocialMoods
  */
+@Slf4j
 public class SettingsCommandProcessor extends DataPacketProcessor<SettingsCommandPacket> {
 
     public static SettingsCommandProcessor INSTANCE = new SettingsCommandProcessor();
@@ -22,7 +24,7 @@ public class SettingsCommandProcessor extends DataPacketProcessor<SettingsComman
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull SettingsCommandPacket pk) {
         Player player = playerHandle.player.asPlayer();
 
-        String command = pk.command.toLowerCase(Locale.ENGLISH);
+        String command = pk.command.toLowerCase(Locale.ENGLISH).replace("/", "");
         Server.getInstance().dispatchCommand(player, command);
     }
 
