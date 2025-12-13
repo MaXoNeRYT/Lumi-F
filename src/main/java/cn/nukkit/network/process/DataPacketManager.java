@@ -198,7 +198,8 @@ public final class DataPacketManager {
                 AnimateProcessor.INSTANCE,
                 EntityEventProcessor.INSTANCE,
                 ContainerCloseProcessor.INSTANCE,
-                BlockEntityDataProcessor.INSTANCE
+                BlockEntityDataProcessor.INSTANCE,
+                SettingsCommandProcessor.INSTANCE
         );
     }
 }
