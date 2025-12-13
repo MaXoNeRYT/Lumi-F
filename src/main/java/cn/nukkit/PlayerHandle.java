@@ -19,11 +19,13 @@ import cn.nukkit.network.session.NetworkPlayerSession;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.LoginChainData;
 import com.google.common.cache.Cache;
+import com.google.common.collect.BiMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -446,5 +448,13 @@ public final class PlayerHandle {
 
     public void removeWindow(Inventory key, boolean b) {
         player.removeWindow(key, b);
+    }
+
+    public BiMap<Inventory, Integer> getWindows() {
+        return player.windows;
+    }
+
+    public BiMap<Integer, Inventory> getWindowIndex() {
+        return player.windowIndex;
     }
 }
