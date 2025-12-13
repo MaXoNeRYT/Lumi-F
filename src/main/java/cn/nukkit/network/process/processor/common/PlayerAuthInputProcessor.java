@@ -32,7 +32,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
     public static final PlayerAuthInputProcessor INSTANCE = new PlayerAuthInputProcessor();
 
     @Override
-    public void handle(PlayerHandle h, @NotNull PlayerAuthInputPacket authPacket) {
+    public void handle(@NotNull PlayerHandle h, @NotNull PlayerAuthInputPacket authPacket) {
         Player p = h.player;
         Server server = p.getServer();
         Level level = p.getLevel();

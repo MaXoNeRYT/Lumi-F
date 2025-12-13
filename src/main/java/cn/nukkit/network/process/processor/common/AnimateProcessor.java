@@ -20,7 +20,7 @@ public class AnimateProcessor extends DataPacketProcessor<AnimatePacket> {
     private static final int NO_SHIELD_DELAY = 10;
 
     @Override
-    public void handle(PlayerHandle handle, @NotNull AnimatePacket packet) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull AnimatePacket packet) {
         if (!handle.isSpawned() || !handle.isAlive()) {
             return;
         }

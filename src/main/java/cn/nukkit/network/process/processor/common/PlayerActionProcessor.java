@@ -20,7 +20,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     public static PlayerActionProcessor INSTANCE = new PlayerActionProcessor();
 
     @Override
-    public void handle(PlayerHandle handle, @NotNull PlayerActionPacket packet) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull PlayerActionPacket packet) {
         if (!handle.isSpawned() || (!handle.isAlive() && packet.action != PlayerActionPacket.ACTION_RESPAWN)) return;
 
         Vector3 pos = new Vector3(packet.x, packet.y, packet.z);

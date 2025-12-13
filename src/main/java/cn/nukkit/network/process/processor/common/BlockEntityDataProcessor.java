@@ -23,7 +23,7 @@ public class BlockEntityDataProcessor extends DataPacketProcessor<BlockEntityDat
     public static final BlockEntityDataProcessor INSTANCE = new BlockEntityDataProcessor();
 
     @Override
-    public void handle(PlayerHandle handle, @NotNull BlockEntityDataPacket packet) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull BlockEntityDataPacket packet) {
         if (!handle.isSpawned() || !handle.isAlive()) {
             return;
         }

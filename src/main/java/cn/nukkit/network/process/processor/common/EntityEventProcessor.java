@@ -19,7 +19,7 @@ public class EntityEventProcessor extends DataPacketProcessor<EntityEventPacket>
     public static final EntityEventProcessor INSTANCE = new EntityEventProcessor();
 
     @Override
-    public void handle(PlayerHandle handle, @NotNull EntityEventPacket packet) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull EntityEventPacket packet) {
         if (!handle.isSpawned() || !handle.isAlive()) {
             return;
         }

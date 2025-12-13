@@ -24,7 +24,7 @@ public class ContainerCloseProcessor extends DataPacketProcessor<ContainerCloseP
     public static final ContainerCloseProcessor INSTANCE = new ContainerCloseProcessor();
 
     @Override
-    public void handle(PlayerHandle handle, @NotNull ContainerClosePacket packet) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull ContainerClosePacket packet) {
         if (!handle.isSpawned()) {
             return;
         }

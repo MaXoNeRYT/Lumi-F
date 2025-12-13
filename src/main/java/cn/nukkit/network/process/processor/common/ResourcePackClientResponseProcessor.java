@@ -8,6 +8,7 @@ import cn.nukkit.network.protocol.ResourcePackClientResponsePacket;
 import cn.nukkit.network.protocol.ResourcePackStackPacket;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.Server;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -20,7 +21,7 @@ public class ResourcePackClientResponseProcessor extends DataPacketProcessor<Res
     public static final ResourcePackClientResponseProcessor INSTANCE = new ResourcePackClientResponseProcessor();
 
     @Override
-    public void handle(PlayerHandle h, ResourcePackClientResponsePacket pk) {
+    public void handle(@NotNull PlayerHandle h, @NotNull ResourcePackClientResponsePacket pk) {
         Player p = h.player;
         Server server = p.getServer();
 

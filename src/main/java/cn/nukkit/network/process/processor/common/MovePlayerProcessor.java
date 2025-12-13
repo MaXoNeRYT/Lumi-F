@@ -17,7 +17,7 @@ public class MovePlayerProcessor extends DataPacketProcessor<MovePlayerPacket> {
     public static final MovePlayerProcessor INSTANCE = new MovePlayerProcessor();
 
     @Override
-    public void handle(PlayerHandle h, @NotNull MovePlayerPacket pk) {
+    public void handle(@NotNull PlayerHandle h, @NotNull MovePlayerPacket pk) {
         Player p = h.player;
         Server server = p.getServer();
 

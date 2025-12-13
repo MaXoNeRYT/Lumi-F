@@ -3355,6 +3355,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         inventory.equipItem(useItemData.hotbarSlot);
                     }
 
+                    Item item;
                     switch (useItemData.actionType) {
                         case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_BLOCK:
                             boolean spamming = !server.getSettings().player().doNotLimitInteractions()
@@ -3469,7 +3470,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 inventory.equipItem(useItemData.hotbarSlot);
                             }
 
-                            Item item = this.inventory.getItemInHand();
+                            item = this.inventory.getItemInHand();
 
                             if (item instanceof ItemCrossbow) {
                                 if (!item.onClickAir(this, directionVector)) {
@@ -3534,7 +3535,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.inventory.sendHeldItem(this);
                     }
 
-                    Item item = this.inventory.getItemInHand();
+                    item = this.inventory.getItemInHand();
 
                     switch (useItemOnEntityData.actionType) {
                         case InventoryTransactionPacket.USE_ITEM_ON_ENTITY_ACTION_INTERACT:

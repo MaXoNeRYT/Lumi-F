@@ -21,7 +21,7 @@ public class InteractProcessor extends DataPacketProcessor<InteractPacket> {
     public static final InteractProcessor INSTANCE = new InteractProcessor();
 
     @Override
-    public void handle(PlayerHandle handle, @NotNull InteractPacket packet) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull InteractPacket packet) {
         if (!handle.isSpawned() || !handle.isAlive()) return;
 
         if (packet.target == 0 && packet.action == InteractPacket.ACTION_MOUSEOVER) {

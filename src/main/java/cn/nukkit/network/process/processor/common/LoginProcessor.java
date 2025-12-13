@@ -35,7 +35,7 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
     public static final LoginProcessor INSTANCE = new LoginProcessor();
 
     @Override
-    public void handle(PlayerHandle h, @NotNull LoginPacket pk) {
+    public void handle(@NotNull PlayerHandle h, @NotNull LoginPacket pk) {
         Player p = h.player;
         Server server = p.getServer();
 

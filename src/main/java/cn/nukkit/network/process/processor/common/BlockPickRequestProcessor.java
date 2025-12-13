@@ -20,7 +20,7 @@ public class BlockPickRequestProcessor extends DataPacketProcessor<BlockPickRequ
     public static final BlockPickRequestProcessor INSTANCE = new BlockPickRequestProcessor();
 
     @Override
-    public void handle(PlayerHandle handle, @NotNull BlockPickRequestPacket packet) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull BlockPickRequestPacket packet) {
         if (!handle.isSpawned() || !handle.isAlive() || handle.player.getInventory() == null || handle.isInventoryOpen()) {
             return;
         }
