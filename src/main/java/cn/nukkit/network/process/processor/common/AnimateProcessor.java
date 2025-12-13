@@ -52,7 +52,7 @@ public class AnimateProcessor extends DataPacketProcessor<AnimatePacket> {
         }
 
         if (animation == AnimatePacket.Action.SWING_ARM) {
-            handle.setNoShieldTicks(NO_SHIELD_DELAY);
+            handle.player.setNoShieldTicks(NO_SHIELD_DELAY);
         }
 
         packet.eid = handle.getId();

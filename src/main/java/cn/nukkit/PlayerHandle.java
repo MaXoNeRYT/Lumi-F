@@ -1,6 +1,5 @@
 package cn.nukkit;
 
-import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.player.PlayerKickEvent;
@@ -8,31 +7,23 @@ import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.form.window.FormWindowDialog;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.InventoryHolder;
-import cn.nukkit.inventory.PlayerUIInventory;
 import cn.nukkit.inventory.transaction.*;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Position;
 import cn.nukkit.level.Sound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.PlayerFogPacket;
 import cn.nukkit.network.protocol.types.ExperimentData;
 import cn.nukkit.network.protocol.types.PlayerBlockActionData;
 import cn.nukkit.network.session.NetworkPlayerSession;
 import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.bossbar.DummyBossBar;
 import cn.nukkit.utils.LoginChainData;
 import com.google.common.cache.Cache;
-import com.google.common.collect.BiMap;
-import it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -54,101 +45,8 @@ public final class PlayerHandle {
         return player.networkSession;
     }
 
-
-    public void sendPlayStatus(int status) {
-        player.sendPlayStatus(status);
-    }
-
-    public void sendPlayStatus(int status, boolean immediate) {
-        player.sendPlayStatus(status, immediate);
-    }
-
-    public SourceInterface getInterfaz() {
-        return player.interfaz;
-    }
-
-    public BiMap<Inventory, Integer> getWindows() {
-        return player.windows;
-    }
-
-    public BiMap<Integer, Inventory> getWindowIndex() {
-        return player.windowIndex;
-    }
-
-    public Set<Integer> getPermanentWindows() {
-        return player.permanentWindows;
-    }
-
-    public LongLinkedOpenHashSet getLoadQueue() {
-        return player.loadQueue;
-    }
-
-    public Map<UUID, Player> getHiddenPlayers() {
-        return player.hiddenPlayers;
-    }
-
-    public int getWindowCnt() {
-        return player.windowCnt;
-    }
-
-    public void setWindowCnt(int windowCnt) {
-        player.windowCnt = windowCnt;
-    }
-
     public void setClosingWindowId(int closingWindowId) {
         player.closingWindowId = closingWindowId;
-    }
-
-    public PlayerUIInventory getPlayerUIInventory() {
-        return player.playerUIInventory;
-    }
-
-    public void setPlayerUIInventory(PlayerUIInventory playerUIInventory) {
-        player.playerUIInventory = playerUIInventory;
-    }
-
-    public CraftingTransaction getCraftingTransaction() {
-        return player.craftingTransaction;
-    }
-
-    public void setCraftingTransaction(CraftingTransaction craftingTransaction) {
-        player.craftingTransaction = craftingTransaction;
-    }
-
-    public EnchantTransaction getEnchantTransaction() {
-        return player.enchantTransaction;
-    }
-
-    public void setEnchantTransaction(EnchantTransaction enchantTransaction) {
-        player.enchantTransaction = enchantTransaction;
-    }
-
-    public RepairItemTransaction getRepairItemTransaction() {
-        return player.repairItemTransaction;
-    }
-
-    public void setRepairItemTransaction(RepairItemTransaction repairItemTransaction) {
-        player.repairItemTransaction = repairItemTransaction;
-    }
-
-    public SmithingTransaction getSmithingTransaction() {
-        return player.smithingTransaction;
-    }
-
-    public void setSmithingTransaction(SmithingTransaction smithingTransaction) {
-        player.smithingTransaction = smithingTransaction;
-    }
-
-    public TradingTransaction getTradingTransaction() {
-        return player.tradingTransaction;
-    }
-
-    public void setTradingTransaction(TradingTransaction tradingTransaction) {
-        player.tradingTransaction = tradingTransaction;
-    }
-
-    public long getRandomClientId() {
-        return player.randomClientId;
     }
 
     public void setRandomClientId(long randomClientId) {
@@ -165,18 +63,6 @@ public final class PlayerHandle {
 
     public Vector3 getTeleportPosition() {
         return player.teleportPosition;
-    }
-
-    public void setTeleportPosition(Vector3 teleportPosition) {
-        player.teleportPosition = teleportPosition;
-    }
-
-    public void setConnected(boolean connected) {
-        player.connected = connected;
-    }
-
-    public boolean isRemoveFormat() {
-        return player.removeFormat;
     }
 
     public String getUsername() {
@@ -203,32 +89,8 @@ public final class PlayerHandle {
         player.displayName = displayName;
     }
 
-    public int getStartAction() {
-        return player.startAction;
-    }
-
-    public void setStartAction(int startAction) {
-        player.startAction = startAction;
-    }
-
     public Vector3 getSleeping() {
         return player.sleeping;
-    }
-
-    public void setSleeping(Vector3 sleeping) {
-        player.sleeping = sleeping;
-    }
-
-    public int getNextChunkOrderRun() {
-        return player.nextChunkOrderRun;
-    }
-
-    public void setNextChunkOrderRun(int nextChunkOrderRun) {
-        player.nextChunkOrderRun = nextChunkOrderRun;
-    }
-
-    public Vector3 getNewPosition() {
-        return player.newPosition;
     }
 
     public void setNewPosition(Vector3 newPosition) {
@@ -243,100 +105,27 @@ public final class PlayerHandle {
         player.chunkRadius = chunkRadius;
     }
 
-    public Position getSpawnPosition() {
-        return player.spawnPosition;
-    }
-
-    public void setSpawnPosition(Position spawnPosition) {
-        player.spawnPosition = spawnPosition;
-    }
-
-    public void setInAirTicks(int inAirTicks) {
-        player.inAirTicks = inAirTicks;
-    }
-
-    public int getStartAirTicks() {
-        return player.startAirTicks;
-    }
-
-    public void setStartAirTicks(int startAirTicks) {
-        player.startAirTicks = startAirTicks;
-    }
-
     public boolean isCheckMovement() {
         return player.checkMovement;
-    }
-
-    public void setFoodData(PlayerFood foodData) {
-        player.foodData = foodData;
-    }
-
-    public int getFormWindowCount() {
-        return player.formWindowCount;
-    }
-
-    public void setFormWindowCount(int formWindowCount) {
-        player.formWindowCount = formWindowCount;
     }
 
     public Map<Integer, FormWindow> getFormWindows() {
         return player.formWindows;
     }
-
-    public void setFormWindows(Map<Integer, FormWindow> formWindows) {
-        player.formWindows = formWindows;
-    }
-
     public Map<Integer, FormWindow> getServerSettings() {
         return player.serverSettings;
-    }
-
-    public void setServerSettings(Map<Integer, FormWindow> serverSettings) {
-        player.serverSettings = serverSettings;
     }
 
     public Cache<String, FormWindowDialog> getDialogWindows() {
         return player.dialogWindows;
     }
 
-    public void setDialogWindows(Cache<String, FormWindowDialog> dialogWindows) {
-        player.dialogWindows = dialogWindows;
-    }
-
-    public void setDummyBossBars(Map<Long, DummyBossBar> dummyBossBars) {
-        player.dummyBossBars = dummyBossBars;
-    }
-
-    public boolean isShouldLogin() {
-        return player.shouldLogin;
-    }
-
     public void setShouldLogin(boolean shouldLogin) {
         player.shouldLogin = shouldLogin;
     }
 
-    public List<PlayerFogPacket.Fog> getFogStack() {
-        return player.fogStack;
-    }
-
-    public void setFogStack(List<PlayerFogPacket.Fog> fogStack) {
-        player.fogStack = fogStack;
-    }
-
     public void setLoginChainData(LoginChainData loginChainData) {
         player.loginChainData = loginChainData;
-    }
-
-    public LoginChainData getLoginChainData() {
-        return player.loginChainData;
-    }
-
-    public boolean isVerified() {
-        return player.loginVerified;
-    }
-
-    public void setVerified(boolean verified) {
-        player.loginVerified = verified;
     }
 
     public boolean isAwaitingEncryptionHandshake() {
@@ -350,19 +139,6 @@ public final class PlayerHandle {
     public AsyncTask getPreLoginEventTask() {
         return player.preLoginEventTask;
     }
-
-    public void setPreLoginEventTask(AsyncTask preLoginEventTask) {
-        player.preLoginEventTask = preLoginEventTask;
-    }
-
-    public void completeLoginSequence() {
-        player.completeLoginSequence();
-    }
-
-    public void processLogin() {
-        player.processLogin();
-    }
-
     public void processPreLogin() {
         player.processPreLogin();
     }
@@ -443,21 +219,8 @@ public final class PlayerHandle {
         return player.isAlive();
     }
 
-    public void setRotation(double yaw, double pitch, double headYaw) {
-        player.setRotation(yaw, pitch, headYaw);
-    }
-
     public float getBaseOffset() {
         return player.getBaseOffset();
-    }
-
-    public void sendPosition(
-            Vector3 pos,
-            double yaw,
-            double pitch,
-            int mode
-    ) {
-        player.sendPosition(pos, yaw, pitch, mode);
     }
 
 
@@ -534,33 +297,84 @@ public final class PlayerHandle {
         player.onSpinAttack(level);
     }
 
-    public boolean isOnline() { return player.isOnline(); }
-    public boolean isCreative() { return player.isCreative(); }
-    public boolean isSwimming() { return player.isSwimming(); }
-    public boolean isGliding() { return player.isGliding(); }
-    public boolean isInsideOfWater() { return player.isInsideOfWater(); }
-    public boolean isServerAuthoritativeBlockBreaking() { return player.isServerAuthoritativeBlockBreaking(); }
+    public boolean isOnline() {
+        return player.isOnline();
+    }
 
-    public void respawn() { player.respawn(); }
-    public void stopSleep() { player.stopSleep(); }
-    public void kick(PlayerKickEvent.Reason reason, String message) { player.kick(reason, message); }
+    public boolean isCreative() {
+        return player.isCreative();
+    }
+
+    public boolean isSwimming() {
+        return player.isSwimming();
+    }
+    public boolean isGliding() {
+        return player.isGliding();
+    }
+
+    public boolean isInsideOfWater() {
+        return player.isInsideOfWater();
+    }
+
+    public boolean isServerAuthoritativeBlockBreaking() {
+        return player.isServerAuthoritativeBlockBreaking();
+    }
+
+    public void respawn() {
+        player.respawn();
+    }
+
+    public void stopSleep() {
+        player.stopSleep();
+    }
+
+    public void kick(PlayerKickEvent.Reason reason, String message) {
+        player.kick(reason, message);
+    }
+
     public void kick(PlayerKickEvent.Reason reason, String message, boolean notify, String extra) {
         player.kick(reason, message, notify, extra);
     }
 
-    public void onBlockBreakStart(Vector3 pos, BlockFace face) { player.onBlockBreakStart(pos, face); }
-    public void onBlockBreakAbort(Vector3 pos, BlockFace face) { player.onBlockBreakAbort(pos, face); }
-    public void onBlockBreakContinue(Vector3 pos, BlockFace face) { player.onBlockBreakContinue(pos, face); }
+    public void onBlockBreakStart(Vector3 pos, BlockFace face) {
+        player.onBlockBreakStart(pos, face);
+    }
 
-    public void setSprinting(boolean value) { player.setSprinting(value); }
-    public void setSneaking(boolean value) { player.setSneaking(value); }
-    public void setSwimming(boolean value) { player.setSwimming(value); }
-    public void setGliding(boolean value) { player.setGliding(value); }
-    public void setCrawling(boolean value) { player.setCrawling(value); }
-    public void setSpinAttack(boolean value) { player.setSpinAttack(value); }
-    public void setUsingItem(boolean value) { player.setUsingItem(value); }
+    public void onBlockBreakAbort(Vector3 pos, BlockFace face) {
+        player.onBlockBreakAbort(pos, face);
+    }
 
-    public Item getChestplate() { return player.getInventory().getChestplateFast(); }
+    public void onBlockBreakContinue(Vector3 pos, BlockFace face) {
+        player.onBlockBreakContinue(pos, face);
+    }
+
+    public void setSprinting(boolean value) {
+        player.setSprinting(value);
+    }
+
+    public void setSneaking(boolean value) {
+        player.setSneaking(value);
+    }
+
+    public void setSwimming(boolean value) {
+        player.setSwimming(value);
+    }
+
+    public void setGliding(boolean value) {
+        player.setGliding(value);
+    }
+
+    public void setCrawling(boolean value) {
+        player.setCrawling(value);
+    }
+
+    public void setUsingItem(boolean value) {
+        player.setUsingItem(value);
+    }
+
+    public Item getChestplate() {
+        return player.getInventory().getChestplateFast();
+    }
 
     public void callEvent(Event event) {
         player.getServer().getPluginManager().callEvent(event);
@@ -574,32 +388,53 @@ public final class PlayerHandle {
         return player.getServer().getSettings().player().allowFlight() || player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
     }
 
-    public double getYaw() { return player.yaw; }
-    public double getPitch() { return player.pitch; }
+    public double getYaw() {
+        return player.yaw;
+    }
 
-    public boolean hasRidingOrSleeping() { return player.riding != null || player.sleeping != null; }
+    public double getPitch() {
+        return player.pitch;
+    }
 
-    public int getInAirTicks() { return player.inAirTicks; }
+    public boolean hasRidingOrSleeping() {
+        return player.riding != null || player.sleeping != null;
+    }
 
-    public void setButtonText(String text) { player.setButtonText(text); }
+    public int getInAirTicks() {
+        return player.inAirTicks;
+    }
 
-    public boolean isInventoryOpen() { return player.inventoryOpen; }
+    public void setButtonText(String text) {
+        player.setButtonText(text);
+    }
 
-    public void openInventory(InventoryHolder holder) { player.addWindow(holder.getInventory()); }
+    public boolean isInventoryOpen() {
+        return player.inventoryOpen;
+    }
 
-    public long getId() { return player.getId(); }
+    public void openInventory(InventoryHolder holder) {
+        player.addWindow(holder.getInventory());
+    }
 
-    public void setInventoryOpen(boolean open) { player.inventoryOpen = open; }
+    public long getId() {
+        return player.getId();
+    }
 
-    public void setNoShieldTicks(int ticks) { player.setNoShieldTicks(ticks); }
+    public void setInventoryOpen(boolean open) {
+        player.inventoryOpen = open;
+    }
 
     public int getLastEating() {
         return player.lastEating;
     }
 
-    public void setLastEating(int ticks) { player.lastEating = ticks; }
+    public void setLastEating(int ticks) {
+        player.lastEating = ticks;
+    }
 
-    public void setCraftingType(int type) { player.craftingType = type; }
+    public void setCraftingType(int type) {
+        player.craftingType = type;
+    }
 
     public void resetCraftingGridType() {
         player.resetCraftingGridType();
@@ -611,73 +446,5 @@ public final class PlayerHandle {
 
     public void removeWindow(Inventory key, boolean b) {
         player.removeWindow(key, b);
-    }
-
-    public void setNeedSendInventory(boolean needSendInventory) {
-        player.needSendInventory = needSendInventory;
-    }
-
-    public boolean isNeedSendInventory() {
-        return player.needSendInventory;
-    }
-
-    public void setNeedSendHeldItem(boolean needSendHeldItem) {
-        player.needSendHeldItem = needSendHeldItem;
-    }
-
-    public boolean isNeedSendHeldItem() {
-        return player.needSendHeldItem;
-    }
-
-    public boolean isUsingItem() {
-        return player.isUsingItem();
-    }
-
-    public void setLastRightClickPos(BlockVector3 pos) {
-        player.lastRightClickPos = pos;
-    }
-
-    public BlockVector3 getLastRightClickPos() {
-        return player.lastRightClickPos;
-    }
-
-    public void setLastRightClickTime(long time) {
-        player.lastRightClickTime = time;
-    }
-
-    public double getLastRightClickTime() {
-        return player.lastRightClickTime;
-    }
-
-    public void setBreakingBlock(Block breakingBlock) {
-        player.breakingBlock = breakingBlock;
-    }
-
-    public Block getBreakingBlock() {
-        return player.breakingBlock;
-    }
-
-    public void setGrindstoneTransaction(GrindstoneTransaction transaction) {
-        player.grindstoneTransaction = transaction;
-    }
-
-    public GrindstoneTransaction getGrindstoneTransaction() {
-        return player.grindstoneTransaction;
-    }
-
-    public void setLoomTransaction(LoomTransaction transaction) {
-        player.loomTransaction = transaction;
-    }
-
-    public LoomTransaction getLoomTransaction() {
-        return player.loomTransaction;
-    }
-
-    public void incrementFailedTransactions() {
-        player.failedTransactions++;
-    }
-
-    public int getFailedTransactions() {
-        return player.failedTransactions;
     }
 }
