@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.block.AnvilDamageEvent;
 import cn.nukkit.event.block.AnvilDamageEvent.DamageCause;
-import cn.nukkit.event.inventory.RepairItemEvent;
 import cn.nukkit.inventory.AnvilInventory;
 import cn.nukkit.inventory.FakeBlockMenu;
 import cn.nukkit.inventory.Inventory;
@@ -82,7 +81,7 @@ public class RepairItemTransaction extends InventoryTransaction {
             this.source.getServer().getLogger().debug("Got unexpected cost " + inventory.getCost() + " from " + this.source.getName() + "(expected " + this.cost + ')');
         }
 
-        RepairItemEvent event = new RepairItemEvent(inventory, this.inputItem, this.outputItem, this.materialItem, this.cost, this.source);
+        cn.nukkit.event.inventory.RepairItemEvent event = new cn.nukkit.event.inventory.RepairItemEvent(inventory, this.inputItem, this.outputItem, this.materialItem, this.cost, this.source);
         this.source.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             this.source.removeAllWindows(false);

@@ -5,18 +5,19 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.inventory.AnvilInventory;
 import cn.nukkit.item.Item;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
 public class RepairItemEvent extends InventoryEvent implements Cancellable {
 
+    @Getter
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
 
     private Item oldItem;
     private Item newItem;
     private Item materialItem;
+    @Setter
     private int cost;
     private Player player;
 
@@ -29,27 +30,4 @@ public class RepairItemEvent extends InventoryEvent implements Cancellable {
         this.player = player;
     }
 
-    public Item getOldItem() {
-        return this.oldItem;
-    }
-
-    public Item getNewItem() {
-        return this.newItem;
-    }
-
-    public Item getMaterialItem() {
-        return this.materialItem;
-    }
-
-    public int getCost() {
-        return this.cost;
-    }
-
-    public void setCost(int cost) {
-        this.cost = cost;
-    }
-
-    public Player getPlayer() {
-        return this.player;
-    }
 }

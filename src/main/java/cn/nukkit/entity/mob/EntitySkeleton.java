@@ -14,6 +14,7 @@ import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBow;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Sound;
@@ -160,7 +161,7 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        drops.add(Item.get(Item.BONE, 0, Utils.rand(0, 2)));
+        drops.add(Item.get(ItemNamespaceId.BONE, 0, Utils.rand(0, 2)));
         drops.add(Item.get(Item.ARROW, 0, Utils.rand(0, 2)));
 
         return drops.toArray(new Item[0]);
