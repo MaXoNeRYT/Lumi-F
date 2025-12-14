@@ -20,9 +20,7 @@ public class RequestChunkRadiusPacket extends DataPacket {
     @Override
     public void decode() {
         this.radius = this.getVarInt();
-        if (this.protocol >= ProtocolInfo.v1_19_80) {
-            this.maxRadius = this.getByte();
-        }
+        this.maxRadius = this.getByte();
     }
 
     @Override

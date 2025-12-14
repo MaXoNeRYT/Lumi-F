@@ -21,9 +21,4 @@ public class ItemIngotNetherite extends Item implements ItemTrimMaterial {
     public ItemTrimMaterialType getMaterial() {
         return ItemTrimMaterialType.MATERIAL_NETHERITE;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

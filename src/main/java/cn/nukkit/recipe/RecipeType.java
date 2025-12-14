@@ -1,7 +1,5 @@
 package cn.nukkit.recipe;
 
-import cn.nukkit.network.protocol.ProtocolInfo;
-
 public enum RecipeType {
 
     SHAPELESS(0),
@@ -29,11 +27,7 @@ public enum RecipeType {
         this.networkType = networkType;
     }
 
-    public int getNetworkType(int protocol) {
-        return switch (this) {
-            case SMITHING_TRANSFORM -> protocol >= ProtocolInfo.v1_19_60 ? networkType : 0;
-            case SMITHING_TRIM -> protocol >= ProtocolInfo.v1_19_80 ? networkType : 0;
-            default -> networkType;
-        };
+    public int getNetworkType() {
+        return networkType;
     }
 }

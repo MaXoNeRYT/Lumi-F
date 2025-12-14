@@ -4,6 +4,7 @@ import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.bossbar.DummyBossBar;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.effect.EffectType;
@@ -19,23 +20,33 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
-import cn.nukkit.network.protocol.BossEventPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
 import org.apache.commons.math3.util.FastMath;
+
+import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
 
 public class EntityWither extends EntityFlyingMob implements EntityBoss, EntitySmite {
 
     public static final int NETWORK_ID = 52;
 
     /**
-     *  Whether the wither is exploded and dying
+     * Whether the wither is exploded and dying
      */
     private boolean exploded;
     private boolean wasExplosion;
+    protected int invul;
+
+    private HashMap<UUID, DummyBossBar> dummyBossBars;
 
     public EntityWither(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -72,13 +83,28 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
         super.initEntity();
 
+        if (this.namedTag.contains("Invul")) {
+            this.invul = this.namedTag.getInt("Invul");
+        } else {
+            this.invul = 200;
+        }
+
+        this.dummyBossBars = new HashMap<>();
+
         this.fireProof = true;
         this.setDamage(new int[]{0, 2, 4, 6});
-        if (this.age == 0) {
-            this.setDataProperty(new IntEntityData(DATA_WITHER_INVULNERABLE_TICKS, 200));
+        if (this.invul > 0) {
+            this.setDataProperty(new IntEntityData(DATA_WITHER_INVULNERABLE_TICKS, this.invul));
 
-            this.stayTime = 220;
+            this.stayTime = this.invul + 20;
         }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putInt("Invul", this.invul);
     }
 
     @Override
@@ -98,7 +124,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.age > 220 && this.attackDelay > 40 && this.distanceSquared(player) <= 4096) {
+        if (this.invul <= 0 && this.attackDelay > 40 && this.distanceSquared(player) <= 4096) {
             this.attackDelay = 0;
 
             double f = 1;
@@ -194,15 +220,22 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         }
 
         super.kill();
+
+        this.updateBossBars();
     }
 
     @Override
     public boolean attack(EntityDamageEvent ev) {
-        if (this.age <= 200 && ev.getCause() != EntityDamageEvent.DamageCause.SUICIDE) {
+        if (this.invul > 0 && ev.getCause() != EntityDamageEvent.DamageCause.SUICIDE) {
             return false;
         }
 
         boolean r = super.attack(ev);
+
+        if (r && !this.closed) {
+            this.updateBossBars();
+        }
+
         if (this.wasExplosion) {
             this.wasExplosion = false;
         } else if (r && ev instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) ev).getDamager() instanceof Player && !this.closed && this.isAlive() && Utils.rand() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
@@ -238,6 +271,43 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         return r;
     }
 
+    private void updateBossBars() {
+        float progress;
+        if (this.invul > 0) {
+            progress = (200 - this.invul) / 2f;
+        } else {
+            progress = (this.health / this.getMaxHealth()) * 100;
+        }
+
+        if (this.isAlive()) {
+            this.getViewers().forEach((id, player) -> {
+                DummyBossBar bossBar = this.dummyBossBars.get(player.getUniqueId());
+
+                if (bossBar == null) {
+                    bossBar = new DummyBossBar.Builder(player)
+                            .text("entity.wither.name")
+                            .length(progress)
+                            .build();
+                    player.createBossBar(bossBar);
+                    this.dummyBossBars.put(player.getUniqueId(), bossBar);
+                }
+
+                if (bossBar.getLength() != progress) {
+                    bossBar.setLength(progress);
+                }
+            });
+        } else {
+            this.getViewers().forEach((id, player) -> {
+                DummyBossBar bossBar = this.dummyBossBars.get(player.getUniqueId());
+
+                if (bossBar != null) {
+                    player.removeBossBar(bossBar.getBossBarId());
+                    this.dummyBossBars.remove(player.getUniqueId());
+                }
+            });
+        }
+    }
+
     private int witherMaxHealth() {
         return switch (this.getServer().getDifficulty()) {
             case NORMAL -> 450;
@@ -262,6 +332,18 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     }
 
     @Override
+    public boolean onUpdate(int currentTick) {
+        if (this.invul > 0) {
+            int tickDiff = currentTick - this.lastUpdate;
+            this.invul -= Math.max(0, tickDiff);
+        }
+
+        this.updateBossBars();
+
+        return super.onUpdate(currentTick);
+    }
+
+    @Override
     public boolean canTarget(Entity entity) {
         return entity.canBeFollowed();
     }
@@ -269,12 +351,25 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     @Override
     public void spawnTo(Player player) {
         super.spawnTo(player);
-        BossEventPacket pkBoss = new BossEventPacket();
-        pkBoss.bossEid = this.id;
-        pkBoss.type = BossEventPacket.TYPE_SHOW;
-        pkBoss.title = this.getName();
-        pkBoss.healthPercent = this.health / 100;
-        player.dataPacket(pkBoss);
+        if (!this.dummyBossBars.containsKey(player.getUniqueId())) {
+            DummyBossBar dummyBossBar = new DummyBossBar.Builder(player)
+                    .text("entity.wither.name")
+                    .length((this.health / this.getMaxHealth()) * 100)
+                    .build();
+            player.createBossBar(dummyBossBar);
+
+            this.dummyBossBars.put(player.getUniqueId(), dummyBossBar);
+        }
+    }
+
+    @Override
+    public void despawnFrom(Player player) {
+        super.despawnFrom(player);
+        DummyBossBar dummyBossBar = this.dummyBossBars.get(player.getUniqueId());
+        if (dummyBossBar != null) {
+            player.removeBossBar(dummyBossBar.getBossBarId());
+            this.dummyBossBars.remove(player.getUniqueId());
+        }
     }
 
     @Override
@@ -286,5 +381,84 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     @Override
     public boolean canBeAffected(EffectType type) {
         return type == EffectType.INSTANT_DAMAGE || type == EffectType.INSTANT_HEALTH;
+    }
+
+    /**
+     * try to spawn wither entity
+     */
+    public static boolean trySpawnWither(Block block) {
+        Block check = block;
+        BlockFace skullFace = null;
+        if (block.getLevel().getGameRules().getBoolean(GameRule.DO_MOB_SPAWNING)) {
+            for (BlockFace face : Set.of(BlockFace.NORTH, BlockFace.EAST)) {
+                boolean[] skulls = new boolean[5];
+                for (int i = -2; i <= 2; i++) {
+                    skulls[i + 2] = block.getSide(face, i).getId() == Block.WITHER_SKELETON_SKULL;
+                }
+                int inrow = 0;
+                for (int i = 0; i < skulls.length; i++) {
+                    if (skulls[i]) {
+                        inrow++;
+                        if (inrow == 2) check = block.getSide(face, i - 2);
+                    } else if (inrow < 3) {
+                        inrow = 0;
+                    }
+                }
+                if (inrow >= 3) {
+                    skullFace = face;
+                }
+            }
+            if (skullFace == null) return false;
+            if (check.getId() == Block.WITHER_SKELETON_SKULL) {
+                faces:
+                for (BlockFace blockFace : BlockFace.values()) {
+                    for (int i = 1; i <= 2; i++) {
+                        if (!(check.getSide(blockFace, i).getId() == Block.SOUL_SAND)) {
+                            continue faces;
+                        }
+                    }
+                    faces1:
+                    for (BlockFace face : Set.of(BlockFace.UP, BlockFace.NORTH, BlockFace.EAST)) {
+                        for (int i = -1; i <= 1; i++) {
+                            if (!(check.getSide(blockFace).getSide(face, i).getId() == Block.SOUL_SAND)) {
+                                continue faces1;
+                            }
+                        }
+
+                        for (int i = 0; i <= 2; i++) {
+                            Block location = check.getSide(blockFace, i);
+                            location.level.breakBlock(location);
+                        }
+                        for (int i = -1; i <= 1; i++) {
+                            Block location = check.getSide(blockFace).getSide(face, i);
+                            location.level.breakBlock(location);
+                            location.level.breakBlock(location.getSide(blockFace.getOpposite()));
+                        }
+                        Block pos = check.getSide(blockFace, 2);
+                        CompoundTag nbt = new CompoundTag()
+                                .putList("Pos", new ListTag<DoubleTag>()
+                                        .add(new DoubleTag(pos.x + 0.5))
+                                        .add(new DoubleTag(pos.y))
+                                        .add(new DoubleTag(pos.z + 0.5)))
+                                .putList("Motion", new ListTag<>()
+                                        .add(new DoubleTag(0))
+                                        .add(new DoubleTag(0))
+                                        .add(new DoubleTag(0)))
+                                .putList("Rotation", new ListTag<FloatTag>()
+                                        .add(new FloatTag(0f))
+                                        .add(new FloatTag(0f)));
+
+                        EntityWither wither = (EntityWither) Entity.createEntity("Wither", check.level.getChunk(check.getChunkX(), check.getChunkZ()), nbt);
+                        if (wither != null) {
+                            wither.stayTime = 220;
+                            wither.spawnToAll();
+                            wither.getLevel().addSoundToViewers(wither, Sound.MOB_WITHER_SPAWN);
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

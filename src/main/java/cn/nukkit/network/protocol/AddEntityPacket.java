@@ -222,24 +222,20 @@ public class AddEntityPacket extends DataPacket {
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
         this.putLFloat(this.headYaw);
-        if (protocol >= ProtocolInfo.v1_19_10) {
-            this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw);
-        }
+        this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw);
         this.putAttributeList(this.attributes);
         this.put(Binary.writeMetadata(protocol, this.metadata));
-        if (protocol >= ProtocolInfo.v1_19_40) {
-            int[] intProperties = this.properties.intProperties();
-            this.putUnsignedVarInt(intProperties.length);
-            for (int i = 0, len = intProperties.length; i < len; ++i) {
-                this.putUnsignedVarInt(i);
-                this.putVarInt(intProperties[i]);
-            }
-            float[] floats = this.properties.floatProperties();
-            this.putUnsignedVarInt(floats.length);
-            for (int i = 0, len = floats.length; i < len; ++i) {
-                this.putUnsignedVarInt(i);
-                this.putLFloat(floats[i]);
-            }
+        int[] intProperties = this.properties.intProperties();
+        this.putUnsignedVarInt(intProperties.length);
+        for (int i = 0, len = intProperties.length; i < len; ++i) {
+            this.putUnsignedVarInt(i);
+            this.putVarInt(intProperties[i]);
+        }
+        float[] floats = this.properties.floatProperties();
+        this.putUnsignedVarInt(floats.length);
+        for (int i = 0, len = floats.length; i < len; ++i) {
+            this.putUnsignedVarInt(i);
+            this.putLFloat(floats[i]);
         }
         this.putUnsignedVarInt(this.links.length);
         for (EntityLink link : links) {
@@ -255,40 +251,6 @@ public class AddEntityPacket extends DataPacket {
         if (this.protocol < ProtocolInfo.v1_20_0_23) {
             if (this.type == EntityCamel.NETWORK_ID) {
                 return "minecraft:horse";
-            }
-
-            if (this.protocol < ProtocolInfo.v1_19_0) {
-                if (this.type == EntityChestBoat.NETWORK_ID) {
-                    return "minecraft:boat";
-                } else if (this.type == EntityAllay.NETWORK_ID) {
-                    return "minecraft:bat";
-                } else if (this.type == EntityWarden.NETWORK_ID) {
-                    return "minecraft:iron_golem";
-                } else if (this.type == EntityTadpole.NETWORK_ID) {
-                    return "minecraft:salmon";
-                } else if (this.type == EntityFrog.NETWORK_ID) {
-                    return "minecraft:rabbit";
-                }
-
-                if (this.protocol < ProtocolInfo.v1_17_0) {
-                    if (this.type == EntityGoat.NETWORK_ID) {
-                        return "minecraft:sheep";
-                    }
-                    if (this.type == EntityAxolotl.NETWORK_ID) {
-                        return "minecraft:tropicalfish";
-                    }
-                    if (this.type == EntityGlowSquid.NETWORK_ID) {
-                        return "minecraft:squid";
-                    }
-
-                    if (this.protocol < ProtocolInfo.v1_16_0) {
-                        if (this.type == EntityPiglin.NETWORK_ID || this.type == EntityPiglinBrute.NETWORK_ID) {
-                            return "minecraft:zombie_pigman";
-                        } else if (this.type == EntityHoglin.NETWORK_ID || this.type == EntityStrider.NETWORK_ID || this.type == EntityZoglin.NETWORK_ID) {
-                            return "minecraft:pig";
-                        }
-                    }
-                }
             }
         }
 

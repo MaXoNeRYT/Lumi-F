@@ -6,9 +6,4 @@ public class ItemEchoShard extends StringItemBase {
     public ItemEchoShard() {
         super(ECHO_SHARD, "Echo Shard");
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_0_29;
-    }
 }

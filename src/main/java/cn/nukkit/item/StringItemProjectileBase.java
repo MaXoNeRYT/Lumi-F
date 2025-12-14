@@ -27,9 +27,4 @@ public abstract class StringItemProjectileBase extends ItemProjectile implements
     public String getNamespaceId(int protocolId) {
         return this.getNamespaceId();
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_100;
-    }
 }

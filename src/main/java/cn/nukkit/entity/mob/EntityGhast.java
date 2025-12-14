@@ -10,6 +10,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -134,7 +135,7 @@ public class EntityGhast extends EntityFlyingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        drops.add(Item.get(Item.GUNPOWDER, 0, Utils.rand(0, 2)));
+        drops.add(Item.get(ItemNamespaceId.GUNPOWDER, 0, Utils.rand(0, 2)));
         drops.add(Item.get(Item.GHAST_TEAR, 0, Utils.rand(0, 1)));
 
         return drops.toArray(Item.EMPTY_ARRAY);

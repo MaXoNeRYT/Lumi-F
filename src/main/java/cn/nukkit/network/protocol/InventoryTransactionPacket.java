@@ -93,11 +93,9 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putSlot(protocol, useItemData.itemInHand);
                 this.putVector3f(useItemData.playerPos.asVector3f());
                 this.putVector3f(useItemData.clickPos);
-                if (this.protocol >= ProtocolInfo.v1_16_210) {
-                    this.putUnsignedVarInt(useItemData.blockRuntimeId);
-                    if (this.protocol >= ProtocolInfo.v1_21_20) {
-                        this.putUnsignedVarInt(useItemData.clientInteractPrediction);
-                    }
+                this.putUnsignedVarInt(useItemData.blockRuntimeId);
+                if (this.protocol >= ProtocolInfo.v1_21_20) {
+                    this.putUnsignedVarInt(useItemData.clientInteractPrediction);
                 }
                 break;
             case TYPE_USE_ITEM_ON_ENTITY:
@@ -140,10 +138,6 @@ public class InventoryTransactionPacket extends DataPacket {
 
         this.transactionType = (int) this.getUnsignedVarInt();
 
-        if (protocol >= 407 && protocol < ProtocolInfo.v1_16_220) {
-            this.hasNetworkIds = this.getBoolean();
-        }
-
         this.actions = new NetworkInventoryAction[Math.min((int) this.getUnsignedVarInt(), 4096)];
         for (int i = 0; i < this.actions.length; i++) {
             this.actions[i] = new NetworkInventoryAction().read(this);
@@ -167,11 +161,9 @@ public class InventoryTransactionPacket extends DataPacket {
                 itemData.itemInHand = this.getSlot(this.protocol);
                 itemData.playerPos = this.getVector3f().asVector3();
                 itemData.clickPos = this.getVector3f();
-                if (this.protocol >= ProtocolInfo.v1_16_210) {
-                    itemData.blockRuntimeId = (int) this.getUnsignedVarInt();
-                    if (this.protocol >= ProtocolInfo.v1_21_20) {
-                        itemData.clientInteractPrediction = (int) this.getUnsignedVarInt();
-                    }
+                itemData.blockRuntimeId = (int) this.getUnsignedVarInt();
+                if (this.protocol >= ProtocolInfo.v1_21_20) {
+                    itemData.clientInteractPrediction = (int) this.getUnsignedVarInt();
                 }
 
                 this.transactionData = itemData;

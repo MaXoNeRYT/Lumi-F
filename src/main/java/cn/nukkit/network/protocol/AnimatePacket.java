@@ -1,8 +1,13 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.network.protocol.types.SwingSource;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.ToString;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author Nukkit Project Team
@@ -15,30 +20,63 @@ public class AnimatePacket extends DataPacket {
     public long eid;
     public Action action;
     public float data = 0.0f;
+    /**
+     * @deprecated since 898
+     */
+    @Deprecated
     public float rowingTime = 0.0f;
+    /**
+     * @since 898
+     */
+    public SwingSource swingSource = SwingSource.NONE;
 
     @Override
     public void decode() {
-        this.action = Action.fromId(this.getVarInt());
+        if (protocol >= ProtocolInfo.v1_21_130) {
+            this.action = Action.fromId(this.getByte() & 0xFF);
+        } else {
+            this.action = Action.fromId(this.getVarInt());
+        }
+
         this.eid = getEntityRuntimeId();
-        if(protocol >= ProtocolInfo.v1_21_120) {
+
+        if (protocol >= ProtocolInfo.v1_21_120) {
             this.data = this.getLFloat();
         }
-        if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {
+
+        if (protocol < ProtocolInfo.v1_21_124 &&
+                (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT)) {
             this.rowingTime = this.getLFloat();
+        }
+
+        if (protocol >= ProtocolInfo.v1_21_130) {
+            this.swingSource = this.getOptional(SwingSource.NONE, (stream) -> SwingSource.from(stream.getString()));
         }
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putVarInt(this.action.getId());
+
+        if (protocol >= ProtocolInfo.v1_21_130) {
+            this.putByte((byte) this.action.getId());
+        } else {
+            this.putVarInt(this.action.getId());
+        }
+
         this.putEntityRuntimeId(this.eid);
-        if(protocol >= ProtocolInfo.v1_21_120) {
+
+        if (protocol >= ProtocolInfo.v1_21_120) {
             this.putLFloat(this.data);
         }
-        if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {
+
+        if (protocol < ProtocolInfo.v1_21_124 &&
+                (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT)) {
             this.putLFloat(this.rowingTime);
+        }
+
+        if (protocol >= ProtocolInfo.v1_21_130) {
+            this.putOptional((swing) -> swing != null && swing != SwingSource.NONE, this.swingSource, (stream, source) -> stream.putString(source.name()));
         }
     }
 

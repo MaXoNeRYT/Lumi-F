@@ -77,6 +77,8 @@ public class LevelDBProvider implements LevelProvider {
     protected final Lock gcLock;
     private final ExecutorService executor;
 
+    private Task autoCompactionTask;
+
     public LevelDBProvider(Level level, String path) {
         this.level = level;
         this.path = path;
@@ -151,7 +153,7 @@ public class LevelDBProvider implements LevelProvider {
 
         if (level.isAutoCompaction()) {
             int delay = level.getServer().getSettings().world().worldAutoCompactionTicks();
-            level.getServer().getScheduler().scheduleDelayedRepeatingTask(InternalPlugin.INSTANCE, new Task() {
+            this.autoCompactionTask = new Task() {
                 @Override
                 public void onRun(int currentTick) {
                     if (closed || !level.isAutoCompaction()) {
@@ -160,7 +162,8 @@ public class LevelDBProvider implements LevelProvider {
                     }
                     CompletableFuture.runAsync(new AutoCompaction(), LevelDBProvider.this.executor);
                 }
-            }, delay + ThreadLocalRandom.current().nextInt(delay), delay);
+            };
+            level.getServer().getScheduler().scheduleDelayedRepeatingTask(InternalPlugin.INSTANCE, autoCompactionTask, delay + ThreadLocalRandom.current().nextInt(delay), delay);
         }
     }
 
@@ -725,6 +728,11 @@ public class LevelDBProvider implements LevelProvider {
         }
 
         try {
+            if (this.autoCompactionTask != null) {
+                this.autoCompactionTask.cancel();
+                this.autoCompactionTask = null;
+            }
+
             gcLock.lock();
 
             this.unloadChunksUnsafe(true);
@@ -1078,7 +1086,9 @@ public class LevelDBProvider implements LevelProvider {
 
             log.debug("Running AutoCompaction... ({})", path);
             try {
-                gcLock.lock();
+                if (!gcLock.tryLock(500, TimeUnit.MILLISECONDS)) {
+                    return;
+                }
 
                 if (!canRun()) {
                     return;
@@ -1103,6 +1113,8 @@ public class LevelDBProvider implements LevelProvider {
                     return next;
                 }, true);
                 log.debug("{} chunks have been compressed ({})", count, path);
+            } catch (InterruptedException e) {
+                log.debug("AutoCompaction interrupted", e);
             } finally {
                 gcLock.unlock();
             }

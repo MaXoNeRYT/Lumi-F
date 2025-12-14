@@ -16,9 +16,4 @@ public class ItemWayfinderArmorTrimSmithingTemplate extends StringItemBase imple
     public ItemTrimPatternType getPattern() {
         return ItemTrimPatternType.WAYFINDER_ARMOR_TRIM;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_80;
-    }
 }

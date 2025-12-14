@@ -27,9 +27,4 @@ public class ItemGlowBerries extends ItemFood {
     public float getSaturationRestore() {
         return 0.4F;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_17_0;
-    }
 }

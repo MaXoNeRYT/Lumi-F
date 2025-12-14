@@ -63,9 +63,4 @@ public abstract class ItemChestBoatBase extends Item {
     public int getMaxStackSize() {
         return 1;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_0;
-    }
 }

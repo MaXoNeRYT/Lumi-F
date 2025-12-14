@@ -58,9 +58,6 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     private float getCoordinate(int flag) {
         if ((flags & flag) != 0) {
-            if (protocol < ProtocolInfo.v1_16_100) {
-                return (float) this.getVarInt();
-            }
             return this.getLFloat();
         }
         return 0;
@@ -75,11 +72,7 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     private void putCoordinate(int flag, float value) {
         if ((flags & flag) != 0) {
-            if (protocol < ProtocolInfo.v1_16_100) {
-                this.putVarInt((int) value);
-            } else {
-                this.putLFloat(value);
-            }
+            this.putLFloat(value);
         }
     }
 

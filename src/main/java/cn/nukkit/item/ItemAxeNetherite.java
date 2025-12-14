@@ -40,9 +40,4 @@ public class ItemAxeNetherite extends ItemTool {
     public boolean canBreakShield() {
         return true;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

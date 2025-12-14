@@ -1,4 +1,4 @@
-package cn.nukkit.network.process.processor.v527;
+package cn.nukkit.network.process.processor.common;
 
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Player;
@@ -17,15 +17,14 @@ import org.jetbrains.annotations.NotNull;
 
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestAbilityProcessor_v527 extends DataPacketProcessor<RequestAbilityPacket> {
+public class RequestAbilityProcessor extends DataPacketProcessor<RequestAbilityPacket> {
 
-    public static final RequestAbilityProcessor_v527 INSTANCE = new RequestAbilityProcessor_v527();
+    public static final RequestAbilityProcessor INSTANCE = new RequestAbilityProcessor();
 
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull RequestAbilityPacket pk) {
         Player player = playerHandle.player;
-        if (player.protocol < ProtocolInfo.v1_19_30_23
-                || player.protocol >= ProtocolInfo.v1_20_30_24) { //1.20.30开始飞行切换使用PlayerAuthInputPacket/PlayerActionPacket
+        if (player.protocol >= ProtocolInfo.v1_20_30_24) { //1.20.30开始飞行切换使用PlayerAuthInputPacket/PlayerActionPacket
             return;
         }
         PlayerAbility ability = pk.getAbility();
@@ -59,10 +58,5 @@ public class RequestAbilityProcessor_v527 extends DataPacketProcessor<RequestAbi
     @Override
     public Class<? extends DataPacket> getPacketClass() {
         return RequestAbilityPacket.class;
-    }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_19_0_29;
     }
 }

@@ -407,7 +407,6 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(SWEET_BERRY_BUSH, BlockSweetBerryBush.class); //462
         register(LANTERN, BlockLantern.class); //463
         register(CAMPFIRE_BLOCK, BlockCampfire.class); //464
-        register(LAVA_CAULDRON, BlockCauldronLava.class); //465
         register(OAK_WOOD, BlockOakWood.class); //467
         register(COMPOSTER, BlockComposter.class); //468
         register(LIT_BLAST_FURNACE, BlockBlastFurnaceLit.class); //469

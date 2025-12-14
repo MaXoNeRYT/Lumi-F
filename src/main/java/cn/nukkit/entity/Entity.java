@@ -411,7 +411,8 @@ public abstract class Entity extends Location implements Metadatable {
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping766, ProtocolInfo.v1_21_50); //1.21.50-1.21.70
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping800, ProtocolInfo.v1_21_80); //1.21.80-latest
 
-        initEntityIdentifiers(ProtocolInfo.v1_19_80, AvailableEntityIdentifiersPacket.TAG);
+        initEntityIdentifiers(ProtocolInfo.v1_20_0_23, AvailableEntityIdentifiersPacket.TAG);
+        initEntityIdentifiers(ProtocolInfo.v1_21_130, AvailableEntityIdentifiersPacket.TAG_898);
     }
 
     public final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
@@ -1214,8 +1215,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     private static int correctEntityIdentifiersProtocol(int protocolId) {
-        //Currently empty because all protocols are using 1.19.80 identifier map
-        return ProtocolInfo.v1_19_80;
+        if (protocolId >= ProtocolInfo.v1_21_130) {
+            return ProtocolInfo.v1_21_130;
+        }
+        return ProtocolInfo.v1_20_0_23;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
@@ -1836,9 +1839,6 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.checkBlockCollision();
         int minY = level.getMinBlockY() - 18;
-        if (this.isPlayer && ((Player) this).protocol < ProtocolInfo.v1_18_0) {
-            minY = -18;
-        }
         if (this.y <= minY && this.isAlive()) {
             if (this.isPlayer) {
                 if (((Player) this).getGamemode() != Player.CREATIVE) this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
@@ -2403,6 +2403,11 @@ public abstract class Entity extends Location implements Metadatable {
         return new Location(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw, this.level);
     }
 
+    public boolean isInsideBubbleColumn() {
+        double y = this.y + this.getEyeHeight();
+        return this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)) == Block.BUBBLE_COLUMN;
+    }
+
     public boolean isSubmerged() {
         double y = this.y + this.getEyeHeight();
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
@@ -2606,25 +2611,33 @@ public abstract class Entity extends Location implements Metadatable {
 
     public List<Block> getBlocksAround() {
         if (this.blocksAround == null) {
-            int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
-            int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
-            int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
-            int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
-            int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
-            int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
+            AxisAlignedBB bb = this.boundingBox;
+            int minX = NukkitMath.floorDouble(bb.getMinX());
+            int minY = Math.max(NukkitMath.floorDouble(bb.getMinY()), this.level.getMinBlockY());
+            int minZ = NukkitMath.floorDouble(bb.getMinZ());
+            int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+            int maxY = Math.min(NukkitMath.ceilDouble(bb.getMaxY()), this.level.getMaxBlockY());
+            int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
 
-            this.blocksAround = new ArrayList<>();
+            int sizeX = maxX - minX + 1;
+            int sizeY = maxY - minY + 1;
+            int sizeZ = maxZ - minZ + 1;
+
+            if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0) {
+                return new ArrayList<>();
+            }
+
+            this.blocksAround = new ArrayList<>(sizeX * sizeY * sizeZ);
 
             try {
-                if (this.level.isYInRange(minY) || this.level.isYInRange(maxY)) {
-                    minY = Math.max(minY, this.level.getMinBlockY());
-                    maxY = Math.min(maxY, this.level.getMaxBlockY());
-                    for (int z = minZ; z <= maxZ; ++z) {
-                        for (int x = minX; x <= maxX; ++x) {
-                            for (int y = minY; y <= maxY; ++y) {
-                                Block block = this.level.getBlock(x, y, z, false);
-                                this.blocksAround.add(block);
-                            }
+                if (!this.level.isYInRange(minY) && !this.level.isYInRange(maxY)) {
+                    return this.blocksAround;
+                }
+                for (int x = minX; x <= maxX; x++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        for (int y = minY; y <= maxY; y++) {
+                            Block block = this.level.getBlock(x, y, z, false);
+                            this.blocksAround.add(block);
                         }
                     }
                 }
@@ -2641,15 +2654,62 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.collisionBlocks == null) {
             this.collisionBlocks = new ArrayList<>();
 
-            List<Block> bl = this.getBlocksAround();
-            for (Block b : bl) {
-                if (b.collidesWithBB(this.boundingBox, true)) {
-                    this.collisionBlocks.add(b);
+            AxisAlignedBB bb = this.boundingBox.clone();
+            double speed = this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ;
+            double expand = Math.max(0.5, Math.sqrt(speed) * 1.5);
+
+            AxisAlignedBB expandedBB = bb.grow(expand, expand, expand);
+            List<Block> blocks = getBlocksInBoundingBox(expandedBB);
+
+            for (Block block : blocks) {
+                if (block.getId() == Block.NETHER_PORTAL) {
+                    AxisAlignedBB portalBB = new SimpleAxisAlignedBB(
+                            block.x, block.y, block.z,
+                            block.x + 1, block.y + 1, block.z + 1
+                    );
+
+                    double motionAbsX = Math.abs(this.motionX), motionAbsY = Math.abs(this.motionY), motionAbsZ = Math.abs(this.motionZ);
+                    AxisAlignedBB trajectoryBB = bb.grow(motionAbsX + 0.3, motionAbsY + 0.3, motionAbsZ + 0.3);
+
+                    if (trajectoryBB.intersectsWith(portalBB)) {
+                        this.collisionBlocks.add(block);
+                    }
+                } else if (block.collidesWithBB(bb, true)) {
+                    this.collisionBlocks.add(block);
                 }
             }
         }
 
         return this.collisionBlocks;
+    }
+
+    private List<Block> getBlocksInBoundingBox(AxisAlignedBB bb) {
+        int minX = NukkitMath.floorDouble(bb.getMinX());
+        int minY = Math.max(NukkitMath.floorDouble(bb.getMinY()), this.level.getMinBlockY());
+        int minZ = NukkitMath.floorDouble(bb.getMinZ());
+        int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+        int maxY = Math.min(NukkitMath.ceilDouble(bb.getMaxY()), this.level.getMaxBlockY());
+        int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
+
+        int sizeX = maxX - minX + 1;
+        int sizeY = maxY - minY + 1;
+        int sizeZ = maxZ - minZ + 1;
+
+        if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0) {
+            return new ArrayList<>();
+        }
+
+        List<Block> blocks = new ArrayList<>(sizeX * sizeY * sizeZ);
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    Block block = this.level.getBlock(x, y, z, false);
+                    if (block != null) blocks.add(block);
+                }
+            }
+        }
+        return blocks;
     }
 
     /**

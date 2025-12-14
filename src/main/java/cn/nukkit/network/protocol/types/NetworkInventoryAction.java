@@ -1,16 +1,18 @@
 package cn.nukkit.network.protocol.types;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.BlockSkull;
+import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
-import cn.nukkit.item.ItemLapisLazuli;
+import cn.nukkit.item.*;
 import cn.nukkit.network.protocol.InventoryTransactionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.ToString;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author CreeperFace
@@ -114,10 +116,6 @@ public class NetworkInventoryAction {
         this.oldItem = packet.getSlot(packet.protocol);
         this.newItem = packet.getSlot(packet.protocol);
 
-        if (packet.hasNetworkIds && packet.protocol >= 407 && packet.protocol < ProtocolInfo.v1_16_220) {
-            this.stackNetworkId = packet.getVarInt();
-        }
-
         return this;
     }
 
@@ -142,10 +140,6 @@ public class NetworkInventoryAction {
         packet.putUnsignedVarInt(this.inventorySlot);
         packet.putSlot(packet.protocol, this.oldItem);
         packet.putSlot(packet.protocol, this.newItem);
-
-        if (packet.hasNetworkIds && packet.protocol >= 407 && packet.protocol < ProtocolInfo.v1_16_220) {
-            packet.putVarInt(this.stackNetworkId);
-        }
     }
 
     public InventoryAction createInventoryAction(Player player) {
@@ -155,17 +149,19 @@ public class NetworkInventoryAction {
                     this.inventorySlot += 36;
                     this.windowId = ContainerIds.INVENTORY;
                     if (this.newItem == null ||
-                            (this.inventorySlot == 36 && !this.newItem.canBePutInHelmetSlot() && !this.oldItem.canBePutInHelmetSlot()) ||
+                            (this.inventorySlot == 36 && !this.newItem.canBePutInHelmetSlot() && !this.oldItem.canBePutInHelmetSlot() &&
+                                    !((this.newItem instanceof ItemBlock itemBlockNew && itemBlockNew.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCK)) ||
+                                            (this.oldItem instanceof ItemBlock itemBlockOld && itemBlockOld.getBlock().hasBlockTag(BlockInternalTags.WEARABLE_BLOCK)))) ||
                             (this.inventorySlot == 37 && !this.newItem.isChestplate() && !this.oldItem.isChestplate()) ||
                             (this.inventorySlot == 38 && !this.newItem.isLeggings() && !this.oldItem.isLeggings()) ||
-                            (this.inventorySlot == 39 && !this.newItem.isBoots()) && !this.oldItem.isBoots()) {
+                            (this.inventorySlot == 39 && !this.newItem.isBoots() && !this.oldItem.isBoots())) {
                         player.getServer().getLogger().error("Player " + player.getName() + " tried to set an invalid armor item");
                         return null;
                     }
                 }
 
                 // ID 124 with slot 14/15 is enchant inventory
-                if (this.windowId == ContainerIds.UI && player.protocol >= ProtocolInfo.v1_16_0) {
+                if (this.windowId == ContainerIds.UI) {
                     switch (this.inventorySlot) {
                         case PlayerUIComponent.CREATED_ITEM_OUTPUT_UI_SLOT:
                             if (player.getWindowById(Player.ANVIL_WINDOW_ID) != null) {

@@ -33,9 +33,7 @@ public class AnimateEntityPacket extends DataPacket {
         this.animation = this.getString();
         this.nextState = this.getString();
         this.stopExpression = this.getString();
-        if (this.protocol >= ProtocolInfo.v1_17_30) {
-            this.stopExpressionVersion = this.getInt();
-        }
+        this.stopExpressionVersion = this.getInt();
         this.controller = this.getString();
         this.blendOutTime = this.getLFloat();
         for (int i = 0, len = (int) this.getUnsignedVarInt(); i < len; i++) {
@@ -49,9 +47,7 @@ public class AnimateEntityPacket extends DataPacket {
         this.putString(this.animation);
         this.putString(this.nextState);
         this.putString(this.stopExpression);
-        if (this.protocol >= ProtocolInfo.v1_17_30) {
-            this.putInt(this.stopExpressionVersion);
-        }
+        this.putInt(this.stopExpressionVersion);
         this.putString(this.controller);
         this.putLFloat(this.blendOutTime);
         this.putUnsignedVarInt(this.entityRuntimeIds.size());
