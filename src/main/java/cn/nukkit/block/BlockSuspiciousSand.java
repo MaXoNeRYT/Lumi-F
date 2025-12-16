@@ -1,10 +1,9 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTool;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.level.Sound;
 
-public class BlockSuspiciousSand extends BlockFallableMeta {
+public class BlockSuspiciousSand extends BlockSuspicious {
 
     public BlockSuspiciousSand() {
         this(0);
@@ -35,22 +34,22 @@ public class BlockSuspiciousSand extends BlockFallableMeta {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{Item.AIR_ITEM};
-    }
-
-    @Override
-    public boolean isSuspiciousBlock() {
-        return true;
-    }
-
-    @Override
     public BlockColor getColor() {
         return BlockColor.SAND_BLOCK_COLOR;
+    }
+
+    @Override
+    public Block getDefaultBlock() {
+        return Block.get(BlockID.SAND);
+    }
+
+    @Override
+    public void playBrushSound() {
+        getLevel().addSound(this, Sound.BRUSH_SUSPICIOUS_SAND);
+    }
+
+    @Override
+    public void playCompletedSound() {
+        getLevel().addSound(this, Sound.BRUSH_COMPLETED_SUSPICIOUS_SAND);
     }
 }

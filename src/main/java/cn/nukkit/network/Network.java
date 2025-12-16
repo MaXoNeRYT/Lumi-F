@@ -3,8 +3,10 @@ package cn.nukkit.network;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.event.server.DataPacketDecodeEvent;
 import cn.nukkit.network.process.DataPacketManager;
 import cn.nukkit.network.protocol.*;
+import cn.nukkit.network.protocol.exception.DataPacketDecodeException;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.VarInt;
@@ -42,7 +44,7 @@ public class Network {
     public static final byte CHANNEL_TEXT = 7; //Chat and other text stuff
     public static final byte CHANNEL_END = 31;
 
-    private PacketPool packetPool137; // TODO: refactor packet pool naming
+    private PacketPool packetPool;
     private PacketPool packetPoolCurrent;
 
     private final Server server;
@@ -258,17 +260,37 @@ public class Network {
                 if (pk != null) {
                     pk.protocol = player == null ? Integer.MAX_VALUE : player.protocol;
                     pk.setBuffer(buf, buf.length - bais.available());
+
                     try {
                         if (raknetProtocol > 8) {
+                            DataPacketDecodeEvent event = new DataPacketDecodeEvent(player, pk);
+
+                            if (!event.call()) {
+                                return;
+                            }
+
                             pk.decode();
                         } else { // version < 1.6
                             pk.setBuffer(buf, 3);
+
+                            DataPacketDecodeEvent event = new DataPacketDecodeEvent(player, pk);
+
+                            if (!event.call()) {
+                                return;
+                            }
+
                             pk.decode();
                         }
+                    } catch (DataPacketDecodeException e) {
+                        if(player != null) {
+                            player.close("", "Unable to decode " + pk.getClass().getSimpleName());
+                        }
+                        return;
                     } catch (Exception e) {
                         if (log.isTraceEnabled()) {
                             log.trace("Dumping Packet\n{}", ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(buf)));
                         }
+
                         log.error("Unable to decode packet", e);
                         throw new IllegalStateException("Unable to decode " + pk.getClass().getSimpleName());
                     }
@@ -316,14 +338,14 @@ public class Network {
         if (protocol >= ProtocolInfo.v1_21_80) {
             return this.packetPoolCurrent;
         }
-        return this.packetPool137;
+        return this.packetPool;
     }
 
     public void setPacketPool(int protocol, PacketPool packetPool) {
         if (protocol >= ProtocolInfo.v1_21_80) {
             this.packetPoolCurrent = packetPool;
         } else {
-            this.packetPool137 = packetPool;
+            this.packetPool = packetPool;
         }
     }
 
@@ -352,9 +374,9 @@ public class Network {
     }
 
     private void registerPackets() {
-        this.packetPool137 = PacketPool.builder()
-                .protocolVersion(ProtocolInfo.v1_16_0)
-                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_16_0))
+        this.packetPool = PacketPool.builder()
+                .protocolVersion(ProtocolInfo.v1_20_0_23)
+                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_20_0_23))
                 .registerPacket(ProtocolInfo.SERVER_TO_CLIENT_HANDSHAKE_PACKET, ServerToClientHandshakePacket.class)
                 .registerPacket(ProtocolInfo.CLIENT_TO_SERVER_HANDSHAKE_PACKET, ClientToServerHandshakePacket.class)
                 .registerPacket(ProtocolInfo.ADD_ENTITY_PACKET, AddEntityPacket.class)
@@ -362,8 +384,8 @@ public class Network {
                 .registerPacket(ProtocolInfo.ADD_PAINTING_PACKET, AddPaintingPacket.class)
                 .registerPacket(ProtocolInfo.TICK_SYNC_PACKET, TickSyncPacket.class)
                 .registerPacket(ProtocolInfo.ADD_PLAYER_PACKET, AddPlayerPacket.class)
-                .registerPacket(ProtocolInfo.ADVENTURE_SETTINGS_PACKET, AdventureSettingsPacket.class)
                 .registerPacket(ProtocolInfo.ANIMATE_PACKET, AnimatePacket.class)
+                .registerPacket(ProtocolInfo.SETTINGS_COMMAND_PACKET, SettingsCommandPacket.class)
                 .registerPacket(ProtocolInfo.ANVIL_DAMAGE_PACKET, AnvilDamagePacket.class)
                 .registerPacket(ProtocolInfo.AVAILABLE_COMMANDS_PACKET, AvailableCommandsPacket.class)
                 .registerPacket(ProtocolInfo.BATCH_PACKET, BatchPacket.class)
@@ -453,7 +475,6 @@ public class Network {
                 .registerPacket(ProtocolInfo.NETWORK_CHUNK_PUBLISHER_UPDATE_PACKET, NetworkChunkPublisherUpdatePacket.class)
                 .registerPacket(ProtocolInfo.AVAILABLE_ENTITY_IDENTIFIERS_PACKET, AvailableEntityIdentifiersPacket.class)
                 .registerPacket(ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V2, LevelSoundEventPacket.class)
-                .registerPacket(ProtocolInfo.SCRIPT_CUSTOM_EVENT_PACKET, ScriptCustomEventPacket.class)
                 .registerPacket(ProtocolInfo.SPAWN_PARTICLE_EFFECT_PACKET, SpawnParticleEffectPacket.class)
                 .registerPacket(ProtocolInfo.BIOME_DEFINITION_LIST_PACKET, BiomeDefinitionListPacket.class)
                 .registerPacket(ProtocolInfo.LEVEL_SOUND_EVENT_PACKET, LevelSoundEventPacket.class)
@@ -512,7 +533,7 @@ public class Network {
                 .registerPacket(ProtocolInfo.SERVER_SCRIPT_DEBUG_DRAWER_PACKET, ServerScriptDebugDrawerPacket.class)
                 .build();
 
-        this.packetPoolCurrent = this.packetPool137.toBuilder()
+        this.packetPoolCurrent = this.packetPool.toBuilder()
                 .protocolVersion(ProtocolInfo.CURRENT_PROTOCOL)
                 .minecraftVersion(ProtocolInfo.MINECRAFT_VERSION)
                 .deregisterPacket(ProtocolInfo.PLAYER_INPUT_PACKET)

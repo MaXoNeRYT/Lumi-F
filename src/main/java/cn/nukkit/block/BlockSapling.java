@@ -117,7 +117,7 @@ public class BlockSapling extends BlockFlowable {
                 for (x = 0; x >= -1; --x) {
                     for (z = 0; z >= -1; --z) {
                         if (this.findSaplings(x, z, JUNGLE)) {
-                            generator = new ObjectJungleBigTree(10, 20, Block.get(WOOD, BlockWood.JUNGLE), Block.get(LEAVES, BlockLeaves.JUNGLE));
+                            generator = new ObjectJungleBigTree(10, 20, Block.get(JUNGLE_LOG), Block.get(LEAVES, BlockLeaves.JUNGLE));
                             bigTree = true;
                             break loop;
                         }
@@ -172,12 +172,12 @@ public class BlockSapling extends BlockFlowable {
         Block air = Block.get(BlockID.AIR);
 
         if (bigTree) {
-            this.level.setBlock(this.add(x, 0, z), air, true, false);
-            this.level.setBlock(this.add(x + 1, 0, z), air, true, false);
-            this.level.setBlock(this.add(x, 0, z + 1), air, true, false);
-            this.level.setBlock(this.add(x + 1, 0, z + 1), air, true, false);
+            this.level.setBlock(this.add(x, 0, z), air, true, true);
+            this.level.setBlock(this.add(x + 1, 0, z), air, true, true);
+            this.level.setBlock(this.add(x, 0, z + 1), air, true, true);
+            this.level.setBlock(this.add(x + 1, 0, z + 1), air, true, true);
         } else {
-            this.level.setBlock(this, air, true, false);
+            this.level.setBlock(this, air, true, true);
         }
 
         if (!generator.generate(this.level, new NukkitRandom(), this.add(x, 0, z))) {

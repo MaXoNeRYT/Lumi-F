@@ -1,10 +1,8 @@
 package cn.nukkit.level.biome.impl.forest;
 
 import cn.nukkit.block.BlockDoublePlant;
-import cn.nukkit.block.BlockFlower;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.biome.type.GrassyBiome;
-import cn.nukkit.level.generator.populator.impl.PopulatorFallenTree;
 import cn.nukkit.level.generator.populator.impl.PopulatorFlower;
 import cn.nukkit.level.generator.populator.impl.PopulatorTree;
 
@@ -39,10 +37,6 @@ public class ForestBiome extends GrassyBiome {
             trees.setBaseAmount(7);
             this.addPopulator(trees);
         }
-
-        PopulatorFallenTree fallenTree = new PopulatorFallenTree();
-        fallenTree.setType(type);
-        this.addPopulator(fallenTree);
 
         if (!(this instanceof FlowerForestBiome)) {
             PopulatorFlower flower = new PopulatorFlower();

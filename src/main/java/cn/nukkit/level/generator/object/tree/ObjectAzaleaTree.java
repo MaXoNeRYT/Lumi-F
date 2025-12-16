@@ -10,7 +10,7 @@ import cn.nukkit.math.Vector3;
  * @since 2025/07/19
  */
 public class ObjectAzaleaTree extends TreeGenerator {
-    private static final Block LOG = Block.get(Block.LOG);
+    private static final Block LOG = Block.get(Block.OAK_LOG);
     private static final Block AZALEA_LEAVES = Block.get(Block.AZALEA_LEAVES);
     private static final Block FLOWERING_AZALEA_LEAVES = Block.get(Block.AZALEA_LEAVES_FLOWERED);
     private static final Block ROOTED_DIRT = Block.get(Block.ROOTED_DIRT);

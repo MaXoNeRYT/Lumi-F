@@ -23,8 +23,6 @@ import java.util.Map;
  */
 public class BlockFurnaceBurning extends BlockSolidMeta implements Faceable, BlockEntityHolder<BlockEntityFurnace> {
 
-    private static final int[] faces = {2, 5, 3, 4};
-
     public BlockFurnaceBurning() {
         this(0);
     }
@@ -87,7 +85,7 @@ public class BlockFurnaceBurning extends BlockSolidMeta implements Faceable, Blo
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        this.setBlockFace(player != null ? player.getDirection() : BlockFace.SOUTH);
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = new CompoundTag().putList(new ListTag<>("Items"));
 
@@ -167,7 +165,12 @@ public class BlockFurnaceBurning extends BlockSolidMeta implements Faceable, Blo
     }
 
     @Override
+    public void setBlockFace(BlockFace face) {
+        this.setDamage(face.getOpposite().getHorizontalIndex());
+    }
+
+    @Override
     public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+        return BlockFace.fromHorizontalIndex(this.getDamage()).getOpposite();
     }
 }

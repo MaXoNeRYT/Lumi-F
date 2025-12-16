@@ -16,9 +16,4 @@ public class ItemSentryArmorTrimSmithingTemplate extends StringItemBase implemen
     public ItemTrimPatternType getPattern() {
         return ItemTrimPatternType.SENTRY_ARMOR_TRIM;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_80;
-    }
 }

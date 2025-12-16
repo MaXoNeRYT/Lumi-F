@@ -47,7 +47,7 @@ public class BlockPaleHangingMoss extends BlockTransparentMeta {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if(item.getIdentifier().equals(ItemNamespaceId.BONE_MEAL)) {
+        if(item.getNamespaceId().equals(ItemNamespaceId.BONE_MEAL)) {
             this.level.addParticle(new BoneMealParticle(this));
             return tryToGrow();
         }

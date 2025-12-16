@@ -69,4 +69,9 @@ public class ShulkerBoxInventory extends ContainerInventory {
         // Do not allow nested shulker boxes
         return item.getId() != BlockID.SHULKER_BOX && item.getId() != BlockID.UNDYED_SHULKER_BOX;
     }
+
+    @Override
+    public boolean canCauseVibration() {
+        return true;
+    }
 }

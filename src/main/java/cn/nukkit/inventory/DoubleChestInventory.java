@@ -191,4 +191,9 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
             player.dataPacket(pk);
         }
     }
+
+    @Override
+    public boolean canCauseVibration() {
+        return true;
+    }
 }

@@ -7,6 +7,7 @@ import cn.nukkit.item.*;
 import cn.nukkit.level.Sound;
 import cn.nukkit.item.data.DyeColor;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.ThreadLocalRandom;
@@ -106,10 +107,6 @@ public class BlockComposter extends BlockSolidMeta implements ItemID {
 
     @Override
     public boolean onActivate(@Nonnull Item item, Player player) {
-        if (item.getCount() <= 0 || item.getId() == Item.AIR) {
-            return false;
-        }
-
         if (this.isFull()) {
             empty(item, player);
             return true;
@@ -120,15 +117,19 @@ public class BlockComposter extends BlockSolidMeta implements ItemID {
             return false;
         }
 
+        return !this.addItem(item, player, chance);
+    }
+
+    public boolean addItem(@NotNull Item item, Player player, int chance) {
         boolean success = ThreadLocalRandom.current().nextInt(100) < chance;
         ComposterFillEvent event = new ComposterFillEvent(this, player, item, chance, success);
         this.level.getServer().getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
-            return true;
+            return false;
         }
 
-        if (!player.isCreative()) {
+        if (player != null &&!player.isCreative()) {
             item.setCount(item.getCount() - 1);
         }
 
@@ -141,7 +142,6 @@ public class BlockComposter extends BlockSolidMeta implements ItemID {
         } else {
             level.addSound(this.add(0.5, 0.5, 0.5), Sound.BLOCK_COMPOSTER_FILL);
         }
-
         return true;
     }
 

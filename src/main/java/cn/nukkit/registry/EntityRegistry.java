@@ -4,11 +4,13 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.custom.CustomEntity;
 import cn.nukkit.entity.custom.EntityDefinition;
+import cn.nukkit.entity.custom.EntityManager;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.*;
 import cn.nukkit.entity.weather.EntityLightning;
+import cn.nukkit.utils.Identifier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Collections;
@@ -191,6 +193,27 @@ public class EntityRegistry implements IRegistry<String, Class<? extends Entity>
     public Map<String, String> getShortNames() {
         return Collections.unmodifiableMap(SHORT_NAMES);
     }
+
+    public int getNetworkId(Identifier identifier) {
+        return getNetworkId(identifier.toString());
+    }
+
+    public int getNetworkId(String identifier) {
+        var mapping = Entity.getEntityRuntimeMapping();
+        for(int networkId : mapping.keySet()) {
+            if(mapping.get(networkId).equals(identifier)) {
+                return networkId;
+            }
+        }
+
+        EntityDefinition definition = EntityManager.get().getDefinition(identifier);
+        if (definition != null) {
+            return definition.getRuntimeId();
+        }
+
+        return -1;
+    }
+
 
     public boolean isRegistered(String name) {
         return KNOWN_ENTITIES.containsKey(name);

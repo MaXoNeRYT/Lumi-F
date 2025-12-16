@@ -96,23 +96,11 @@ public class LoginPacket extends DataPacket {
         JsonObject skinToken = ClientChainData.decodeToken(new String(this.get(size), StandardCharsets.UTF_8));
         if (skinToken == null) throw new RuntimeException("Invalid null skin token");
 
-        // 将1.19.62按1.19.63版本处理 修复1.19.62皮肤修改问题
-        if (this.protocol_ == ProtocolInfo.v1_19_60 &&
-                skinToken.has("GameVersion") && !skinToken.get("GameVersion").getAsString().startsWith("1.19.60")) {
-            this.protocol_ = ProtocolInfo.v1_19_63;
-        }
-
         if (skinToken.has("ClientRandomId")) {
             this.clientId = skinToken.get("ClientRandomId").getAsLong();
         }
 
         skin = new Skin();
-
-        if (protocol_ < ProtocolInfo.v1_19_60) {
-            if (skinToken.has("SkinId")) {
-                skin.setSkinId(skinToken.get("SkinId").getAsString());
-            }
-        }
 
         if (protocol_ < 388) {
             if (skinToken.has("SkinData")) {
@@ -139,18 +127,16 @@ public class LoginPacket extends DataPacket {
                 skin.setCapeId(skinToken.get("CapeId").getAsString());
             }
 
-            if (protocol_ >= ProtocolInfo.v1_19_60) {
-                if (skinToken.has("SkinId")) {
-                    //这边获取到的"SkinId"是FullId
-                    //FullId = SkinId + CapeId
-                    //而Skin对象中的skinId不是FullId,我们需要减掉CapeId
-                    String fullSkinId = skinToken.get("SkinId").getAsString();
-                    skin.setFullSkinId(fullSkinId);
-                    if (skin.getCapeId() != null) {
-                        skin.setSkinId(fullSkinId.substring(0, fullSkinId.length() - skin.getCapeId().length()));
-                    } else {
-                        skin.setSkinId(fullSkinId);
-                    }
+            if (skinToken.has("SkinId")) {
+                //这边获取到的"SkinId"是FullId
+                //FullId = SkinId + CapeId
+                //而Skin对象中的skinId不是FullId,我们需要减掉CapeId
+                String fullSkinId = skinToken.get("SkinId").getAsString();
+                skin.setFullSkinId(fullSkinId);
+                if (skin.getCapeId() != null) {
+                    skin.setSkinId(fullSkinId.substring(0, fullSkinId.length() - skin.getCapeId().length()));
+                } else {
+                    skin.setSkinId(fullSkinId);
                 }
             }
 
@@ -183,7 +169,7 @@ public class LoginPacket extends DataPacket {
 
             if (skinToken.has("AnimatedImageData")) {
                 for (JsonElement element : skinToken.get("AnimatedImageData").getAsJsonArray()) {
-                    skin.getAnimations().add(getAnimation(protocol_, element.getAsJsonObject()));
+                    skin.getAnimations().add(getAnimation(element.getAsJsonObject()));
                 }
             }
 
@@ -209,13 +195,13 @@ public class LoginPacket extends DataPacket {
         }
     }
 
-    private static SkinAnimation getAnimation(int protocol, JsonObject element) {
+    private static SkinAnimation getAnimation(JsonObject element) {
         float frames = element.get("Frames").getAsFloat();
         int type = element.get("Type").getAsInt();
         byte[] data = Base64.getDecoder().decode(element.get("Image").getAsString());
         int width = element.get("ImageWidth").getAsInt();
         int height = element.get("ImageHeight").getAsInt();
-        int expression = protocol >= ProtocolInfo.v1_16_100 ? element.get("AnimationExpression").getAsInt() : 0;
+        int expression = element.get("AnimationExpression").getAsInt();
         return new SkinAnimation(new SerializedImage(width, height, data), type, frames, expression);
     }
 

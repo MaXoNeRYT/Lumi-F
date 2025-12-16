@@ -30,6 +30,8 @@ public interface ItemNamespaceId {
 
     String ACACIA_SAPLING = "minecraft:acacia_sapling";
 
+    String ACACIA_SHELF = "minecraft:acacia_shelf";
+
     String ACACIA_SIGN = "minecraft:acacia_sign";
 
     String ACACIA_SLAB = "minecraft:acacia_slab";
@@ -142,6 +144,8 @@ public interface ItemNamespaceId {
 
     String BAMBOO_SAPLING = "minecraft:bamboo_sapling";
 
+    String BAMBOO_SHELF = "minecraft:bamboo_shelf";
+
     String BAMBOO_SIGN = "minecraft:bamboo_sign";
 
     String BAMBOO_SLAB = "minecraft:bamboo_slab";
@@ -215,6 +219,8 @@ public interface ItemNamespaceId {
     String BIRCH_PRESSURE_PLATE = "minecraft:birch_pressure_plate";
 
     String BIRCH_SAPLING = "minecraft:birch_sapling";
+
+    String BIRCH_SHELF = "minecraft:birch_shelf";
 
     String BIRCH_SIGN = "minecraft:birch_sign";
 
@@ -470,8 +476,6 @@ public interface ItemNamespaceId {
 
     String CAVE_VINES_HEAD_WITH_BERRIES = "minecraft:cave_vines_head_with_berries";
 
-    String CHAIN = "minecraft:chain";
-
     String CHAIN_COMMAND_BLOCK = "minecraft:chain_command_block";
 
     String CHAINMAIL_BOOTS = "minecraft:chainmail_boots";
@@ -515,6 +519,8 @@ public interface ItemNamespaceId {
     String CHERRY_PRESSURE_PLATE = "minecraft:cherry_pressure_plate";
 
     String CHERRY_SAPLING = "minecraft:cherry_sapling";
+
+    String CHERRY_SHELF = "minecraft:cherry_shelf";
 
     String CHERRY_SIGN = "minecraft:cherry_sign";
 
@@ -670,11 +676,15 @@ public interface ItemNamespaceId {
 
     String COPPER_AXE = "minecraft:copper_axe";
 
+    String COPPER_BARS = "minecraft:copper_bars";
+
     String COPPER_BLOCK = "minecraft:copper_block";
 
     String COPPER_BOOTS = "minecraft:copper_boots";
 
     String COPPER_BULB = "minecraft:copper_bulb";
+
+    String COPPER_CHAIN = "minecraft:copper_chain";
 
     String COPPER_CHEST = "minecraft:copper_chest";
 
@@ -684,13 +694,19 @@ public interface ItemNamespaceId {
 
     String COPPER_GOLEM_SPAWN_EGG = "minecraft:copper_golem_spawn_egg";
 
+    String COPPER_GOLEM_STATUE = "minecraft:copper_golem_statue";
+
     String COPPER_GRATE = "minecraft:copper_grate";
 
     String COPPER_HELMET = "minecraft:copper_helmet";
 
     String COPPER_HOE = "minecraft:copper_hoe";
 
+    String COPPER_HORSE_ARMOR = "minecraft:copper_horse_armor";
+
     String COPPER_INGOT = "minecraft:copper_ingot";
+
+    String COPPER_LANTERN = "minecraft:copper_lantern";
 
     String COPPER_LEGGINGS = "minecraft:copper_leggings";
 
@@ -703,6 +719,8 @@ public interface ItemNamespaceId {
     String COPPER_SHOVEL = "minecraft:copper_shovel";
 
     String COPPER_SWORD = "minecraft:copper_sword";
+
+    String COPPER_TORCH = "minecraft:copper_torch";
 
     String COPPER_TRAPDOOR = "minecraft:copper_trapdoor";
 
@@ -765,6 +783,8 @@ public interface ItemNamespaceId {
     String CRIMSON_PRESSURE_PLATE = "minecraft:crimson_pressure_plate";
 
     String CRIMSON_ROOTS = "minecraft:crimson_roots";
+
+    String CRIMSON_SHELF = "minecraft:crimson_shelf";
 
     String CRIMSON_SIGN = "minecraft:crimson_sign";
 
@@ -861,6 +881,8 @@ public interface ItemNamespaceId {
     String DARK_OAK_PRESSURE_PLATE = "minecraft:dark_oak_pressure_plate";
 
     String DARK_OAK_SAPLING = "minecraft:dark_oak_sapling";
+
+    String DARK_OAK_SHELF = "minecraft:dark_oak_shelf";
 
     String DARK_OAK_SIGN = "minecraft:dark_oak_sign";
 
@@ -1368,13 +1390,21 @@ public interface ItemNamespaceId {
 
     String EXPOSED_COPPER = "minecraft:exposed_copper";
 
+    String EXPOSED_COPPER_BARS = "minecraft:exposed_copper_bars";
+
     String EXPOSED_COPPER_BULB = "minecraft:exposed_copper_bulb";
+
+    String EXPOSED_COPPER_CHAIN = "minecraft:exposed_copper_chain";
 
     String EXPOSED_COPPER_CHEST = "minecraft:exposed_copper_chest";
 
     String EXPOSED_COPPER_DOOR = "minecraft:exposed_copper_door";
 
+    String EXPOSED_COPPER_GOLEM_STATUE = "minecraft:exposed_copper_golem_statue";
+
     String EXPOSED_COPPER_GRATE = "minecraft:exposed_copper_grate";
+
+    String EXPOSED_COPPER_LANTERN = "minecraft:exposed_copper_lantern";
 
     String EXPOSED_COPPER_TRAPDOOR = "minecraft:exposed_copper_trapdoor";
 
@@ -1385,6 +1415,8 @@ public interface ItemNamespaceId {
     String EXPOSED_CUT_COPPER_STAIRS = "minecraft:exposed_cut_copper_stairs";
 
     String EXPOSED_DOUBLE_CUT_COPPER_SLAB = "minecraft:exposed_double_cut_copper_slab";
+
+    String EXPOSED_LIGHTNING_ROD = "minecraft:exposed_lightning_rod";
 
     String EYE_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:eye_armor_trim_smithing_template";
 
@@ -1768,6 +1800,8 @@ public interface ItemNamespaceId {
 
     String IRON_BOOTS = "minecraft:iron_boots";
 
+    String IRON_CHAIN = "minecraft:iron_chain";
+
     String IRON_CHESTPLATE = "minecraft:iron_chestplate";
 
     String IRON_DOOR = "minecraft:iron_door";
@@ -1825,6 +1859,8 @@ public interface ItemNamespaceId {
     String JUNGLE_PRESSURE_PLATE = "minecraft:jungle_pressure_plate";
 
     String JUNGLE_SAPLING = "minecraft:jungle_sapling";
+
+    String JUNGLE_SHELF = "minecraft:jungle_shelf";
 
     String JUNGLE_SIGN = "minecraft:jungle_sign";
 
@@ -2102,6 +2138,8 @@ public interface ItemNamespaceId {
 
     String MANGROVE_ROOTS = "minecraft:mangrove_roots";
 
+    String MANGROVE_SHELF = "minecraft:mangrove_shelf";
+
     String MANGROVE_SIGN = "minecraft:mangrove_sign";
 
     String MANGROVE_SLAB = "minecraft:mangrove_slab";
@@ -2324,6 +2362,8 @@ public interface ItemNamespaceId {
 
     String OAK_SAPLING = "minecraft:oak_sapling";
 
+    String OAK_SHELF = "minecraft:oak_shelf";
+
     String OAK_SIGN = "minecraft:oak_sign";
 
     String OAK_SLAB = "minecraft:oak_slab";
@@ -2382,13 +2422,21 @@ public interface ItemNamespaceId {
 
     String OXIDIZED_COPPER = "minecraft:oxidized_copper";
 
+    String OXIDIZED_COPPER_BARS = "minecraft:oxidized_copper_bars";
+
     String OXIDIZED_COPPER_BULB = "minecraft:oxidized_copper_bulb";
+
+    String OXIDIZED_COPPER_CHAIN = "minecraft:oxidized_copper_chain";
 
     String OXIDIZED_COPPER_CHEST = "minecraft:oxidized_copper_chest";
 
     String OXIDIZED_COPPER_DOOR = "minecraft:oxidized_copper_door";
 
+    String OXIDIZED_COPPER_GOLEM_STATUE = "minecraft:oxidized_copper_golem_statue";
+
     String OXIDIZED_COPPER_GRATE = "minecraft:oxidized_copper_grate";
+
+    String OXIDIZED_COPPER_LANTERN = "minecraft:oxidized_copper_lantern";
 
     String OXIDIZED_COPPER_TRAPDOOR = "minecraft:oxidized_copper_trapdoor";
 
@@ -2399,6 +2447,8 @@ public interface ItemNamespaceId {
     String OXIDIZED_CUT_COPPER_STAIRS = "minecraft:oxidized_cut_copper_stairs";
 
     String OXIDIZED_DOUBLE_CUT_COPPER_SLAB = "minecraft:oxidized_double_cut_copper_slab";
+
+    String OXIDIZED_LIGHTNING_ROD = "minecraft:oxidized_lightning_rod";
 
     String PACKED_ICE = "minecraft:packed_ice";
 
@@ -2437,6 +2487,8 @@ public interface ItemNamespaceId {
     String PALE_OAK_PRESSURE_PLATE = "minecraft:pale_oak_pressure_plate";
 
     String PALE_OAK_SAPLING = "minecraft:pale_oak_sapling";
+
+    String PALE_OAK_SHELF = "minecraft:pale_oak_shelf";
 
     String PALE_OAK_SIGN = "minecraft:pale_oak_sign";
 
@@ -3058,6 +3110,8 @@ public interface ItemNamespaceId {
 
     String SPRUCE_SAPLING = "minecraft:spruce_sapling";
 
+    String SPRUCE_SHELF = "minecraft:spruce_shelf";
+
     String SPRUCE_SIGN = "minecraft:spruce_sign";
 
     String SPRUCE_SLAB = "minecraft:spruce_slab";
@@ -3360,6 +3414,8 @@ public interface ItemNamespaceId {
 
     String WARPED_ROOTS = "minecraft:warped_roots";
 
+    String WARPED_SHELF = "minecraft:warped_shelf";
+
     String WARPED_SIGN = "minecraft:warped_sign";
 
     String WARPED_SLAB = "minecraft:warped_slab";
@@ -3386,13 +3442,21 @@ public interface ItemNamespaceId {
 
     String WAXED_COPPER = "minecraft:waxed_copper";
 
+    String WAXED_COPPER_BARS = "minecraft:waxed_copper_bars";
+
     String WAXED_COPPER_BULB = "minecraft:waxed_copper_bulb";
+
+    String WAXED_COPPER_CHAIN = "minecraft:waxed_copper_chain";
 
     String WAXED_COPPER_CHEST = "minecraft:waxed_copper_chest";
 
     String WAXED_COPPER_DOOR = "minecraft:waxed_copper_door";
 
+    String WAXED_COPPER_GOLEM_STATUE = "minecraft:waxed_copper_golem_statue";
+
     String WAXED_COPPER_GRATE = "minecraft:waxed_copper_grate";
+
+    String WAXED_COPPER_LANTERN = "minecraft:waxed_copper_lantern";
 
     String WAXED_COPPER_TRAPDOOR = "minecraft:waxed_copper_trapdoor";
 
@@ -3408,13 +3472,21 @@ public interface ItemNamespaceId {
 
     String WAXED_EXPOSED_COPPER = "minecraft:waxed_exposed_copper";
 
+    String WAXED_EXPOSED_COPPER_BARS = "minecraft:waxed_exposed_copper_bars";
+
     String WAXED_EXPOSED_COPPER_BULB = "minecraft:waxed_exposed_copper_bulb";
+
+    String WAXED_EXPOSED_COPPER_CHAIN = "minecraft:waxed_exposed_copper_chain";
 
     String WAXED_EXPOSED_COPPER_CHEST = "minecraft:waxed_exposed_copper_chest";
 
     String WAXED_EXPOSED_COPPER_DOOR = "minecraft:waxed_exposed_copper_door";
 
+    String WAXED_EXPOSED_COPPER_GOLEM_STATUE = "minecraft:waxed_exposed_copper_golem_statue";
+
     String WAXED_EXPOSED_COPPER_GRATE = "minecraft:waxed_exposed_copper_grate";
+
+    String WAXED_EXPOSED_COPPER_LANTERN = "minecraft:waxed_exposed_copper_lantern";
 
     String WAXED_EXPOSED_COPPER_TRAPDOOR = "minecraft:waxed_exposed_copper_trapdoor";
 
@@ -3426,17 +3498,29 @@ public interface ItemNamespaceId {
 
     String WAXED_EXPOSED_DOUBLE_CUT_COPPER_SLAB = "minecraft:waxed_exposed_double_cut_copper_slab";
 
+    String WAXED_EXPOSED_LIGHTNING_ROD = "minecraft:waxed_exposed_lightning_rod";
+
+    String WAXED_LIGHTNING_ROD = "minecraft:waxed_lightning_rod";
+
     String WAXED_OXIDIZED_CHISELED_COPPER = "minecraft:waxed_oxidized_chiseled_copper";
 
     String WAXED_OXIDIZED_COPPER = "minecraft:waxed_oxidized_copper";
 
+    String WAXED_OXIDIZED_COPPER_BARS = "minecraft:waxed_oxidized_copper_bars";
+
     String WAXED_OXIDIZED_COPPER_BULB = "minecraft:waxed_oxidized_copper_bulb";
+
+    String WAXED_OXIDIZED_COPPER_CHAIN = "minecraft:waxed_oxidized_copper_chain";
 
     String WAXED_OXIDIZED_COPPER_CHEST = "minecraft:waxed_oxidized_copper_chest";
 
     String WAXED_OXIDIZED_COPPER_DOOR = "minecraft:waxed_oxidized_copper_door";
 
+    String WAXED_OXIDIZED_COPPER_GOLEM_STATUE = "minecraft:waxed_oxidized_copper_golem_statue";
+
     String WAXED_OXIDIZED_COPPER_GRATE = "minecraft:waxed_oxidized_copper_grate";
+
+    String WAXED_OXIDIZED_COPPER_LANTERN = "minecraft:waxed_oxidized_copper_lantern";
 
     String WAXED_OXIDIZED_COPPER_TRAPDOOR = "minecraft:waxed_oxidized_copper_trapdoor";
 
@@ -3448,17 +3532,27 @@ public interface ItemNamespaceId {
 
     String WAXED_OXIDIZED_DOUBLE_CUT_COPPER_SLAB = "minecraft:waxed_oxidized_double_cut_copper_slab";
 
+    String WAXED_OXIDIZED_LIGHTNING_ROD = "minecraft:waxed_oxidized_lightning_rod";
+
     String WAXED_WEATHERED_CHISELED_COPPER = "minecraft:waxed_weathered_chiseled_copper";
 
     String WAXED_WEATHERED_COPPER = "minecraft:waxed_weathered_copper";
 
+    String WAXED_WEATHERED_COPPER_BARS = "minecraft:waxed_weathered_copper_bars";
+
     String WAXED_WEATHERED_COPPER_BULB = "minecraft:waxed_weathered_copper_bulb";
+
+    String WAXED_WEATHERED_COPPER_CHAIN = "minecraft:waxed_weathered_copper_chain";
 
     String WAXED_WEATHERED_COPPER_CHEST = "minecraft:waxed_weathered_copper_chest";
 
     String WAXED_WEATHERED_COPPER_DOOR = "minecraft:waxed_weathered_copper_door";
 
+    String WAXED_WEATHERED_COPPER_GOLEM_STATUE = "minecraft:waxed_weathered_copper_golem_statue";
+
     String WAXED_WEATHERED_COPPER_GRATE = "minecraft:waxed_weathered_copper_grate";
+
+    String WAXED_WEATHERED_COPPER_LANTERN = "minecraft:waxed_weathered_copper_lantern";
 
     String WAXED_WEATHERED_COPPER_TRAPDOOR = "minecraft:waxed_weathered_copper_trapdoor";
 
@@ -3470,19 +3564,29 @@ public interface ItemNamespaceId {
 
     String WAXED_WEATHERED_DOUBLE_CUT_COPPER_SLAB = "minecraft:waxed_weathered_double_cut_copper_slab";
 
+    String WAXED_WEATHERED_LIGHTNING_ROD = "minecraft:waxed_weathered_lightning_rod";
+
     String WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:wayfinder_armor_trim_smithing_template";
 
     String WEATHERED_CHISELED_COPPER = "minecraft:weathered_chiseled_copper";
 
     String WEATHERED_COPPER = "minecraft:weathered_copper";
 
+    String WEATHERED_COPPER_BARS = "minecraft:weathered_copper_bars";
+
     String WEATHERED_COPPER_BULB = "minecraft:weathered_copper_bulb";
+
+    String WEATHERED_COPPER_CHAIN = "minecraft:weathered_copper_chain";
 
     String WEATHERED_COPPER_CHEST = "minecraft:weathered_copper_chest";
 
     String WEATHERED_COPPER_DOOR = "minecraft:weathered_copper_door";
 
+    String WEATHERED_COPPER_GOLEM_STATUE = "minecraft:weathered_copper_golem_statue";
+
     String WEATHERED_COPPER_GRATE = "minecraft:weathered_copper_grate";
+
+    String WEATHERED_COPPER_LANTERN = "minecraft:weathered_copper_lantern";
 
     String WEATHERED_COPPER_TRAPDOOR = "minecraft:weathered_copper_trapdoor";
 
@@ -3493,6 +3597,8 @@ public interface ItemNamespaceId {
     String WEATHERED_CUT_COPPER_STAIRS = "minecraft:weathered_cut_copper_stairs";
 
     String WEATHERED_DOUBLE_CUT_COPPER_SLAB = "minecraft:weathered_double_cut_copper_slab";
+
+    String WEATHERED_LIGHTNING_ROD = "minecraft:weathered_lightning_rod";
 
     String WEB = "minecraft:web";
 

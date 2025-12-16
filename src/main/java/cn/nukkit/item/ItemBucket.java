@@ -342,18 +342,4 @@ public class ItemBucket extends Item {
             }
         }
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        int damage = this.getDamage();
-        if (damage <= 10) {
-            return true;
-        }
-
-        if (damage == POWDER_SNOW_BUCKET || damage == AXOLOTL_BUCKET) {
-            return protocolId >= ProtocolInfo.v1_17_0;
-        }
-
-        return protocolId >= ProtocolInfo.v1_19_0;
-    }
 }

@@ -84,6 +84,10 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
         return rarity;
     }
 
+    public EnchantmentType getType() {
+        return type;
+    }
+
     public int getLevel() {
         return level;
     }
@@ -172,7 +176,7 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
     }
 
     @Override
-    protected Enchantment clone() {
+    public Enchantment clone() {
         try {
             return (Enchantment) super.clone();
         } catch (CloneNotSupportedException e) {

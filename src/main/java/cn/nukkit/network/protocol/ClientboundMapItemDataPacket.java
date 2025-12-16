@@ -72,9 +72,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         if (protocol >= 354) {
             this.putBoolean(this.isLocked);
         }
-        if (protocol >= ProtocolInfo.v1_19_20) {
-            this.putBlockVector3(this.origin);
-        }
+        this.putBlockVector3(this.origin);
 
         if ((update & ENTITIES_UPDATE) != 0) {
             this.putUnsignedVarInt(eids.length);

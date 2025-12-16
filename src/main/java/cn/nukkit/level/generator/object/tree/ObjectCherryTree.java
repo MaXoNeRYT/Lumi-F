@@ -2,7 +2,7 @@ package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
-import cn.nukkit.block.BlockWood;
+import cn.nukkit.block.BlockLog;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitRandom;
@@ -13,7 +13,7 @@ import cn.nukkit.math.Vector3;
  * @since 2025/07/19
  */
 public class ObjectCherryTree extends TreeGenerator {
-    private static final Block CHERRY_LOG = Block.get(BlockID.CHERRY_LOG, BlockWood.faces[BlockFace.DOWN.getIndex()]);
+    private static final Block CHERRY_LOG = Block.get(BlockID.CHERRY_LOG, BlockLog.faces[BlockFace.DOWN.getIndex()]);
     private static final Block CHERRY_LEAVES = Block.get(BlockID.CHERRY_LEAVES);
     private static final Block DIRT = Block.get(BlockID.DIRT);
 
@@ -122,9 +122,9 @@ public class ObjectCherryTree extends TreeGenerator {
 
     private Block getLogWithAxis(BlockFace.Axis axis) {
         if (axis == BlockFace.Axis.X) {
-            return Block.get(BlockID.CHERRY_LOG, BlockWood.faces[BlockFace.WEST.getIndex()]);
+            return Block.get(BlockID.CHERRY_LOG, BlockLog.faces[BlockFace.WEST.getIndex()]);
         } else if (axis == BlockFace.Axis.Z) {
-            return Block.get(BlockID.CHERRY_LOG, BlockWood.faces[BlockFace.NORTH.getIndex()]);
+            return Block.get(BlockID.CHERRY_LOG, BlockLog.faces[BlockFace.NORTH.getIndex()]);
         }
         return CHERRY_LOG;
     }

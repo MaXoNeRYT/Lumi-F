@@ -9,7 +9,10 @@ import cn.nukkit.entity.data.attribute.EntityMovementSpeedModifier;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.mob.EntityWolf;
+import cn.nukkit.entity.passive.EntityIronGolem;
+import cn.nukkit.entity.passive.EntitySkeletonHorse;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.util.BlockIterator;
 import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -30,8 +33,7 @@ import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
-import cn.nukkit.entity.util.BlockIterator;
-import org.jetbrains.annotations.ApiStatus;
+import cn.nukkit.network.protocol.types.SwingSource;
 
 import java.util.*;
 
@@ -115,7 +117,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     @Override
     public boolean canBeAffected(EffectType type) {
-        return !(this instanceof EntitySmite) || type != EffectType.REGENERATION && type != EffectType.POISON;
+        return true;
     }
 
     @Override
@@ -129,9 +131,13 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        if (source instanceof EntityDamageByEntityEvent event) {
-            if (event.getDamager() instanceof Player damager && damager.attackCooldown > 0) {
+        if (source instanceof EntityDamageByEntityEvent event && event.getDamager() instanceof Player damager) {
+            if (damager.attackCooldown > 0) {
                 return false;
+            }
+
+            if (damager.fallDistance < 0 && !damager.onGround && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
+                source.setDamage(source.getFinalDamage() / 2, EntityDamageEvent.DamageModifier.CRITICAL);
             }
         }
 
@@ -147,15 +153,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
 
                 // Critical hit
-                if (damager instanceof Player && !damager.onGround) {
+                if (source.isApplicable(EntityDamageEvent.DamageModifier.CRITICAL)) {
                     AnimatePacket animate = new AnimatePacket();
                     animate.action = AnimatePacket.Action.CRITICAL_HIT;
+                    animate.swingSource = SwingSource.ATTACK;
                     animate.eid = getId();
+                    animate.data = 55;
 
                     this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
                     this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
-
-                    source.setDamage(source.getDamage() * 1.5f);
                 }
 
                 if (damager.isOnFire() && !(damager instanceof Player)) {
@@ -265,29 +271,28 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             return;
         }
         super.kill();
-        EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
-        this.server.getPluginManager().callEvent(ev);
+
+        EntityDeathEvent event = new EntityDeathEvent(this, this.getDrops(), 0);
+        if (event.getEntity() instanceof BaseEntity baseEntity) {
+            event.setExperience(baseEntity.getKillExperience());
+        }
+        event.call();
 
         this.checkTameableEntityDeath();
 
         if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT) && this.lastDamageCause != null && DamageCause.VOID != this.lastDamageCause.getCause()) {
-            if (ev.getEntity() instanceof BaseEntity) {
-                BaseEntity baseEntity = (BaseEntity) ev.getEntity();
-                if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                    if (((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager() instanceof Player) {
-                        this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
+            if (event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent entityEvent && entityEvent.getDamager() instanceof Player) {
+                this.getLevel().dropExpOrb(this, event.getExperience());
 
-                        if (!this.dropsOnNaturalDeath()) {
-                            for (Item item : ev.getDrops()) {
-                                this.getLevel().dropItem(this, item);
-                            }
-                        }
+                if (!this.dropsOnNaturalDeath()) {
+                    for (Item item : event.getDrops()) {
+                        this.getLevel().dropItem(this, item);
                     }
                 }
             }
 
             if (this.dropsOnNaturalDeath()) {
-                for (Item item : ev.getDrops()) {
+                for (Item item : event.getDrops()) {
                     this.getLevel().dropItem(this, item);
                 }
             }
@@ -338,8 +343,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.resetFallDistance();
             }
 
-            if (inWater && !this.hasEffect(EffectType.WATER_BREATHING)) {
-                if (this instanceof EntitySwimming || this.isDrowned || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
+            boolean inBubbleColumn = this.isInsideBubbleColumn();
+            if (inWater && !inBubbleColumn && !this.hasEffect(EffectType.WATER_BREATHING) && !this.hasEffect(EffectType.CONDUIT_POWER)) {
+                if (this instanceof EntitySwimming || this.isDrowned || this instanceof EntitySkeletonHorse || this instanceof EntityIronGolem || this instanceof Player player && (player.isCreative() || player.isSpectator())) {
                     this.setAirTicks(400);
                 } else {
                     if (turtleTicks == 0) {
@@ -348,7 +354,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
                         if (airTicks <= -20) {
                             airTicks = 0;
-                            if (!(this instanceof Player) || level.getGameRules().getBoolean(GameRule.DROWNING_DAMAGE)) {
+                            if (!this.isPlayer || level.getGameRules().getBoolean(GameRule.DROWNING_DAMAGE)) {
                                 this.attack(new EntityDamageEvent(this, DamageCause.DROWNING, 2));
                             }
                         }
@@ -376,21 +382,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             // Check collisions with blocks
-            if (this instanceof Player) {
-                if (this.age % 5 == 0) {
-                    Block block = this.level.getBlock(getFloorX(), NukkitMath.floorDouble(this.y - 0.25), getFloorZ());
+            if ((this.isPlayer || this instanceof BaseEntity) && this.riding == null && this.age % (this instanceof Player ? 2 : 10) == 0) {
+                int floorY = NukkitMath.floorDouble(this.y - 0.25);
+                if (floorY != getFloorY()) {
+                    Block block = this.level.getBlock(this.chunk, getFloorX(), floorY, getFloorZ(), false);
                     if (block instanceof BlockCactus) {
                         block.onEntityCollide(this);
                     } else if (block instanceof BlockMagma) {
                         block.onEntityCollide(this);
-                        if (this.isInsideOfWater()) {
-                            this.level.addParticle(new BubbleParticle(this));
-                            this.setMotion(this.getMotion().add(0, -0.3, 0));
-                        }
-                    } /*else if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
-                        this.level.addParticle(new BubbleParticle(this));
-                        this.setMotion(this.getMotion().add(0, 0.3, 0));
-                    }*/
+                    }
                 }
             }
 
@@ -407,10 +407,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.knockBackTime -= tickDiff;
             }
 
-            if (this.riding == null) {
+            if (this.riding == null && this.age % 2 == 1 && !this.closed && this.isAlive()) {
                 Entity[] e = level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
                 for (Entity entity : e) {
-                    if (entity instanceof EntityRideable) {
+                    if (entity instanceof EntityRideable && !entity.closed && entity.isAlive()) {
                         this.collidingWith(entity);
                     }
                 }
@@ -445,7 +445,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
      * Get an array of blocks within the entity's line of sight.
      *
      * @param maxDistance 视线的最大距离，超过 120 会被限制为 120 / The maximum distance of the line of sight. If it exceeds 120, it will be limited to 120.
-     * @param maxLength  返回的方块列表的最大长度，若不为 0，列表长度超过该值时会移除最早添加的方块 / The maximum length of the returned block list. If it is not 0, the earliest added block will be removed when the list length exceeds this value.
+     * @param maxLength   返回的方块列表的最大长度，若不为 0，列表长度超过该值时会移除最早添加的方块 / The maximum length of the returned block list. If it is not 0, the earliest added block will be removed when the list length exceeds this value.
      * @param transparent 透明方块 ID 的集合，若方块 ID 在该集合中，会停止遍历 / A set of transparent block IDs. If a block ID is in this set, the traversal will stop.
      * @return 视线范围内的方块数组 / An array of blocks within the line of sight.
      */
@@ -510,7 +510,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     return block;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return null;
     }
@@ -531,7 +532,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     public boolean removeMovementSpeedModifier(String identifier) {
         Object result = this.movementSpeedModifiers.remove(identifier);
 
-        if(result != null) {
+        if (result != null) {
             this.recalculateMovementSpeed();
             return true;
         }

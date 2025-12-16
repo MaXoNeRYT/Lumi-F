@@ -95,7 +95,7 @@ public abstract class BlockEntity extends Position implements BlockEntityID {
                 }
             }
         } else {
-            Server.getInstance().getLogger().warning("Tried to create block entity that doesn't exists: " + type);
+            Server.getInstance().getLogger().debug("Tried to create block entity that doesn't exists: " + type);
         }
 
         return blockEntity;

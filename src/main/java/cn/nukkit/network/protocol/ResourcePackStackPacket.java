@@ -43,12 +43,14 @@ public class ResourcePackStackPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBoolean(this.mustAccept);
-        this.putUnsignedVarInt(this.behaviourPackStack.length);
-        for (ResourcePack entry : this.behaviourPackStack) {
-            this.putString(entry.getPackId().toString());
-            this.putString(entry.getPackVersion());
-            if (this.protocol >= 313) {
-                this.putString("");
+        if (protocol < ProtocolInfo.v1_21_130) {
+            this.putUnsignedVarInt(this.behaviourPackStack.length);
+            for (ResourcePack entry : this.behaviourPackStack) {
+                this.putString(entry.getPackId().toString());
+                this.putString(entry.getPackVersion());
+                if (this.protocol >= 313) {
+                    this.putString("");
+                }
             }
         }
         this.putUnsignedVarInt(this.resourcePackStack.length);
@@ -60,22 +62,17 @@ public class ResourcePackStackPacket extends DataPacket {
             }
         }
         if (this.protocol >= 313) {
-            if (protocol < ProtocolInfo.v1_16_100) {
-                this.putBoolean(isExperimental);
-            }
             if (protocol >= 388) {
                 this.putString(Utils.getVersionByProtocol(protocol));
             }
-            if (protocol >= ProtocolInfo.v1_16_100) {
-                this.putLInt(this.experiments.size());
-                for (ExperimentData experimentData : this.experiments) {
-                    this.putString(experimentData.getName());
-                    this.putBoolean(experimentData.isEnabled());
-                }
-                this.putBoolean(!this.experiments.isEmpty()); // Were experiments previously toggled
-                if (this.protocol >= ProtocolInfo.v1_20_80) {
-                    this.putBoolean(this.hasEditorPacks);
-                }
+            this.putLInt(this.experiments.size());
+            for (ExperimentData experimentData : this.experiments) {
+                this.putString(experimentData.getName());
+                this.putBoolean(experimentData.isEnabled());
+            }
+            this.putBoolean(!this.experiments.isEmpty()); // Were experiments previously toggled
+            if (this.protocol >= ProtocolInfo.v1_20_80) {
+                this.putBoolean(this.hasEditorPacks);
             }
         }
     }

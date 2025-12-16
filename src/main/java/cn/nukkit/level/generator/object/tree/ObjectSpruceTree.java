@@ -1,7 +1,8 @@
 package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockWood;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockLog;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.biome.Biome;
 import cn.nukkit.math.NukkitRandom;
@@ -24,13 +25,18 @@ public class ObjectSpruceTree extends ObjectTree {
     }
 
     @Override
-    public int getType() {
-        return BlockWood.SPRUCE;
+    public int getTrunkBlock() {
+        return BlockID.SPRUCE_LOG;
     }
 
     @Override
     public int getTreeHeight() {
         return this.treeHeight;
+    }
+
+    @Override
+    protected int getLeafType() {
+        return 1;
     }
 
     @Override
@@ -64,7 +70,7 @@ public class ObjectSpruceTree extends ObjectTree {
                     }
 
                     if (!Block.isBlockSolidById(level.getBlockIdAt(xx, yyy, zz))) {
-                        level.setBlockAt(xx, yyy, zz, this.getLeafBlock(), this.getType());
+                        level.setBlockAt(xx, yyy, zz, this.getLeafBlock(), this.getLeafType());
                         if (createSnow) {
                             if (level.getBlockIdAt(xx, yyy + 1, zz) == Block.AIR && level.getBlockIdAt(xx, yyy + 2, zz) == Block.AIR) {
                                 level.setBlockAt(xx, yyy + 1, zz, Block.SNOW_LAYER, 0);

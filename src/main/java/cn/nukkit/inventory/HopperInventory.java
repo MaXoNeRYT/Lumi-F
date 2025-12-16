@@ -15,4 +15,9 @@ public class HopperInventory extends ContainerInventory {
     public BlockEntityHopper getHolder() {
         return (BlockEntityHopper) super.getHolder();
     }
+
+    @Override
+    public boolean canCauseVibration() {
+        return true;
+    }
 }

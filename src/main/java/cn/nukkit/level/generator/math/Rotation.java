@@ -265,8 +265,12 @@ public enum Rotation {
                 break;
 
             case BlockID.HAY_BALE:
-            case BlockID.LOG:
-            case BlockID.LOG2:
+            case BlockID.OAK_LOG:
+            case BlockID.SPRUCE_LOG:
+            case BlockID.BIRCH_LOG:
+            case BlockID.JUNGLE_LOG:
+            case BlockID.ACACIA_LOG:
+            case BlockID.DARK_OAK_LOG:
             case BlockID.QUARTZ_BLOCK:
             case BlockID.PURPUR_BLOCK:
             case BlockID.BONE_BLOCK:
@@ -690,8 +694,12 @@ public enum Rotation {
                 }
                 break;
             case BlockID.HAY_BALE:
-            case BlockID.LOG:
-            case BlockID.LOG2:
+            case BlockID.OAK_LOG:
+            case BlockID.SPRUCE_LOG:
+            case BlockID.BIRCH_LOG:
+            case BlockID.JUNGLE_LOG:
+            case BlockID.ACACIA_LOG:
+            case BlockID.DARK_OAK_LOG:
             case BlockID.QUARTZ_BLOCK:
             case BlockID.PURPUR_BLOCK:
             case BlockID.BONE_BLOCK:
@@ -1120,8 +1128,12 @@ public enum Rotation {
 				break;
 
 			case BlockID.HAY_BALE:
-			case BlockID.LOG:
-			case BlockID.LOG2:
+            case BlockID.OAK_LOG:
+            case BlockID.SPRUCE_LOG:
+            case BlockID.BIRCH_LOG:
+            case BlockID.JUNGLE_LOG:
+            case BlockID.ACACIA_LOG:
+            case BlockID.DARK_OAK_LOG:
 			case BlockID.QUARTZ_BLOCK:
 			case BlockID.PURPUR_BLOCK:
 			case BlockID.BONE_BLOCK, BlockID.NETHER_PORTAL:

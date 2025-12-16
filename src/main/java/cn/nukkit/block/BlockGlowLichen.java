@@ -29,7 +29,7 @@ public class BlockGlowLichen extends BlockLichen {
     @Override
     public boolean onActivate(Item item, Player player) {
 
-        if (!item.getIdentifier().equals(ItemNamespaceId.BONE_MEAL)) {
+        if (!item.getNamespaceId().equals(ItemNamespaceId.BONE_MEAL)) {
             return false;
         }
 

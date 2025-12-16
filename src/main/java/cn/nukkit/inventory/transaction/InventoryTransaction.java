@@ -183,8 +183,7 @@ public class InventoryTransaction {
 
     protected void sendInventories() {
         for (InventoryAction action : this.actions) {
-            if (action instanceof SlotChangeAction) {
-                SlotChangeAction sca = (SlotChangeAction) action;
+            if (action instanceof SlotChangeAction sca) {
                 sca.getInventory().sendSlot(sca.getSlot(), this.source);
             }
         }

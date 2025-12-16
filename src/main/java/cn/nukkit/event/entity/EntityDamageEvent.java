@@ -31,7 +31,7 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
     private final Map<DamageModifier, Float> originals;
 
     private boolean breakShield = false;
-    private int ShieldBreakCoolDown = 100;
+    private int shieldBreakCooldown = 100;
 
     public EntityDamageEvent(Entity entity, DamageCause cause, float damage) {
         this(entity, cause, new DamageModifierFloatEnumMap(damage));
@@ -66,6 +66,10 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         }
 
         return 0;
+    }
+
+    public Map<DamageModifier, Float> getModifiers() {
+        return modifiers;
     }
 
     public float getDamage() {
@@ -143,11 +147,11 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
     }
 
     public int getShieldBreakCoolDown() {
-        return this.ShieldBreakCoolDown;
+        return this.shieldBreakCooldown;
     }
 
     public void setShieldBreakCoolDown(int shieldBreakCoolDown) {
-        this.ShieldBreakCoolDown = shieldBreakCoolDown;
+        this.shieldBreakCooldown = shieldBreakCoolDown;
     }
 
     public enum DamageModifier {
@@ -178,7 +182,11 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         /**
          * Damage reduction caused by armor's enchantments
          */
-        ARMOR_ENCHANTMENTS
+        ARMOR_ENCHANTMENTS,
+        /**
+         * Critical hit
+         */
+        CRITICAL,
     }
 
     public enum DamageCause {

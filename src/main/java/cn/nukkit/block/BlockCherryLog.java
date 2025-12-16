@@ -1,6 +1,6 @@
 package cn.nukkit.block;
 
-public class BlockCherryLog extends BlockWood {
+public class BlockCherryLog extends BlockLog {
 
     public BlockCherryLog() {
         this(0);
@@ -26,12 +26,8 @@ public class BlockCherryLog extends BlockWood {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_CHERRY_LOG;
     }
 
-    @Override
-    protected int getStrippedDamage() {
-        return this.getDamage() & ~0x3;
-    }
 }

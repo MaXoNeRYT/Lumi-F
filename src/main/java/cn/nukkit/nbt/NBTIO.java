@@ -27,23 +27,39 @@ import java.util.zip.GZIPInputStream;
 public class NBTIO {
 
     public static CompoundTag putItemHelper(Item item) {
-        return putItemHelper(item, null);
+        return putItemHelper(item, false);
+    }
+
+    public static CompoundTag putItemHelper(Item item, boolean forceNamespaceId) {
+        return putItemHelper(item, null, forceNamespaceId);
     }
 
     public static CompoundTag putItemHelper(Item item, Integer slot) {
-        return putItemHelper(item, slot, ProtocolInfo.CURRENT_PROTOCOL);
+        return putItemHelper(item, slot, false);
+    }
+
+    public static CompoundTag putItemHelper(Item item, Integer slot, boolean forceNamespaceId) {
+        return putItemHelper(item, slot, ProtocolInfo.CURRENT_PROTOCOL, forceNamespaceId);
     }
 
     public static CompoundTag putItemHelper(Item item, Integer slot, int protocol) {
+        return putItemHelper(item, slot, protocol, false);
+    }
+
+    public static CompoundTag putItemHelper(Item item, Integer slot, int protocol, boolean forceNamespaceId) {
         CompoundTag tag = new CompoundTag((String) null)
                 .putByte("Count", item.getCount())
                 .putShort("Damage", item.getDamage());
 
-        int id = item.getId();
-        if (id == ItemID.STRING_IDENTIFIED_ITEM || id <= 255 - Block.LOWEST_CUSTOM_BLOCK_ID) {
-            tag.putString("Name", item.getNamespaceId(protocol));
+        if (!forceNamespaceId) {
+            int id = item.getId();
+            if (id == ItemID.STRING_IDENTIFIED_ITEM || id <= 255 - Block.LOWEST_CUSTOM_BLOCK_ID) {
+                tag.putString("Name", item.getNamespaceId(protocol));
+            } else {
+                tag.putShort("id", item.getId() & 0xFFFF);
+            }
         } else {
-            tag.putShort("id", item.getId() & 0xFFFF);
+            tag.putString("Name", item.getNamespaceId(protocol));
         }
 
         if (slot != null) {

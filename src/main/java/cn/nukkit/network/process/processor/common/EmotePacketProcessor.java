@@ -21,6 +21,11 @@ public class EmotePacketProcessor extends DataPacketProcessor<EmotePacket> {
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull EmotePacket pk) {
         Player player = playerHandle.player;
+        if(!player.getAvailableEmotes().contains(pk.emoteID)) {
+            player.getServer().getLogger().warning(player.getUsername() + " tried to send EmotePacket with a invalid uuid : " + pk.emoteID.toString());
+            return;
+        }
+
         if (!player.spawned || player.getServer().getTick() - player.getLastEmote() < 20) {
             return;
         }

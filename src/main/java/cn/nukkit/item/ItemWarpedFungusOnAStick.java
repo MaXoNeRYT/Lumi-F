@@ -28,9 +28,4 @@ public class ItemWarpedFungusOnAStick extends ItemTool {
     public boolean noDamageOnBreak() {
         return true;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

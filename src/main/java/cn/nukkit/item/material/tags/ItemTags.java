@@ -30,6 +30,8 @@ public final class ItemTags {
 
     public static final ItemTag COALS = register("minecraft:coals", new LazyItemTag("minecraft:coals"));
 
+    public static final ItemTag COPPER_TIER = register("minecraft:copper_tier", new LazyItemTag("minecraft:copper_tier"));
+
     public static final ItemTag CRIMSON_STEMS = register("minecraft:crimson_stems", new LazyItemTag("minecraft:crimson_stems"));
 
     public static final ItemTag DECORATED_POT_SHERDS = register("minecraft:decorated_pot_sherds", new LazyItemTag("minecraft:decorated_pot_sherds"));

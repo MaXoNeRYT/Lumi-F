@@ -135,7 +135,7 @@ public class BlockSugarcane extends BlockFlowable {
         if (down.getId() == SUGARCANE_BLOCK) {
             this.getLevel().setBlock(block, Block.get(SUGARCANE_BLOCK), true);
             return true;
-        } else if (down.hasBlockTag(BlockTags.DIRT)) {
+        } else if (down.hasBlockTag(BlockTags.DIRT) || down.hasBlockTag(BlockTags.SAND)) {
             Block block0 = down.north();
             Block block1 = down.south();
             Block block2 = down.west();

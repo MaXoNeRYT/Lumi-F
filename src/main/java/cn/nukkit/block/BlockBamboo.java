@@ -15,6 +15,7 @@ import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.network.protocol.types.SwingSource;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -62,7 +63,7 @@ public class BlockBamboo extends BlockTransparentMeta {
             this.level.useBreakOn(this, null, null, true);
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             Block up = this.up();
-            if (this.getAge() == 0 && up.getId() == AIR && this.level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL && ThreadLocalRandom.current().nextInt(3) == 0) {
+            if (this.getAge() == 0 && up.getId() == AIR && ThreadLocalRandom.current().nextInt(3) == 0) {
                 this.grow(up);
             }
             return type;
@@ -124,6 +125,7 @@ public class BlockBamboo extends BlockTransparentMeta {
             if (player != null) {
                 AnimatePacket animatePacket = new AnimatePacket();
                 animatePacket.action = AnimatePacket.Action.SWING_ARM;
+                animatePacket.swingSource = SwingSource.EVENT;
                 animatePacket.eid = player.getId();
                 this.getLevel().addChunkPacket(player.getChunkX(), player.getChunkZ(), animatePacket);
             }

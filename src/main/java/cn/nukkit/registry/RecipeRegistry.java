@@ -20,10 +20,14 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.Deflater;
 
 @Getter
@@ -41,12 +45,15 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     private final Map<Integer, BrewingRecipe> BREWING = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, ContainerRecipe> CONTAINER = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, CampfireRecipe> CAMPFIRE = new Int2ObjectOpenHashMap<>();
-    private final Map<UUID, SmithingRecipe> SMITHING = new Object2ObjectOpenHashMap<>(); //589
+    private final Map<UUID, SmithingRecipe> SMITHING = new Object2ObjectOpenHashMap<>();
     private final Object2DoubleOpenHashMap<Recipe> FURNACE_XP = new Object2DoubleOpenHashMap<>();
-    private final Collection<Recipe> RECIPES = new ArrayDeque<>(); //649
+    private final Collection<Recipe> RECIPES = new ArrayDeque<>();
+
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
         this.registerMultiRecipe(new RepairItemRecipe());
         this.registerMultiRecipe(new BookCloningRecipe());
         this.registerMultiRecipe(new MapCloningRecipe());
@@ -58,22 +65,39 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         this.registerMultiRecipe(new DecoratedPotRecipe());
         this.registerMultiRecipe(new ShulkerBoxRecipe());
 
-        final JsonArray potionMixes = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject().get("potionMixes").getAsJsonArray();
-        potionMixes.forEach((potionMix) -> {
+        final JsonObject brewing = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject();
+
+        brewing.get("potionMixes").getAsJsonArray().forEach((potionMix) -> {
             final JsonObject recipe = potionMix.getAsJsonObject();
 
-            int fromPotionId = recipe.get("inputId").getAsInt();
+            String fromPotionId = recipe.get("inputId").getAsString();
             int fromPotionMeta = recipe.get("inputMeta").getAsInt();
-            int ingredient = recipe.get("reagentId").getAsInt();
+            String ingredient = recipe.get("reagentId").getAsString();
             int ingredientMeta = recipe.get("reagentMeta").getAsInt();
-            int toPotionId = recipe.get("outputId").getAsInt();
+            String toPotionId = recipe.get("outputId").getAsString();
             int toPotionMeta = recipe.get("outputMeta").getAsInt();
 
             Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
         });
 
-        RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes_827.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
-        this.rebuildPacket();
+        brewing.get("containerMixes").getAsJsonArray().forEach((containerMix) -> {
+            final JsonObject recipe = containerMix.getAsJsonObject();
+
+            final Item ingredient = Item.get(recipe.get("reagentId").getAsString());
+
+            final String fromPotionId = recipe.get("inputId").getAsString();
+            final String toPotionId = recipe.get("outputId").getAsString();
+
+            for (int meta : Registries.POTION.getPotionId2TypeMap().keySet()) {
+                Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(
+                        Item.get(fromPotionId, meta),
+                        ingredient,
+                        Item.get(toPotionId, meta)
+                ));
+            }
+        });
+
+        RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
     }
 
     @Override
@@ -93,6 +117,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
 
     @Override
     public void reload() {
+        isLoad.set(false);
         SHAPED.clear();
         SHAPELESS.clear();
         FURNACE.clear();
@@ -104,7 +129,8 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         SMITHING.clear();
         FURNACE_XP.clear();
         RECIPES.clear();
-        this.init();
+        init();
+        buildPackets();
     }
 
     public void registerFurnaceRecipe(FurnaceRecipe recipe, double xp) {
@@ -207,10 +233,6 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         if (recipeMap != null) {
             SmithingRecipe recipe = recipeMap.get(inputHash);
 
-            if (recipe != null && recipe.matchItems(inputList)) {
-                return recipe;
-            }
-
             ArrayList<Item> list = new ArrayList<>();
             for (Item item : inputList) {
                 Item clone = item.clone();
@@ -219,6 +241,10 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
                     clone.setDamage(0);
                 }
                 list.add(clone);
+            }
+
+            if (recipe != null && recipe.matchItems(list)) {
+                return recipe;
             }
 
             for (SmithingRecipe smithingRecipe : recipeMap.values()) {
@@ -245,7 +271,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public MultiRecipe getMultiRecipe(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
-        if(outputItem == null) return null;
+        if (outputItem == null) return null;
         return this.MULTI.values().stream().filter(multiRecipe -> multiRecipe.canExecute(player, outputItem, inputs)).findFirst().orElse(null);
     }
 
@@ -258,10 +284,11 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public BatchPacket getPacket(int protocol) {
-       return PACKETS.get(protocol);
+        return PACKETS.get(protocol);
     }
 
-    public void rebuildPacket() {
+    @ApiStatus.Internal
+    public void buildPackets() {
         ProtocolInfo.SUPPORTED_PROTOCOLS.parallelStream().forEach(protocol -> {
             CraftingDataPacket pk = new CraftingDataPacket();
             pk.protocol = protocol;

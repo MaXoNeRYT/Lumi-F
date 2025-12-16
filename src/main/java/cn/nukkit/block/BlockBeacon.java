@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.impl.BlockEntityBeacon;
 import cn.nukkit.inventory.BeaconInventory;
@@ -8,7 +9,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,6 +36,16 @@ public class BlockBeacon extends BlockTransparent implements BlockEntityHolder<B
     @Override
     public double getHardness() {
         return 3;
+    }
+
+    @Override
+    public double calculateBreakTime(@NotNull Item item) {
+        return calculateBreakTime(item, null);
+    }
+
+    @Override
+    public double calculateBreakTime(@NotNull Item item, Player player) {
+        return 4.5;
     }
 
     @Override
@@ -72,8 +82,8 @@ public class BlockBeacon extends BlockTransparent implements BlockEntityHolder<B
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
 
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityBeacon)) {
+            BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+            if (!(blockEntity instanceof BlockEntityBeacon)) {
                 CompoundTag nbt = new CompoundTag("")
                         .putString("id", BlockEntity.BEACON)
                         .putInt("x", (int) this.x)

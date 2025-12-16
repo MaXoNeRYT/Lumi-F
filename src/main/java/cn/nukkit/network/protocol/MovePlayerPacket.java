@@ -44,9 +44,7 @@ public class MovePlayerPacket extends DataPacket {
             this.teleportCause = this.getLInt();
             this.teleportItem = this.getLInt();
         }
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            this.frame = this.getUnsignedVarLong();
-        }
+        this.frame = this.getUnsignedVarLong();
     }
 
     @Override
@@ -64,9 +62,7 @@ public class MovePlayerPacket extends DataPacket {
             this.putLInt(this.teleportCause);
             this.putLInt(this.teleportItem);
         }
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            this.putUnsignedVarLong(this.frame);
-        }
+        this.putUnsignedVarLong(this.frame);
     }
 
     @Override

@@ -10,7 +10,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.block.BlockTypes;
-import cn.nukkit.level.generator.loot.PillagerOutpostChest;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.level.generator.task.ActorSpawnTask;
 import cn.nukkit.level.generator.task.CallbackableChunkGenerationTask;
@@ -51,7 +50,7 @@ public class PopulatorPillagerOutpost extends Populator {
                 final int baseMeta = chunk.getBlockData(x, baseY, z);
 
                 switch (baseId) {
-                    case COBBLESTONE, MOSS_STONE, LOG2, PLANKS, FENCE -> {
+                    case COBBLESTONE, MOSS_STONE, DARK_OAK_LOG, PLANKS, FENCE -> {
                         int y = baseY - 1;
                         int id = chunk.getBlockId(x, y, z);
                         while (BlockTypes.isPlantOrFluid[id] && y > 1) {
@@ -70,7 +69,6 @@ public class PopulatorPillagerOutpost extends Populator {
                 switch (nbt.getString("metadata")) {
                     case "topChest" -> {
                         final ListTag<CompoundTag> itemList = new ListTag<>("Items");
-                        PillagerOutpostChest.get().create(itemList, random);
                         Server.getInstance().getScheduler().scheduleDelayedTask(InternalPlugin.INSTANCE, new LootSpawnTask(chunk.getProvider().getLevel(),
                             new BlockVector3(nbt.getInt("x"), nbt.getInt("y") - 1, nbt.getInt("z")), itemList), 2);
                     }

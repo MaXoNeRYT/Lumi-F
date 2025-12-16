@@ -1,9 +1,6 @@
 package cn.nukkit.block;
 
-
 import cn.nukkit.block.properties.enums.OxidizationLevel;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
 import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,13 +22,6 @@ public class BlockCopperBulb extends BlockCopperBulbBase {
     @Override
     public int getId() {
         return COPPER_BULB;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                new ItemBlock(Block.get(this.getId()))
-        };
     }
 
     @Override

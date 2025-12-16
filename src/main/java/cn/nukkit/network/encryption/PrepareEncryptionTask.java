@@ -38,7 +38,7 @@ public class PrepareEncryptionTask extends AsyncTask {
             this.encryptionKey = EncryptionUtils.getSecretKey(serverKeyPair.getPrivate(), EncryptionUtils.parseKey(this.player.getLoginChainData().getIdentityPublicKey()), token);
             this.handshakeJwt = EncryptionUtils.createHandshakeJwt(serverKeyPair, token);
 
-            boolean useGcm = this.player.protocol > ProtocolInfo.v1_16_210;
+            boolean useGcm = true;
             this.encryptionCipher = EncryptionUtils.createCipher(useGcm, true, this.encryptionKey);
             this.decryptionCipher = EncryptionUtils.createCipher(useGcm, false, this.encryptionKey);
         } catch (Exception ex) {

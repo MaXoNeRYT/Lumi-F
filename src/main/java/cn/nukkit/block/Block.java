@@ -339,7 +339,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public double getFrictionFactor() {
-        return 0.6;
+        return DEFAULT_FRICTION_FACTOR;
     }
 
     public int getLightLevel() {
@@ -564,18 +564,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         this.z = (int) v.z;
         this.level = v.level;
         this.boundingBox = null;
-    }
-
-    /**
-     * 是否直接掉落方块物品
-     * Whether to drop block items directly
-     *
-     * @param player 玩家
-     * @return true - 直接掉落方块物品, false - 通过getDrops方法获取掉落物品
-     *         true - Drop block items directly, false - Get dropped items through the getDrops method
-     */
-    public boolean isDropOriginal(Player player) {
-        return false;
     }
 
     public Item[] getDrops(Item item) {
@@ -1380,10 +1368,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      */
     public static boolean isWater(int id) {
         return id == WATER || id == STILL_WATER;
-    }
-
-    public boolean isSuspiciousBlock() {
-        return false;
     }
 
     public PersistentDataContainer getPersistentDataContainer() {
