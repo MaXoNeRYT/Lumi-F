@@ -442,6 +442,8 @@ public interface ItemNamespaceId {
 
     String CALIBRATED_SCULK_SENSOR = "minecraft:calibrated_sculk_sensor";
 
+    String CAMEL_HUSK_SPAWN_EGG = "minecraft:camel_husk_spawn_egg";
+
     String CAMEL_SPAWN_EGG = "minecraft:camel_spawn_egg";
 
     String CAMERA = "minecraft:camera";
@@ -710,6 +712,8 @@ public interface ItemNamespaceId {
 
     String COPPER_LEGGINGS = "minecraft:copper_leggings";
 
+    String COPPER_NAUTILUS_ARMOR = "minecraft:copper_nautilus_armor";
+
     String COPPER_NUGGET = "minecraft:copper_nugget";
 
     String COPPER_ORE = "minecraft:copper_ore";
@@ -717,6 +721,8 @@ public interface ItemNamespaceId {
     String COPPER_PICKAXE = "minecraft:copper_pickaxe";
 
     String COPPER_SHOVEL = "minecraft:copper_shovel";
+
+    String COPPER_SPEAR = "minecraft:copper_spear";
 
     String COPPER_SWORD = "minecraft:copper_sword";
 
@@ -1020,11 +1026,15 @@ public interface ItemNamespaceId {
 
     String DIAMOND_LEGGINGS = "minecraft:diamond_leggings";
 
+    String DIAMOND_NAUTILUS_ARMOR = "minecraft:diamond_nautilus_armor";
+
     String DIAMOND_ORE = "minecraft:diamond_ore";
 
     String DIAMOND_PICKAXE = "minecraft:diamond_pickaxe";
 
     String DIAMOND_SHOVEL = "minecraft:diamond_shovel";
+
+    String DIAMOND_SPEAR = "minecraft:diamond_spear";
 
     String DIAMOND_SWORD = "minecraft:diamond_sword";
 
@@ -1556,11 +1566,15 @@ public interface ItemNamespaceId {
 
     String GOLDEN_LEGGINGS = "minecraft:golden_leggings";
 
+    String GOLDEN_NAUTILUS_ARMOR = "minecraft:golden_nautilus_armor";
+
     String GOLDEN_PICKAXE = "minecraft:golden_pickaxe";
 
     String GOLDEN_RAIL = "minecraft:golden_rail";
 
     String GOLDEN_SHOVEL = "minecraft:golden_shovel";
+
+    String GOLDEN_SPEAR = "minecraft:golden_spear";
 
     String GOLDEN_SWORD = "minecraft:golden_sword";
 
@@ -1818,6 +1832,8 @@ public interface ItemNamespaceId {
 
     String IRON_LEGGINGS = "minecraft:iron_leggings";
 
+    String IRON_NAUTILUS_ARMOR = "minecraft:iron_nautilus_armor";
+
     String IRON_NUGGET = "minecraft:iron_nugget";
 
     String IRON_ORE = "minecraft:iron_ore";
@@ -1825,6 +1841,8 @@ public interface ItemNamespaceId {
     String IRON_PICKAXE = "minecraft:iron_pickaxe";
 
     String IRON_SHOVEL = "minecraft:iron_shovel";
+
+    String IRON_SPEAR = "minecraft:iron_spear";
 
     String IRON_SWORD = "minecraft:iron_sword";
 
@@ -2280,6 +2298,8 @@ public interface ItemNamespaceId {
 
     String NAUTILUS_SHELL = "minecraft:nautilus_shell";
 
+    String NAUTILUS_SPAWN_EGG = "minecraft:nautilus_spawn_egg";
+
     String NETHER_BRICK = "minecraft:nether_brick";
 
     String NETHER_BRICK_DOUBLE_SLAB = "minecraft:nether_brick_double_slab";
@@ -2316,15 +2336,21 @@ public interface ItemNamespaceId {
 
     String NETHERITE_HOE = "minecraft:netherite_hoe";
 
+    String NETHERITE_HORSE_ARMOR = "minecraft:netherite_horse_armor";
+
     String NETHERITE_INGOT = "minecraft:netherite_ingot";
 
     String NETHERITE_LEGGINGS = "minecraft:netherite_leggings";
+
+    String NETHERITE_NAUTILUS_ARMOR = "minecraft:netherite_nautilus_armor";
 
     String NETHERITE_PICKAXE = "minecraft:netherite_pickaxe";
 
     String NETHERITE_SCRAP = "minecraft:netherite_scrap";
 
     String NETHERITE_SHOVEL = "minecraft:netherite_shovel";
+
+    String NETHERITE_SPEAR = "minecraft:netherite_spear";
 
     String NETHERITE_SWORD = "minecraft:netherite_sword";
 
@@ -2507,6 +2533,8 @@ public interface ItemNamespaceId {
     String PANDA_SPAWN_EGG = "minecraft:panda_spawn_egg";
 
     String PAPER = "minecraft:paper";
+
+    String PARCHED_SPAWN_EGG = "minecraft:parched_spawn_egg";
 
     String PARROT_SPAWN_EGG = "minecraft:parrot_spawn_egg";
 
@@ -3178,6 +3206,8 @@ public interface ItemNamespaceId {
 
     String STONE_SHOVEL = "minecraft:stone_shovel";
 
+    String STONE_SPEAR = "minecraft:stone_spear";
+
     String STONE_STAIRS = "minecraft:stone_stairs";
 
     String STONE_SWORD = "minecraft:stone_sword";
@@ -3678,6 +3708,8 @@ public interface ItemNamespaceId {
 
     String WOODEN_SLAB = "minecraft:wooden_slab";
 
+    String WOODEN_SPEAR = "minecraft:wooden_spear";
+
     String WOODEN_SWORD = "minecraft:wooden_sword";
 
     String WOOL = "minecraft:wool";
@@ -3719,6 +3751,8 @@ public interface ItemNamespaceId {
     String ZOMBIE_HEAD = "minecraft:zombie_head";
 
     String ZOMBIE_HORSE_SPAWN_EGG = "minecraft:zombie_horse_spawn_egg";
+
+    String ZOMBIE_NAUTILUS_SPAWN_EGG = "minecraft:zombie_nautilus_spawn_egg";
 
     String ZOMBIE_PIGMAN_SPAWN_EGG = "minecraft:zombie_pigman_spawn_egg";
 
