@@ -56,6 +56,10 @@ public class MultiRecipe implements Recipe {
         return this.networkId;
     }
 
+    public boolean hideRecipe() {
+        return false;
+    }
+
     public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         return false;
     }

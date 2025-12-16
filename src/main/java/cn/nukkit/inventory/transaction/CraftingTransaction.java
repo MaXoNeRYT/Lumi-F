@@ -2,8 +2,10 @@ package cn.nukkit.inventory.transaction;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.BlockShulkerBox;
 import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.inventory.*;
+import cn.nukkit.inventory.transaction.action.CraftingTakeResultAction;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
@@ -105,6 +107,19 @@ public class CraftingTransaction extends InventoryTransaction {
     protected void setTransactionRecipe(Recipe recipe) {
         this.transactionRecipe = recipe;
         this.recipe = recipe instanceof CraftingRecipe ? (CraftingRecipe) recipe : null;
+
+        if(recipe != null) {
+            final Item result = recipe.getResult();
+            this.setPrimaryOutput(result);
+
+            for(InventoryAction action : this.getActions()) {
+                if(action instanceof SlotChangeAction && action.getTargetItem().equals(result, true, false)) {
+                    action.getTargetItemUnsafe().setCompoundTag(result.getCompoundTag());
+                } else if(action instanceof CraftingTakeResultAction) {
+                    action.getSourceItemUnsafe().setCompoundTag(result.getCompoundTag());
+                }
+            }
+        }
     }
 
     @Override
