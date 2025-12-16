@@ -141,6 +141,7 @@ public final class PlayerHandle {
     public AsyncTask getPreLoginEventTask() {
         return player.preLoginEventTask;
     }
+
     public void processPreLogin() {
         player.processPreLogin();
     }
@@ -376,10 +377,6 @@ public final class PlayerHandle {
 
     public Item getChestplate() {
         return player.getInventory().getChestplateFast();
-    }
-
-    public void callEvent(Event event) {
-        player.getServer().getPluginManager().callEvent(event);
     }
 
     public void addSound(Vector3 pos, Sound sound) {

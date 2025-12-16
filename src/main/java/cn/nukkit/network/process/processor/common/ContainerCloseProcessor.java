@@ -2,9 +2,9 @@ package cn.nukkit.network.process.processor.common;
 
 import cn.nukkit.Player;
 import cn.nukkit.PlayerHandle;
-import cn.nukkit.Server;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.inventory.ContainerInventory;
+import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.PlayerEnderChestInventory;
 import cn.nukkit.inventory.TradeInventory;
 import cn.nukkit.network.process.DataPacketProcessor;
@@ -16,9 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
-/**
- * @author SocialMoods
- */
 public class ContainerCloseProcessor extends DataPacketProcessor<ContainerClosePacket> {
 
     public static final ContainerCloseProcessor INSTANCE = new ContainerCloseProcessor();
@@ -34,9 +31,9 @@ public class ContainerCloseProcessor extends DataPacketProcessor<ContainerCloseP
                 handle.setInventoryOpen(false);
 
                 if (handle.getCraftingType() == Player.CRAFTING_SMALL) {
-                    for (Entry<cn.nukkit.inventory.Inventory, Integer> open : new ArrayList<>(handle.getWindows().entrySet())) {
+                    for (Entry<Inventory, Integer> open : new ArrayList<>(handle.getWindows().entrySet())) {
                         if (open.getKey() instanceof ContainerInventory || open.getKey() instanceof PlayerEnderChestInventory) {
-                            Server.getInstance().getPluginManager().callEvent(new InventoryCloseEvent(open.getKey(), handle.player));
+                            new InventoryCloseEvent(open.getKey(), handle.player).call();
                             handle.setClosingWindowId(Integer.MAX_VALUE);
                             handle.removeWindow(open.getKey(), true);
                             handle.setClosingWindowId(Integer.MIN_VALUE);
@@ -50,12 +47,10 @@ public class ContainerCloseProcessor extends DataPacketProcessor<ContainerCloseP
             handle.resetCraftingGridType();
             handle.player.addWindow(handle.player.getCraftingGrid(), ContainerIds.NONE);
 
-            if (handle.getProtocol() >= 407) {
-                ContainerClosePacket pk = new ContainerClosePacket();
-                pk.windowId = -1;
-                pk.wasServerInitiated = false;
-                handle.player.dataPacket(pk);
-            }
+            ContainerClosePacket pk = new ContainerClosePacket();
+            pk.windowId = -1;
+            pk.wasServerInitiated = false;
+            handle.player.dataPacket(pk);
 
             TradeInventory tradeInventory = handle.player.getTradeInventory();
             if (tradeInventory != null) {
@@ -64,10 +59,10 @@ public class ContainerCloseProcessor extends DataPacketProcessor<ContainerCloseP
 
         } else if (handle.getWindowIndex().containsKey(packet.windowId)) {
             handle.setInventoryOpen(false);
-            cn.nukkit.inventory.Inventory inn = handle.getWindowIndex().get(packet.windowId);
-            Server.getInstance().getPluginManager().callEvent(new InventoryCloseEvent(inn, handle.player));
+            Inventory inventory = handle.getWindowIndex().get(packet.windowId);
+            new InventoryCloseEvent(inventory, handle.player).call();
             handle.setClosingWindowId(packet.windowId);
-            handle.removeWindow(inn, true);
+            handle.removeWindow(inventory, true);
             handle.setClosingWindowId(Integer.MIN_VALUE);
         } else {
             ContainerClosePacket pk = new ContainerClosePacket();

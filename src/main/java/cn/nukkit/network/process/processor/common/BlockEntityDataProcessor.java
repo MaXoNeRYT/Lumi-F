@@ -15,9 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
 
-/**
- * @author SocialMoods
- */
 public class BlockEntityDataProcessor extends DataPacketProcessor<BlockEntityDataPacket> {
 
     public static final BlockEntityDataProcessor INSTANCE = new BlockEntityDataProcessor();
@@ -36,8 +33,8 @@ public class BlockEntityDataProcessor extends DataPacketProcessor<BlockEntityDat
             return;
         }
 
-        BlockEntity t = handle.player.getLevel().getBlockEntity(pos);
-        if (t instanceof BlockEntitySpawnable spawnable) {
+        BlockEntity blockEntity = handle.player.getLevel().getBlockEntity(pos);
+        if (blockEntity instanceof BlockEntitySpawnable spawnable) {
             CompoundTag nbt;
             try {
                 nbt = NBTIO.read(new ByteArrayInputStream(packet.namedTag), ByteOrder.LITTLE_ENDIAN, true);

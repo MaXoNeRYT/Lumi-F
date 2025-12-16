@@ -12,9 +12,6 @@ import cn.nukkit.network.protocol.BlockPickRequestPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author SocialMoods
- */
 public class BlockPickRequestProcessor extends DataPacketProcessor<BlockPickRequestPacket> {
 
     public static final BlockPickRequestProcessor INSTANCE = new BlockPickRequestProcessor();
@@ -43,18 +40,16 @@ public class BlockPickRequestProcessor extends DataPacketProcessor<BlockPickRequ
             }
         }
 
-        PlayerBlockPickEvent pickEvent = new PlayerBlockPickEvent(handle.player, block, item);
-        if (handle.player.isSpectator()) pickEvent.setCancelled();
+        PlayerBlockPickEvent event = new PlayerBlockPickEvent(handle.player, block, item);
+        if (handle.player.isSpectator()) event.setCancelled();
 
-        handle.callEvent(pickEvent);
-
-        if (!pickEvent.isCancelled()) {
+        if (event.call()) {
             PlayerInventory inventory = handle.player.getInventory();
             boolean itemExists = false;
             int itemSlot = -1;
 
             for (int slot = 0; slot < inventory.getSize(); slot++) {
-                if (inventory.getItem(slot).equals(pickEvent.getItem())) {
+                if (inventory.getItem(slot).equals(event.getItem())) {
                     if (slot < inventory.getHotbarSize()) {
                         inventory.setHeldItemSlot(slot);
                     } else {
@@ -69,7 +64,7 @@ public class BlockPickRequestProcessor extends DataPacketProcessor<BlockPickRequ
                 if (inventory.getItem(slot).isNull()) {
                     if (!itemExists && handle.isCreative()) {
                         inventory.setHeldItemSlot(slot);
-                        inventory.setItemInHand(pickEvent.getItem());
+                        inventory.setItemInHand(event.getItem());
                         return;
                     } else if (itemSlot > -1) {
                         inventory.setHeldItemSlot(slot);
@@ -80,9 +75,9 @@ public class BlockPickRequestProcessor extends DataPacketProcessor<BlockPickRequ
                 }
             }
 
+            Item itemInHand = inventory.getItemInHand();
             if (!itemExists && handle.isCreative()) {
-                Item itemInHand = inventory.getItemInHand();
-                inventory.setItemInHand(pickEvent.getItem());
+                inventory.setItemInHand(event.getItem());
                 if (!inventory.isFull()) {
                     for (int slot = 0; slot < inventory.getSize(); slot++) {
                         if (inventory.getItem(slot).isNull()) {
@@ -92,7 +87,6 @@ public class BlockPickRequestProcessor extends DataPacketProcessor<BlockPickRequ
                     }
                 }
             } else if (itemSlot > -1) {
-                Item itemInHand = inventory.getItemInHand();
                 inventory.setItemInHand(inventory.getItem(itemSlot));
                 inventory.setItem(itemSlot, itemInHand);
             }

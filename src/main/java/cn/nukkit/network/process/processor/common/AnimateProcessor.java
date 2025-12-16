@@ -10,9 +10,6 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.SwingSource;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author SocialMoods
- */
 public class AnimateProcessor extends DataPacketProcessor<AnimatePacket> {
 
     public static final AnimateProcessor INSTANCE = new AnimateProcessor();
@@ -32,31 +29,31 @@ public class AnimateProcessor extends DataPacketProcessor<AnimatePacket> {
             return;
         }
 
-        PlayerAnimationEvent animationEvent = new PlayerAnimationEvent(handle.player, packet.action);
-        handle.callEvent(animationEvent);
-        if (animationEvent.isCancelled()) return;
+        PlayerAnimationEvent event = new PlayerAnimationEvent(handle.player, packet.action);
 
-        AnimatePacket.Action animation = animationEvent.getAnimationType();
+        if (event.call()) return;
 
-        switch (animation) {
+        AnimatePacket.Action action = event.getAnimationType();
+
+        switch (action) {
             case ROW_RIGHT:
             case ROW_LEFT:
                 if (handle.getRiding() instanceof EntityBoat boat) {
-                    if (handle.getProtocol() >= 407 /*v1_21_130*/) {
-                        boat.onPaddle(animation, 1);
+                    if (handle.getProtocol() >= ProtocolInfo.v1_21_130) {
+                        boat.onPaddle(action, 1);
                     } else {
-                        boat.onPaddle(animation, packet.rowingTime);
+                        boat.onPaddle(action, packet.rowingTime);
                     }
                 }
                 break;
         }
 
-        if (animation == AnimatePacket.Action.SWING_ARM) {
+        if (action == AnimatePacket.Action.SWING_ARM) {
             handle.player.setNoShieldTicks(NO_SHIELD_DELAY);
         }
 
         packet.eid = handle.getId();
-        packet.action = animation;
+        packet.action = action;
         packet.swingSource = SwingSource.EVENT;
 
         Server.broadcastPacket(handle.player.getViewers().values(), packet);

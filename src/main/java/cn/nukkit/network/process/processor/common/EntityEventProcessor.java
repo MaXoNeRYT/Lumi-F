@@ -11,9 +11,6 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author SocialMoods
- */
 public class EntityEventProcessor extends DataPacketProcessor<EntityEventPacket> {
 
     public static final EntityEventProcessor INSTANCE = new EntityEventProcessor();

@@ -13,9 +13,6 @@ import cn.nukkit.network.protocol.InteractPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author SocialMoods
- */
 public class InteractProcessor extends DataPacketProcessor<InteractPacket> {
 
     public static final InteractProcessor INSTANCE = new InteractProcessor();
@@ -49,7 +46,7 @@ public class InteractProcessor extends DataPacketProcessor<InteractPacket> {
                 if (!handle.isInventoryOpen()) {
                     if (handle.getRiding() instanceof EntityChestBoat && handle.getRiding() == targetEntity) {
                         handle.openInventory((InventoryHolder) targetEntity);
-                    } else if (handle.getProtocol() >= 407) {
+                    } else  {
                         if (handle.player.getInventory().open(handle.player)) {
                             handle.setInventoryOpen(true);
                         }
@@ -60,12 +57,12 @@ public class InteractProcessor extends DataPacketProcessor<InteractPacket> {
                 if (packet.target == 0) return;
 
                 String buttonText = "";
-                if (targetEntity instanceof EntityInteractable) {
-                    buttonText = ((EntityInteractable) targetEntity).getInteractButtonText(handle.player);
+                if (targetEntity instanceof EntityInteractable interactable) {
+                    buttonText = interactable.getInteractButtonText(handle.player);
                     if (buttonText == null) buttonText = "";
                 }
                 handle.setButtonText(buttonText);
-                handle.callEvent(new PlayerMouseOverEntityEvent(handle.player, targetEntity));
+                new PlayerMouseOverEntityEvent(handle.player, targetEntity).call();
             }
             case InteractPacket.ACTION_VEHICLE_EXIT -> {
                 if (!(targetEntity instanceof EntityRideable) || handle.getRiding() != targetEntity) return;
