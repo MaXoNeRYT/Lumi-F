@@ -12,9 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-/**
- * @author SocialMoods
- */
 @Slf4j
 public class SettingsCommandProcessor extends DataPacketProcessor<SettingsCommandPacket> {
 

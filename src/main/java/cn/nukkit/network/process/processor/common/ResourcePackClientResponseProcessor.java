@@ -13,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-/**
- * @author SocialMoods
- */
 public class ResourcePackClientResponseProcessor extends DataPacketProcessor<ResourcePackClientResponsePacket> {
 
     public static final ResourcePackClientResponseProcessor INSTANCE = new ResourcePackClientResponseProcessor();
@@ -26,9 +23,7 @@ public class ResourcePackClientResponseProcessor extends DataPacketProcessor<Res
         Server server = p.getServer();
 
         switch (pk.responseStatus) {
-            case ResourcePackClientResponsePacket.STATUS_REFUSED -> {
-                h.close("", "disconnectionScreen.noReason");
-            }
+            case ResourcePackClientResponsePacket.STATUS_REFUSED -> h.close("", "disconnectionScreen.noReason");
 
             case ResourcePackClientResponsePacket.STATUS_SEND_PACKS -> {
                 if (h.isShouldPack()

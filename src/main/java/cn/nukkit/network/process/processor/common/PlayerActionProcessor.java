@@ -13,60 +13,131 @@ import cn.nukkit.network.protocol.PlayerActionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author SocialMoods
- */
 public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacket> {
 
     public static PlayerActionProcessor INSTANCE = new PlayerActionProcessor();
 
     @Override
     public void handle(@NotNull PlayerHandle handle, @NotNull PlayerActionPacket packet) {
-        if (!handle.isSpawned() || (!handle.isAlive() && packet.action != PlayerActionPacket.ACTION_RESPAWN)) return;
+        if (!handle.isSpawned() || (!handle.isAlive() && packet.action != PlayerActionPacket.ACTION_RESPAWN)) {
+            return;
+        }
 
         Vector3 pos = new Vector3(packet.x, packet.y, packet.z);
         BlockFace face = BlockFace.fromIndex(packet.face);
 
         switch (packet.action) {
             case PlayerActionPacket.ACTION_START_BREAK -> {
-                if (!handle.isServerAuthoritativeBlockBreaking()) handle.onBlockBreakStart(pos, face);
+                if (!handle.isServerAuthoritativeBlockBreaking()) {
+                    handle.onBlockBreakStart(pos, face);
+                }
             }
+
             case PlayerActionPacket.ACTION_ABORT_BREAK, PlayerActionPacket.ACTION_STOP_BREAK -> {
-                if (!handle.isServerAuthoritativeBlockBreaking()) handle.onBlockBreakAbort(pos, face);
+                if (!handle.isServerAuthoritativeBlockBreaking()) {
+                    handle.onBlockBreakAbort(pos, face);
+                }
             }
-            case PlayerActionPacket.ACTION_STOP_SLEEPING -> handle.stopSleep();
+
+            case PlayerActionPacket.ACTION_STOP_SLEEPING -> {
+                handle.stopSleep();
+            }
+
             case PlayerActionPacket.ACTION_RESPAWN -> {
-                if (!handle.isSpawned() || handle.isAlive() || !handle.isOnline()) return;
+                if (!handle.isSpawned() || handle.isAlive() || !handle.isOnline()) {
+                    return;
+                }
                 handle.respawn();
             }
+
             case PlayerActionPacket.ACTION_JUMP -> {
-                if (handle.isMovementServerAuthoritative() || handle.isLockMovementInput()) return;
-                if (handle.getInAirTicks() > 40 && handle.isCheckMovement() && !handle.checkFlightAllowed() && !handle.isCreative() && !handle.isSwimming() && !handle.isGliding()) {
-                    handle.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_JUMP, inAirTicks=" + handle.getInAirTicks());
+                if (handle.isMovementServerAuthoritative() || handle.isLockMovementInput()) {
+                    return;
+                }
+
+                if (handle.getInAirTicks() > 40
+                        && handle.isCheckMovement()
+                        && !handle.checkFlightAllowed()
+                        && !handle.isCreative()
+                        && !handle.isSwimming()
+                        && !handle.isGliding()) {
+
+                    handle.kick(
+                            PlayerKickEvent.Reason.FLYING_DISABLED,
+                            "Flying is not enabled on this server",
+                            true,
+                            "type=ACTION_JUMP, inAirTicks=" + handle.getInAirTicks()
+                    );
                     return;
                 }
                 new PlayerJumpEvent(handle.player).call();
             }
-            case PlayerActionPacket.ACTION_START_SPRINT -> toggleSprint(handle, true);
-            case PlayerActionPacket.ACTION_STOP_SPRINT -> toggleSprint(handle, false);
-            case PlayerActionPacket.ACTION_START_SNEAK -> toggleSneak(handle, true);
-            case PlayerActionPacket.ACTION_STOP_SNEAK -> toggleSneak(handle, false);
-            case PlayerActionPacket.ACTION_CONTINUE_BREAK -> {
-                if (!handle.isServerAuthoritativeBlockBreaking()) handle.onBlockBreakContinue(pos, face);
+
+            case PlayerActionPacket.ACTION_START_SPRINT -> {
+                toggleSprint(handle, true);
             }
-            case PlayerActionPacket.ACTION_START_SWIMMING -> toggleSwim(handle, true);
-            case PlayerActionPacket.ACTION_STOP_SWIMMING -> toggleSwim(handle, false);
-            case PlayerActionPacket.ACTION_START_GLIDE -> toggleGlide(handle, true);
-            case PlayerActionPacket.ACTION_STOP_GLIDE -> toggleGlide(handle, false);
-            case PlayerActionPacket.ACTION_START_CRAWLING -> toggleCrawl(handle, true);
-            case PlayerActionPacket.ACTION_STOP_CRAWLING -> toggleCrawl(handle, false);
-            case PlayerActionPacket.ACTION_START_FLYING -> toggleFlight(handle, true);
-            case PlayerActionPacket.ACTION_STOP_FLYING -> toggleFlight(handle, false);
+
+            case PlayerActionPacket.ACTION_STOP_SPRINT -> {
+                toggleSprint(handle, false);
+            }
+
+            case PlayerActionPacket.ACTION_START_SNEAK -> {
+                toggleSneak(handle, true);
+            }
+
+            case PlayerActionPacket.ACTION_STOP_SNEAK -> {
+                toggleSneak(handle, false);
+            }
+
+            case PlayerActionPacket.ACTION_CONTINUE_BREAK -> {
+                if (!handle.isServerAuthoritativeBlockBreaking()) {
+                    handle.onBlockBreakContinue(pos, face);
+                }
+            }
+
+            case PlayerActionPacket.ACTION_START_SWIMMING -> {
+                toggleSwim(handle, true);
+            }
+
+            case PlayerActionPacket.ACTION_STOP_SWIMMING -> {
+                toggleSwim(handle, false);
+            }
+
+            case PlayerActionPacket.ACTION_START_GLIDE -> {
+                toggleGlide(handle, true);
+            }
+
+            case PlayerActionPacket.ACTION_STOP_GLIDE -> {
+                toggleGlide(handle, false);
+            }
+
+            case PlayerActionPacket.ACTION_START_CRAWLING -> {
+                toggleCrawl(handle, true);
+            }
+
+            case PlayerActionPacket.ACTION_STOP_CRAWLING -> {
+                toggleCrawl(handle, false);
+            }
+
+            case PlayerActionPacket.ACTION_START_FLYING -> {
+                toggleFlight(handle, true);
+            }
+
+            case PlayerActionPacket.ACTION_STOP_FLYING -> {
+                toggleFlight(handle, false);
+            }
+
             case PlayerActionPacket.ACTION_MISSED_SWING -> {
-                if (handle.isMovementServerAuthoritative() || handle.getProtocol() < ProtocolInfo.v1_20_10_21) return;
+                if (handle.isMovementServerAuthoritative() || handle.getProtocol() < ProtocolInfo.v1_20_10_21) {
+                    return;
+                }
+
                 PlayerMissedSwingEvent evt = new PlayerMissedSwingEvent(handle.player);
                 Server.getInstance().getPluginManager().callEvent(evt);
-                if (!evt.isCancelled()) handle.player.level.addSound(handle.player, Sound.GAME_PLAYER_ATTACK_NODAMAGE);
+
+                if (!evt.isCancelled()) {
+                    handle.player.level.addSound(handle.player, Sound.GAME_PLAYER_ATTACK_NODAMAGE);
+                }
             }
         }
 
@@ -76,24 +147,37 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     private void toggleSprint(PlayerHandle handle, boolean value) {
         PlayerToggleSprintEvent evt = new PlayerToggleSprintEvent(handle.player, value);
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) handle.setNeedSendData(true);
-        else handle.setSprinting(value);
+        if (evt.isCancelled()) {
+            handle.setNeedSendData(true);
+        } else {
+            handle.setSprinting(value);
+        }
     }
 
     private void toggleSneak(PlayerHandle handle, boolean value) {
         PlayerToggleSneakEvent evt = new PlayerToggleSneakEvent(handle.player, value);
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) handle.setNeedSendData(true);
-        else handle.setSneaking(value);
+        if (evt.isCancelled()) {
+            handle.setNeedSendData(true);
+        } else {
+            handle.setSneaking(value);
+        }
     }
 
     private void toggleSwim(PlayerHandle handle, boolean value) {
         PlayerToggleSwimEvent evt = new PlayerToggleSwimEvent(handle.player, value);
-        if (value && !handle.isInsideOfWater()) evt.setCancelled(true);
-        if (!value && handle.hasRidingOrSleeping()) evt.setCancelled(true);
+        if (value && !handle.isInsideOfWater()) {
+            evt.setCancelled(true);
+        }
+        if (!value && handle.hasRidingOrSleeping()) {
+            evt.setCancelled(true);
+        }
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) handle.setNeedSendData(true);
-        else handle.setSwimming(value);
+        if (evt.isCancelled()) {
+            handle.setNeedSendData(true);
+        } else {
+            handle.setSwimming(value);
+        }
     }
 
     private void toggleGlide(PlayerHandle handle, boolean value) {
@@ -103,22 +187,31 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
             evt.setCancelled(true);
         }
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) handle.setNeedSendData(true);
-        else handle.setGliding(value);
+        if (evt.isCancelled()) {
+            handle.setNeedSendData(true);
+        } else {
+            handle.setGliding(value);
+        }
     }
 
     private void toggleCrawl(PlayerHandle handle, boolean value) {
         PlayerToggleCrawlEvent evt = new PlayerToggleCrawlEvent(handle.player, value);
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) handle.setNeedSendData(true);
-        else handle.setCrawling(value);
+        if (evt.isCancelled()) {
+            handle.setNeedSendData(true);
+        } else {
+            handle.setCrawling(value);
+        }
     }
 
     private void toggleFlight(PlayerHandle handle, boolean value) {
         PlayerToggleFlightEvent evt = new PlayerToggleFlightEvent(handle.player, value);
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) handle.setNeedSendAdventureSettings(true);
-        else handle.player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, value);
+        if (evt.isCancelled()) {
+            handle.setNeedSendAdventureSettings(true);
+        } else {
+            handle.player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, value);
+        }
     }
 
     @Override

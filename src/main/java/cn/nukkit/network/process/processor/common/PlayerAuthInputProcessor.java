@@ -24,9 +24,6 @@ import cn.nukkit.network.protocol.types.PlayerActionType;
 import cn.nukkit.network.protocol.types.PlayerBlockActionData;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author SocialMoods
- */
 public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInputPacket> {
 
     public static final PlayerAuthInputProcessor INSTANCE = new PlayerAuthInputProcessor();

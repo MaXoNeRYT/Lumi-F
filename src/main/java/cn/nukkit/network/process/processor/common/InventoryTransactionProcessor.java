@@ -21,7 +21,6 @@ import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
 import cn.nukkit.item.*;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.GameRule;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.BlockFace;

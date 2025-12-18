@@ -443,45 +443,107 @@ public final class PlayerHandle {
         return player.windowIndex;
     }
 
-    public BlockVector3 getLastRightClickPos() { return player.lastRightClickPos; }
-    public void setLastRightClickPos(BlockVector3 pos) { player.lastRightClickPos = pos; }
+    public BlockVector3 getLastRightClickPos() {
+        return player.lastRightClickPos;
+    }
 
-    public double getLastRightClickTime() { return player.lastRightClickTime; }
-    public void setLastRightClickTime(long time) { player.lastRightClickTime = time; }
+    public void setLastRightClickPos(BlockVector3 pos) {
+        player.lastRightClickPos = pos;
+    }
 
-    public CraftingTransaction getCraftingTransaction() { return player.craftingTransaction; }
-    public void setCraftingTransaction(CraftingTransaction transaction) { player.craftingTransaction = transaction; }
+    public double getLastRightClickTime() {
+        return player.lastRightClickTime;
+    }
 
-    public EnchantTransaction getEnchantTransaction() { return player.enchantTransaction; }
-    public void setEnchantTransaction(EnchantTransaction transaction) { player.enchantTransaction = transaction; }
+    public void setLastRightClickTime(long time) {
+        player.lastRightClickTime = time;
+    }
 
-    public RepairItemTransaction getRepairItemTransaction() { return player.repairItemTransaction; }
-    public void setRepairItemTransaction(RepairItemTransaction transaction) { player.repairItemTransaction = transaction; }
+    public CraftingTransaction getCraftingTransaction() {
+        return player.craftingTransaction;
+    }
 
-    public SmithingTransaction getSmithingTransaction() { return player.smithingTransaction; }
-    public void setSmithingTransaction(SmithingTransaction transaction) { player.smithingTransaction = transaction; }
+    public void setCraftingTransaction(CraftingTransaction transaction) {
+        player.craftingTransaction = transaction;
+    }
 
-    public GrindstoneTransaction getGrindstoneTransaction() { return player.grindstoneTransaction; }
-    public void setGrindstoneTransaction(GrindstoneTransaction transaction) { player.grindstoneTransaction = transaction; }
+    public EnchantTransaction getEnchantTransaction() {
+        return player.enchantTransaction;
+    }
 
-    public TradingTransaction getTradingTransaction() { return player.tradingTransaction; }
-    public void setTradingTransaction(TradingTransaction transaction) { player.tradingTransaction = transaction; }
+    public void setEnchantTransaction(EnchantTransaction transaction) {
+        player.enchantTransaction = transaction;
+    }
 
-    public LoomTransaction getLoomTransaction() { return player.loomTransaction; }
-    public void setLoomTransaction(LoomTransaction transaction) { player.loomTransaction = transaction; }
+    public RepairItemTransaction getRepairItemTransaction() {
+        return player.repairItemTransaction;
+    }
 
-    public int getFailedTransactions() { return player.failedTransactions; }
-    public void incrementFailedTransactions() { player.failedTransactions++; }
+    public void setRepairItemTransaction(RepairItemTransaction transaction) {
+        player.repairItemTransaction = transaction;
+    }
 
-    public int getStartAction() { return player.startAction; }
+    public SmithingTransaction getSmithingTransaction() {
+        return player.smithingTransaction;
+    }
 
-    public void setBreakingBlock(Block block) { player.breakingBlock = block; }
+    public void setSmithingTransaction(SmithingTransaction transaction) {
+        player.smithingTransaction = transaction;
+    }
 
-    public Vector3 getSleeping() { return player.sleeping; }
+    public GrindstoneTransaction getGrindstoneTransaction() {
+        return player.grindstoneTransaction;
+    }
 
-    public boolean isInventoryOpen() { return player.inventoryOpen; }
+    public void setGrindstoneTransaction(GrindstoneTransaction transaction) {
+        player.grindstoneTransaction = transaction;
+    }
 
-    public void setNeedSendHeldItem(boolean need) { player.needSendHeldItem = need; }
+    public TradingTransaction getTradingTransaction() {
+        return player.tradingTransaction;
+    }
 
-    public void setInventoryOpen(boolean open) { player.inventoryOpen = open; }
+    public void setTradingTransaction(TradingTransaction transaction) {
+        player.tradingTransaction = transaction;
+    }
+
+    public LoomTransaction getLoomTransaction() {
+        return player.loomTransaction;
+    }
+
+    public void setLoomTransaction(LoomTransaction transaction) {
+        player.loomTransaction = transaction;
+    }
+
+    public int getFailedTransactions() {
+        return player.failedTransactions;
+    }
+
+    public void incrementFailedTransactions() {
+        player.failedTransactions++;
+    }
+
+    public int getStartAction() {
+        return player.startAction;
+    }
+
+    public void setBreakingBlock(Block block) {
+        player.breakingBlock = block;
+    }
+
+    public Vector3 getSleeping() {
+        return player.sleeping;
+    }
+
+    public boolean isInventoryOpen() {
+        return player.inventoryOpen;
+    }
+
+    public void setNeedSendHeldItem(boolean need) {
+        player.needSendHeldItem = need;
+    }
+
+    public void setInventoryOpen(boolean open) {
+        player.inventoryOpen = open;
+    }
 }

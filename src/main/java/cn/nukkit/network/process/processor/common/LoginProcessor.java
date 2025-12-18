@@ -27,9 +27,6 @@ import java.util.regex.Matcher;
 import static cn.nukkit.Player.PLAYER_NAME_PATTERN;
 import static cn.nukkit.entity.Entity.DATA_NAMETAG;
 
-/**
- * @author SocialMoods
- */
 public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
 
     public static final LoginProcessor INSTANCE = new LoginProcessor();

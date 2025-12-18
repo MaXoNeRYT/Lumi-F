@@ -9,9 +9,6 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.Server;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author SocialMoods
- */
 public class MovePlayerProcessor extends DataPacketProcessor<MovePlayerPacket> {
 
     public static final MovePlayerProcessor INSTANCE = new MovePlayerProcessor();
