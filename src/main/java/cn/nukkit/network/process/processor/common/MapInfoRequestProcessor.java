@@ -27,19 +27,19 @@ public class MapInfoRequestProcessor extends DataPacketProcessor<MapInfoRequestP
     public static final MapInfoRequestProcessor INSTANCE = new MapInfoRequestProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull MapInfoRequestPacket pk) {
-        Player player = playerHandle.player;
+    public void handle(@NotNull PlayerHandle handle, @NotNull MapInfoRequestPacket packet) {
+        Player player = handle.player;
         ItemMap mapItem = null;
 
         for (Item item1 : player.getOffhandInventory().getContents().values()) {
-            if (item1 instanceof ItemMap map && map.getMapId() == pk.mapId) {
+            if (item1 instanceof ItemMap map && map.getMapId() == packet.mapId) {
                 mapItem = map;
             }
         }
 
         if (mapItem == null) {
             for (Item item1 : player.getInventory().getContents().values()) {
-                if (item1 instanceof ItemMap map && map.getMapId() == pk.mapId) {
+                if (item1 instanceof ItemMap map && map.getMapId() == packet.mapId) {
                     mapItem = map;
                 }
             }
@@ -49,17 +49,14 @@ public class MapInfoRequestProcessor extends DataPacketProcessor<MapInfoRequestP
             for (BlockEntity be : player.level.getBlockEntities().values()) {
                 if (be instanceof BlockEntityItemFrame itemFrame1) {
 
-                    if (itemFrame1.getItem() instanceof ItemMap && ((ItemMap) itemFrame1.getItem()).getMapId() == pk.mapId) {
+                    if (itemFrame1.getItem() instanceof ItemMap && ((ItemMap) itemFrame1.getItem()).getMapId() == packet.mapId) {
                         ((ItemMap) itemFrame1.getItem()).sendImage(player);
                         break;
                     }
                 }
             }
         } else {
-            PlayerMapInfoRequestEvent event;
-            player.getServer().getPluginManager().callEvent(event = new PlayerMapInfoRequestEvent(player, mapItem));
-
-            if (!event.isCancelled()) {
+            if (new PlayerMapInfoRequestEvent(player, mapItem).call()) {
                 if (mapItem.trySendImage(player)) {
                     return;
                 }

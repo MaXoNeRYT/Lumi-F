@@ -24,13 +24,12 @@ public class ServerSettingsRequestProcessor extends DataPacketProcessor<ServerSe
     public static final ServerSettingsRequestProcessor INSTANCE = new ServerSettingsRequestProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull ServerSettingsRequestPacket pk) {
-        Player player = playerHandle.player;
-        PlayerServerSettingsRequestEvent settingsRequestEvent = new PlayerServerSettingsRequestEvent(player, new HashMap<>(player.getServerSettings()));
-        player.getServer().getPluginManager().callEvent(settingsRequestEvent);
+    public void handle(@NotNull PlayerHandle handle, @NotNull ServerSettingsRequestPacket packet) {
+        Player player = handle.player;
+        PlayerServerSettingsRequestEvent event = new PlayerServerSettingsRequestEvent(player, new HashMap<>(player.getServerSettings()));
 
-        if (!settingsRequestEvent.isCancelled()) {
-            settingsRequestEvent.getSettings().forEach((id, window) -> {
+        if (event.call()) {
+            event.getSettings().forEach((id, window) -> {
                 ServerSettingsResponsePacket re = new ServerSettingsResponsePacket();
                 re.formId = id;
                 re.data = window.getJSONData(player.protocol);
