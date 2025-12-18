@@ -43,7 +43,7 @@ public class RequestAbilityProcessor extends DataPacketProcessor<RequestAbilityP
             playerToggleFlightEvent.setCancelled();
         }
 
-        if (playerToggleFlightEvent.call()) {
+        if (!playerToggleFlightEvent.call()) {
             player.getAdventureSettings().update();
         } else {
             player.getAdventureSettings().set(AdventureSettings.Type.FLYING, playerToggleFlightEvent.isFlying());

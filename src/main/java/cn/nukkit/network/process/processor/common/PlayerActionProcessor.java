@@ -203,7 +203,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
 
     private void toggleFlight(PlayerHandle handle, boolean value) {
         PlayerToggleFlightEvent evt = new PlayerToggleFlightEvent(handle.player, value);
-        if (evt.call()) {
+        if (!evt.call()) {
             handle.setNeedSendAdventureSettings(true);
         } else {
             handle.player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, value);

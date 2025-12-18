@@ -536,7 +536,7 @@ public class InventoryTransactionProcessor extends DataPacketProcessor<Inventory
 
                         PlayerInteractEvent interactEvent = new PlayerInteractEvent(player, item, directionVector, face, PlayerInteractEvent.Action.RIGHT_CLICK_AIR);
 
-                        if (interactEvent.call()) {
+                        if (!interactEvent.call()) {
                             playerHandle.setNeedSendHeldItem(true);
                             return;
                         }
@@ -600,7 +600,7 @@ public class InventoryTransactionProcessor extends DataPacketProcessor<Inventory
                         PlayerInteractEntityEvent playerInteractEntityEvent = new PlayerInteractEntityEvent(player, targetEntity, item, useItemOnEntityData.clickPos);
                         if (player.isSpectator()) playerInteractEntityEvent.setCancelled();
 
-                        if (playerInteractEntityEvent.call()) {
+                        if (!playerInteractEntityEvent.call()) {
                             break;
                         }
 

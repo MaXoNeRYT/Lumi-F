@@ -174,7 +174,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                 e.setCancelled(true);
             }
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setSprinting(true);
@@ -192,7 +192,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
 
             server.getPluginManager().callEvent(e);
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setSprinting(false);
@@ -203,7 +203,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
             PlayerToggleSneakEvent e = new PlayerToggleSneakEvent(p, true);
             server.getPluginManager().callEvent(e);
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setSneaking(true);
@@ -213,7 +213,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
         if (authPacket.getInputData().contains(AuthInputAction.STOP_SNEAKING)) {
             PlayerToggleSneakEvent e = new PlayerToggleSneakEvent(p, false);
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setSneaking(false);
@@ -245,7 +245,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                 e.setCancelled(true);
             }
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setGliding(true);
@@ -255,7 +255,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
         if (authPacket.getInputData().contains(AuthInputAction.STOP_GLIDING)) {
             PlayerToggleGlideEvent e = new PlayerToggleGlideEvent(p, false);
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setGliding(false);
@@ -269,7 +269,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                 e.setCancelled(true);
             }
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setSwimming(true);
@@ -279,7 +279,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
         if (authPacket.getInputData().contains(AuthInputAction.STOP_SWIMMING)) {
             PlayerToggleSwimEvent e = new PlayerToggleSwimEvent(p, false);
 
-            if (e.call()) {
+            if (!e.call()) {
                 h.setNeedSendData(true);
             } else {
                 p.setSwimming(false);
@@ -319,7 +319,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                             }
                         }
 
-                        if (e.call()) {
+                        if (!e.call()) {
                             h.setNeedSendData(true);
                         } else {
                             h.onSpinAttack(riptide.getLevel());
@@ -345,7 +345,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                     PlayerToggleSpinAttackEvent e =
                             new PlayerToggleSpinAttackEvent(p, false);
 
-                    if (e.call()) {
+                    if (!e.call()) {
                         h.setNeedSendData(true);
                     } else {
                         p.setSpinAttack(false);
@@ -370,7 +370,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                     e.setCancelled();
                 }
 
-                if (e.call()) {
+                if (!e.call()) {
                     h.setNeedSendAdventureSettings(true);
                 } else {
                     p.getAdventureSettings().set(AdventureSettings.Type.FLYING, e.isFlying());
@@ -385,7 +385,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                     e.setCancelled();
                 }
 
-                if (e.call()) {
+                if (!e.call()) {
                     h.setNeedSendAdventureSettings(true);
                 } else {
                     p.getAdventureSettings().set(AdventureSettings.Type.FLYING, e.isFlying());
@@ -405,7 +405,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                     e.setCancelled(true);
                 }
 
-                if (e.call()) {
+                if (!e.call()) {
                     h.setNeedSendData(true);
                 } else {
                     p.setCrawling(true);
@@ -416,7 +416,7 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                 PlayerToggleCrawlEvent e =
                         new PlayerToggleCrawlEvent(p, false);
 
-                if (e.call()) {
+                if (!e.call()) {
                     h.setNeedSendData(true);
                 } else {
                     p.setCrawling(false);

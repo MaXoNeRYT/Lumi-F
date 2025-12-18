@@ -40,7 +40,7 @@ public class PlayerSkinProcessor extends DataPacketProcessor<PlayerSkinPacket> {
             playerChangeSkinEvent.setCancelled(true);
             Server.getInstance().getLogger().warning("Player " + playerHandle.getUsername() + " change skin too quick!");
         }
-        if (!playerChangeSkinEvent.call()) {
+        if (playerChangeSkinEvent.call()) {
             boolean personaSkins = Server.getInstance().getSettings().player().personaSkins();
             player.lastSkinChange = System.currentTimeMillis();
             player.setSkin(skin.isPersona() && !personaSkins ? Skin.NO_PERSONA_SKIN : skin);
