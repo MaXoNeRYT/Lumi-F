@@ -34,5 +34,4 @@ public class ScriptDebugShape {
     Float arrowHeadRadius;
     @Nullable
     Integer segments;
-
 }
