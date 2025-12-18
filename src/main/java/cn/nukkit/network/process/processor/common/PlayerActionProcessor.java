@@ -2,6 +2,7 @@ package cn.nukkit.network.process.processor.common;
 
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.PlayerHandle;
+import cn.nukkit.Server;
 import cn.nukkit.event.player.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Sound;
@@ -44,7 +45,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
                     handle.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_JUMP, inAirTicks=" + handle.getInAirTicks());
                     return;
                 }
-                handle.callEvent(new PlayerJumpEvent(handle.player));
+                new PlayerJumpEvent(handle.player).call();
             }
             case PlayerActionPacket.ACTION_START_SPRINT -> toggleSprint(handle, true);
             case PlayerActionPacket.ACTION_STOP_SPRINT -> toggleSprint(handle, false);
@@ -62,9 +63,9 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
             case PlayerActionPacket.ACTION_START_FLYING -> toggleFlight(handle, true);
             case PlayerActionPacket.ACTION_STOP_FLYING -> toggleFlight(handle, false);
             case PlayerActionPacket.ACTION_MISSED_SWING -> {
-                if (handle.isMovementServerAuthoritative() || handle.getProtocol() < 0x1_20_10_21) return;
+                if (handle.isMovementServerAuthoritative() || handle.getProtocol() < ProtocolInfo.v1_20_10_21) return;
                 PlayerMissedSwingEvent evt = new PlayerMissedSwingEvent(handle.player);
-                handle.callEvent(evt);
+                Server.getInstance().getPluginManager().callEvent(evt);
                 if (!evt.isCancelled()) handle.player.level.addSound(handle.player, Sound.GAME_PLAYER_ATTACK_NODAMAGE);
             }
         }
@@ -74,14 +75,14 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
 
     private void toggleSprint(PlayerHandle handle, boolean value) {
         PlayerToggleSprintEvent evt = new PlayerToggleSprintEvent(handle.player, value);
-        handle.callEvent(evt);
+        Server.getInstance().getPluginManager().callEvent(evt);
         if (evt.isCancelled()) handle.setNeedSendData(true);
         else handle.setSprinting(value);
     }
 
     private void toggleSneak(PlayerHandle handle, boolean value) {
         PlayerToggleSneakEvent evt = new PlayerToggleSneakEvent(handle.player, value);
-        handle.callEvent(evt);
+        Server.getInstance().getPluginManager().callEvent(evt);
         if (evt.isCancelled()) handle.setNeedSendData(true);
         else handle.setSneaking(value);
     }
@@ -90,7 +91,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
         PlayerToggleSwimEvent evt = new PlayerToggleSwimEvent(handle.player, value);
         if (value && !handle.isInsideOfWater()) evt.setCancelled(true);
         if (!value && handle.hasRidingOrSleeping()) evt.setCancelled(true);
-        handle.callEvent(evt);
+        Server.getInstance().getPluginManager().callEvent(evt);
         if (evt.isCancelled()) handle.setNeedSendData(true);
         else handle.setSwimming(value);
     }
@@ -101,21 +102,21 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
         if (handle.hasRidingOrSleeping() || (value && (chestplate == null || chestplate.getId() != 0xEL))) {
             evt.setCancelled(true);
         }
-        handle.callEvent(evt);
+        Server.getInstance().getPluginManager().callEvent(evt);
         if (evt.isCancelled()) handle.setNeedSendData(true);
         else handle.setGliding(value);
     }
 
     private void toggleCrawl(PlayerHandle handle, boolean value) {
         PlayerToggleCrawlEvent evt = new PlayerToggleCrawlEvent(handle.player, value);
-        handle.callEvent(evt);
+        Server.getInstance().getPluginManager().callEvent(evt);
         if (evt.isCancelled()) handle.setNeedSendData(true);
         else handle.setCrawling(value);
     }
 
     private void toggleFlight(PlayerHandle handle, boolean value) {
         PlayerToggleFlightEvent evt = new PlayerToggleFlightEvent(handle.player, value);
-        handle.callEvent(evt);
+        Server.getInstance().getPluginManager().callEvent(evt);
         if (evt.isCancelled()) handle.setNeedSendAdventureSettings(true);
         else handle.player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, value);
     }

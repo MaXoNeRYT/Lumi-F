@@ -199,7 +199,8 @@ public final class DataPacketManager {
                 EntityEventProcessor.INSTANCE,
                 ContainerCloseProcessor.INSTANCE,
                 BlockEntityDataProcessor.INSTANCE,
-                SettingsCommandProcessor.INSTANCE
+                SettingsCommandProcessor.INSTANCE,
+                InventoryTransactionProcessor.INSTANCE
         );
     }
 }
