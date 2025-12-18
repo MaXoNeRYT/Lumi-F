@@ -145,9 +145,8 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     }
 
     private void toggleSprint(PlayerHandle handle, boolean value) {
-        PlayerToggleSprintEvent evt = new PlayerToggleSprintEvent(handle.player, value);
-        Server.getInstance().getPluginManager().callEvent(evt);
-        if (!evt.isCancelled()) {
+        PlayerToggleSprintEvent event = new PlayerToggleSprintEvent(handle.player, value);
+        if (!event.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setSprinting(value);
@@ -155,10 +154,10 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     }
 
     private void toggleSneak(PlayerHandle handle, boolean value) {
-        PlayerToggleSneakEvent evt = new PlayerToggleSneakEvent(handle.player, value);
-        Server.getInstance().getPluginManager().callEvent(evt);
+        PlayerToggleSneakEvent event = new PlayerToggleSneakEvent(handle.player, value);
+        Server.getInstance().getPluginManager().callEvent(event);
 
-        if (!evt.isCancelled()) {
+        if (!event.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setSneaking(value);
@@ -166,17 +165,17 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     }
 
     private void toggleSwim(PlayerHandle handle, boolean value) {
-        PlayerToggleSwimEvent evt = new PlayerToggleSwimEvent(handle.player, value);
+        PlayerToggleSwimEvent event = new PlayerToggleSwimEvent(handle.player, value);
 
         if (value && !handle.isInsideOfWater()) {
-            evt.setCancelled(true);
+            event.setCancelled(true);
         }
 
         if (!value && handle.hasRidingOrSleeping()) {
-            evt.setCancelled(true);
+            event.setCancelled(true);
         }
 
-        if (!evt.call()) {
+        if (!event.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setSwimming(value);
@@ -184,14 +183,14 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     }
 
     private void toggleGlide(PlayerHandle handle, boolean value) {
-        PlayerToggleGlideEvent evt = new PlayerToggleGlideEvent(handle.player, value);
+        PlayerToggleGlideEvent event = new PlayerToggleGlideEvent(handle.player, value);
         Item chestplate = handle.getChestplate();
 
         if (handle.hasRidingOrSleeping() || (value && (chestplate == null || chestplate.getId() != 0xEL))) {
-            evt.setCancelled(true);
+            event.setCancelled(true);
         }
 
-        if (!evt.call()) {
+        if (!event.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setGliding(value);
@@ -199,9 +198,9 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     }
 
     private void toggleCrawl(PlayerHandle handle, boolean value) {
-        PlayerToggleCrawlEvent evt = new PlayerToggleCrawlEvent(handle.player, value);
+        PlayerToggleCrawlEvent event = new PlayerToggleCrawlEvent(handle.player, value);
 
-        if (!evt.call()) {
+        if (!event.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setCrawling(value);
@@ -209,8 +208,8 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     }
 
     private void toggleFlight(PlayerHandle handle, boolean value) {
-        PlayerToggleFlightEvent evt = new PlayerToggleFlightEvent(handle.player, value);
-        if (!evt.call()) {
+        PlayerToggleFlightEvent event = new PlayerToggleFlightEvent(handle.player, value);
+        if (!event.call()) {
             handle.setNeedSendAdventureSettings(true);
         } else {
             handle.player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, value);

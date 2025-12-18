@@ -29,68 +29,68 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
     public static final PlayerAuthInputProcessor INSTANCE = new PlayerAuthInputProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle h, @NotNull PlayerAuthInputPacket authPacket) {
-        Player p = h.player;
-        Server server = p.getServer();
-        Level level = p.getLevel();
-        int protocol = h.getProtocol();
+    public void handle(@NotNull PlayerHandle handle, @NotNull PlayerAuthInputPacket packet) {
+        Player player = handle.player;
+        Server server = player.getServer();
+        Level level = player.getLevel();
+        int protocol = handle.getProtocol();
 
-        if (!h.isMovementServerAuthoritative()) {
+        if (!handle.isMovementServerAuthoritative()) {
             return;
         }
 
-        if (!authPacket.getBlockActionData().isEmpty()) {
-            for (PlayerBlockActionData action : authPacket.getBlockActionData().values()) {
+        if (!packet.getBlockActionData().isEmpty()) {
+            for (PlayerBlockActionData action : packet.getBlockActionData().values()) {
                 BlockVector3 blockPos = action.getPosition();
                 BlockFace blockFace = BlockFace.fromIndex(action.getFacing());
 
-                if (h.getLastBlockAction() != null
-                        && h.getLastBlockAction().getAction() == PlayerActionType.PREDICT_DESTROY_BLOCK
+                if (handle.getLastBlockAction() != null
+                        && handle.getLastBlockAction().getAction() == PlayerActionType.PREDICT_DESTROY_BLOCK
                         && action.getAction() == PlayerActionType.CONTINUE_DESTROY_BLOCK) {
-                    h.onBlockBreakStart(blockPos.asVector3(), blockFace);
+                    handle.onBlockBreakStart(blockPos.asVector3(), blockFace);
                 }
 
-                BlockVector3 lastBreakPos = h.getLastBlockAction() == null
+                BlockVector3 lastBreakPos = handle.getLastBlockAction() == null
                         ? null
-                        : h.getLastBlockAction().getPosition();
+                        : handle.getLastBlockAction().getPosition();
 
                 if (lastBreakPos != null
                         && (lastBreakPos.getX() != blockPos.getX()
                         || lastBreakPos.getY() != blockPos.getY()
                         || lastBreakPos.getZ() != blockPos.getZ())) {
 
-                    h.onBlockBreakAbort(lastBreakPos.asVector3(), BlockFace.DOWN);
-                    h.onBlockBreakStart(blockPos.asVector3(), blockFace);
+                    handle.onBlockBreakAbort(lastBreakPos.asVector3(), BlockFace.DOWN);
+                    handle.onBlockBreakStart(blockPos.asVector3(), blockFace);
                 }
 
                 switch (action.getAction()) {
                     case START_DESTROY_BLOCK ->
-                            h.onBlockBreakStart(blockPos.asVector3(), blockFace);
+                            handle.onBlockBreakStart(blockPos.asVector3(), blockFace);
                     case ABORT_DESTROY_BLOCK, STOP_DESTROY_BLOCK ->
-                            h.onBlockBreakAbort(blockPos.asVector3(), blockFace);
+                            handle.onBlockBreakAbort(blockPos.asVector3(), blockFace);
                     case CONTINUE_DESTROY_BLOCK ->
-                            h.onBlockBreakContinue(blockPos.asVector3(), blockFace);
+                            handle.onBlockBreakContinue(blockPos.asVector3(), blockFace);
                     case PREDICT_DESTROY_BLOCK -> {
-                        h.onBlockBreakAbort(blockPos.asVector3(), blockFace);
-                        h.onBlockBreakComplete(blockPos, blockFace);
+                        handle.onBlockBreakAbort(blockPos.asVector3(), blockFace);
+                        handle.onBlockBreakComplete(blockPos, blockFace);
                     }
                 }
 
-                h.setLastBlockAction(action);
+                handle.setLastBlockAction(action);
             }
         }
 
         if (protocol >= ProtocolInfo.v1_20_10_21
-                && authPacket.getInputData().contains(AuthInputAction.MISSED_SWING)) {
+                && packet.getInputData().contains(AuthInputAction.MISSED_SWING)) {
 
-            PlayerMissedSwingEvent pmse = new PlayerMissedSwingEvent(p);
-            if (h.player.isSpectator()) {
+            PlayerMissedSwingEvent pmse = new PlayerMissedSwingEvent(player);
+            if (handle.player.isSpectator()) {
                 pmse.setCancelled();
             }
 
-            if (!pmse.call()) {
+            if (pmse.call()) {
                 level.addLevelSoundEvent(
-                        p,
+                        player,
                         LevelSoundEventPacket.SOUND_ATTACK_NODAMAGE,
                         -1,
                         "minecraft:player",
@@ -100,58 +100,58 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
             }
         }
 
-        if (h.isLockMovementInput()) {
+        if (handle.isLockMovementInput()) {
             return;
         }
 
-        if (h.getTeleportPosition() != null) {
+        if (handle.getTeleportPosition() != null) {
             return;
         }
 
         boolean ignoreCoordinateMove = false;
 
-        if (h.getRiding() instanceof EntityMinecartAbstract minecart) {
-            double inputY = authPacket.getMotion().getY();
+        if (handle.getRiding() instanceof EntityMinecartAbstract minecart) {
+            double inputY = packet.getMotion().getY();
             if (inputY >= -1.001 && inputY <= 1.001) {
                 minecart.setCurrentSpeed(inputY);
             }
-        } else if (h.getRiding() instanceof EntityBoat boat) {
+        } else if (handle.getRiding() instanceof EntityBoat boat) {
             if (protocol >= ProtocolInfo.v1_21_130) {
-                if (boat.isControlling(p)) {
-                    if (h.getTemporalVector()
+                if (boat.isControlling(player)) {
+                    if (handle.getTemporalVector()
                             .setComponents(
-                                    authPacket.getPosition().getX(),
-                                    authPacket.getPosition().getY(),
-                                    authPacket.getPosition().getZ())
+                                    packet.getPosition().getX(),
+                                    packet.getPosition().getY(),
+                                    packet.getPosition().getZ())
                             .distanceSquared(boat) < 100) {
 
                         boat.onPlayerInput(
-                                p,
-                                authPacket.getMotion().getX(),
-                                authPacket.getMotion().getY()
+                                player,
+                                packet.getMotion().getX(),
+                                packet.getMotion().getY()
                         );
                         ignoreCoordinateMove = true;
                     }
                 }
             } else {
-                if (authPacket.getInputData()
+                if (packet.getInputData()
                         .contains(AuthInputAction.IN_CLIENT_PREDICTED_IN_VEHICLE)) {
 
-                    if (boat.getId() == authPacket.getPredictedVehicle()
-                            && boat.isControlling(p)) {
+                    if (boat.getId() == packet.getPredictedVehicle()
+                            && boat.isControlling(player)) {
 
-                        if (h.getTemporalVector()
+                        if (handle.getTemporalVector()
                                 .setComponents(
-                                        authPacket.getPosition().getX(),
-                                        authPacket.getPosition().getY(),
-                                        authPacket.getPosition().getZ())
+                                        packet.getPosition().getX(),
+                                        packet.getPosition().getY(),
+                                        packet.getPosition().getZ())
                                 .distanceSquared(boat) < 100) {
 
                             boat.onInput(
-                                    authPacket.getPosition().getX(),
-                                    authPacket.getPosition().getY(),
-                                    authPacket.getPosition().getZ(),
-                                    authPacket.getHeadYaw()
+                                    packet.getPosition().getX(),
+                                    packet.getPosition().getY(),
+                                    packet.getPosition().getZ(),
+                                    packet.getHeadYaw()
                             );
                             ignoreCoordinateMove = true;
                         }
@@ -160,73 +160,70 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
             }
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.START_SPRINTING)) {
-            PlayerToggleSprintEvent e = new PlayerToggleSprintEvent(p, true);
+        if (packet.getInputData().contains(AuthInputAction.START_SPRINTING)) {
+            PlayerToggleSprintEvent e = new PlayerToggleSprintEvent(player, true);
 
-            if ((p.getFoodData().getFood() <= 6
-                    && !p.getAdventureSettings().get(AdventureSettings.Type.FLYING))
-                    || h.getRiding() != null
-                    || h.getSleeping() != null
-                    || p.hasEffect(EffectType.BLINDNESS)
-                    || (p.isSneaking()
-                    && !authPacket.getInputData().contains(AuthInputAction.STOP_SNEAKING))) {
+            if ((player.getFoodData().getFood() <= 6
+                    && !player.getAdventureSettings().get(AdventureSettings.Type.FLYING))
+                    || handle.getRiding() != null
+                    || handle.getSleeping() != null
+                    || player.hasEffect(EffectType.BLINDNESS)
+                    || (player.isSneaking()
+                    && !packet.getInputData().contains(AuthInputAction.STOP_SNEAKING))) {
 
                 e.setCancelled(true);
             }
 
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setSprinting(true);
+                player.setSprinting(true);
             }
 
-            p.setUsingItem(false);
+            player.setUsingItem(false);
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.STOP_SPRINTING)) {
-            PlayerToggleSprintEvent e = new PlayerToggleSprintEvent(p, false);
+        if (packet.getInputData().contains(AuthInputAction.STOP_SPRINTING)) {
+            PlayerToggleSprintEvent e = new PlayerToggleSprintEvent(player, false);
 
-            if (h.getRiding() != null || h.getSleeping() != null) {
+            if (handle.getRiding() != null || handle.getSleeping() != null) {
                 e.setCancelled(true);
             }
 
-            server.getPluginManager().callEvent(e);
-
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setSprinting(false);
+                player.setSprinting(false);
             }
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.START_SNEAKING)) {
-            PlayerToggleSneakEvent e = new PlayerToggleSneakEvent(p, true);
-            server.getPluginManager().callEvent(e);
+        if (packet.getInputData().contains(AuthInputAction.START_SNEAKING)) {
+            PlayerToggleSneakEvent e = new PlayerToggleSneakEvent(player, true);
 
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setSneaking(true);
+                player.setSneaking(true);
             }
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.STOP_SNEAKING)) {
-            PlayerToggleSneakEvent e = new PlayerToggleSneakEvent(p, false);
+        if (packet.getInputData().contains(AuthInputAction.STOP_SNEAKING)) {
+            PlayerToggleSneakEvent e = new PlayerToggleSneakEvent(player, false);
 
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setSneaking(false);
+                player.setSneaking(false);
             }
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.START_JUMPING)) {
-            server.getPluginManager().callEvent(new PlayerJumpEvent(p));
+        if (packet.getInputData().contains(AuthInputAction.START_JUMPING)) {
+            new PlayerJumpEvent(player).call();
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.START_GLIDING)) {
+        if (packet.getInputData().contains(AuthInputAction.START_GLIDING)) {
             boolean withoutElytra = false;
-            Item chestplate = p.getInventory().getChestplateFast();
+            Item chestplate = player.getInventory().getChestplateFast();
 
             if (chestplate == null
                     || chestplate.getId() != ItemID.ELYTRA
@@ -235,77 +232,77 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
             }
 
             if (withoutElytra && !server.getSettings().player().allowFlight()) {
-                p.kick(PlayerKickEvent.Reason.FLYING_DISABLED, Player.MSG_FLYING_NOT_ENABLED, true);
+                player.kick(PlayerKickEvent.Reason.FLYING_DISABLED, Player.MSG_FLYING_NOT_ENABLED, true);
                 return;
             }
 
-            PlayerToggleGlideEvent e = new PlayerToggleGlideEvent(p, true);
+            PlayerToggleGlideEvent e = new PlayerToggleGlideEvent(player, true);
 
-            if (h.getRiding() != null || h.getSleeping() != null || withoutElytra) {
+            if (handle.getRiding() != null || handle.getSleeping() != null || withoutElytra) {
                 e.setCancelled(true);
             }
 
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setGliding(true);
+                player.setGliding(true);
             }
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.STOP_GLIDING)) {
-            PlayerToggleGlideEvent e = new PlayerToggleGlideEvent(p, false);
+        if (packet.getInputData().contains(AuthInputAction.STOP_GLIDING)) {
+            PlayerToggleGlideEvent e = new PlayerToggleGlideEvent(player, false);
 
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setGliding(false);
+                player.setGliding(false);
             }
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.START_SWIMMING)) {
-            PlayerToggleSwimEvent e = new PlayerToggleSwimEvent(p, true);
+        if (packet.getInputData().contains(AuthInputAction.START_SWIMMING)) {
+            PlayerToggleSwimEvent e = new PlayerToggleSwimEvent(player, true);
 
-            if (h.getRiding() != null || h.getSleeping() != null || !p.isInsideOfWater()) {
+            if (handle.getRiding() != null || handle.getSleeping() != null || !player.isInsideOfWater()) {
                 e.setCancelled(true);
             }
 
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setSwimming(true);
+                player.setSwimming(true);
             }
         }
 
-        if (authPacket.getInputData().contains(AuthInputAction.STOP_SWIMMING)) {
-            PlayerToggleSwimEvent e = new PlayerToggleSwimEvent(p, false);
+        if (packet.getInputData().contains(AuthInputAction.STOP_SWIMMING)) {
+            PlayerToggleSwimEvent e = new PlayerToggleSwimEvent(player, false);
 
             if (!e.call()) {
-                h.setNeedSendData(true);
+                handle.setNeedSendData(true);
             } else {
-                p.setSwimming(false);
+                player.setSwimming(false);
             }
         }
 
         if (protocol >= ProtocolInfo.v1_20_30_24) {
             if (protocol >= ProtocolInfo.v1_21_40) {
-                if (authPacket.getInputData().contains(AuthInputAction.START_SPIN_ATTACK)) {
-                    Enchantment riptide = p.getInventory()
+                if (packet.getInputData().contains(AuthInputAction.START_SPIN_ATTACK)) {
+                    Enchantment riptide = player.getInventory()
                             .getItemInHandFast()
                             .getEnchantment(Enchantment.ID_TRIDENT_RIPTIDE);
 
                     if (riptide != null) {
                         PlayerToggleSpinAttackEvent e =
-                                new PlayerToggleSpinAttackEvent(p, true);
+                                new PlayerToggleSpinAttackEvent(player, true);
 
                         if (riptide.getLevel() < 1) {
                             e.setCancelled(true);
                         } else {
                             boolean inWater = false;
 
-                            for (Block block : p.getCollisionBlocks()) {
+                            for (Block block : player.getCollisionBlocks()) {
                                 if (block instanceof BlockWater
                                         || block.level.isBlockWaterloggedAt(
-                                        p.getChunk(),
+                                        player.getChunk(),
                                         (int) block.x,
                                         (int) block.y,
                                         (int) block.z)) {
@@ -314,18 +311,18 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                                 }
                             }
 
-                            if (!(inWater || (p.getLevel().isRaining() && p.canSeeSky()))) {
+                            if (!(inWater || (player.getLevel().isRaining() && player.canSeeSky()))) {
                                 e.setCancelled(true);
                             }
                         }
 
                         if (!e.call()) {
-                            h.setNeedSendData(true);
+                            handle.setNeedSendData(true);
                         } else {
-                            h.onSpinAttack(riptide.getLevel());
-                            p.setSpinAttack(true);
-                            p.setUsingItem(false);
-                            p.resetFallDistance();
+                            handle.onSpinAttack(riptide.getLevel());
+                            player.setSpinAttack(true);
+                            player.setUsingItem(false);
+                            player.resetFallDistance();
 
                             int sound;
                             if (riptide.getLevel() >= 3) {
@@ -336,27 +333,27 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                                 sound = LevelSoundEventPacket.SOUND_ITEM_TRIDENT_RIPTIDE_1;
                             }
 
-                            p.getLevel().addLevelSoundEvent(p, sound);
+                            player.getLevel().addLevelSoundEvent(player, sound);
                         }
                     }
                 }
 
-                if (authPacket.getInputData().contains(AuthInputAction.STOP_SPIN_ATTACK)) {
+                if (packet.getInputData().contains(AuthInputAction.STOP_SPIN_ATTACK)) {
                     PlayerToggleSpinAttackEvent e =
-                            new PlayerToggleSpinAttackEvent(p, false);
+                            new PlayerToggleSpinAttackEvent(player, false);
 
                     if (!e.call()) {
-                        h.setNeedSendData(true);
+                        handle.setNeedSendData(true);
                     } else {
-                        p.setSpinAttack(false);
+                        player.setSpinAttack(false);
                     }
                 }
             }
 
-            if (authPacket.getInputData().contains(AuthInputAction.START_FLYING)) {
+            if (packet.getInputData().contains(AuthInputAction.START_FLYING)) {
                 if (!server.getSettings().player().allowFlight()
-                        && !p.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)) {
-                    p.kick(
+                        && !player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)) {
+                    player.kick(
                             PlayerKickEvent.Reason.FLYING_DISABLED,
                             "Flying is not enabled on this server"
                     );
@@ -364,31 +361,31 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                 }
 
                 PlayerToggleFlightEvent e =
-                        new PlayerToggleFlightEvent(p, true);
+                        new PlayerToggleFlightEvent(player, true);
 
-                if (p.isSpectator()) {
+                if (player.isSpectator()) {
                     e.setCancelled();
                 }
 
                 if (!e.call()) {
-                    h.setNeedSendAdventureSettings(true);
+                    handle.setNeedSendAdventureSettings(true);
                 } else {
-                    p.getAdventureSettings().set(AdventureSettings.Type.FLYING, e.isFlying());
+                    player.getAdventureSettings().set(AdventureSettings.Type.FLYING, e.isFlying());
                 }
             }
 
-            if (authPacket.getInputData().contains(AuthInputAction.STOP_FLYING)) {
+            if (packet.getInputData().contains(AuthInputAction.STOP_FLYING)) {
                 PlayerToggleFlightEvent e =
-                        new PlayerToggleFlightEvent(p, false);
+                        new PlayerToggleFlightEvent(player, false);
 
-                if (p.isSpectator()) {
+                if (player.isSpectator()) {
                     e.setCancelled();
                 }
 
                 if (!e.call()) {
-                    h.setNeedSendAdventureSettings(true);
+                    handle.setNeedSendAdventureSettings(true);
                 } else {
-                    p.getAdventureSettings().set(AdventureSettings.Type.FLYING, e.isFlying());
+                    player.getAdventureSettings().set(AdventureSettings.Type.FLYING, e.isFlying());
                 }
             }
         }
@@ -397,64 +394,64 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
                 || (protocol >= ProtocolInfo.v1_20_10_21
                 && server.getSettings().features().enableExperimentMode())) {
 
-            if (authPacket.getInputData().contains(AuthInputAction.START_CRAWLING)) {
+            if (packet.getInputData().contains(AuthInputAction.START_CRAWLING)) {
                 PlayerToggleCrawlEvent e =
-                        new PlayerToggleCrawlEvent(p, true);
+                        new PlayerToggleCrawlEvent(player, true);
 
-                if (h.getRiding() != null || h.getSleeping() != null) {
+                if (handle.getRiding() != null || handle.getSleeping() != null) {
                     e.setCancelled(true);
                 }
 
                 if (!e.call()) {
-                    h.setNeedSendData(true);
+                    handle.setNeedSendData(true);
                 } else {
-                    p.setCrawling(true);
+                    player.setCrawling(true);
                 }
             }
 
-            if (authPacket.getInputData().contains(AuthInputAction.STOP_CRAWLING)) {
+            if (packet.getInputData().contains(AuthInputAction.STOP_CRAWLING)) {
                 PlayerToggleCrawlEvent e =
-                        new PlayerToggleCrawlEvent(p, false);
+                        new PlayerToggleCrawlEvent(player, false);
 
                 if (!e.call()) {
-                    h.setNeedSendData(true);
+                    handle.setNeedSendData(true);
                 } else {
-                    p.setCrawling(false);
+                    player.setCrawling(false);
                 }
             }
         }
 
-        Vector3 clientPosition = authPacket.getPosition()
+        Vector3 clientPosition = packet.getPosition()
                 .subtract(
                         0,
-                        h.getRiding() == null
-                                ? h.getBaseOffset()
-                                : h.getRiding().getMountedOffset(p).getY(),
+                        handle.getRiding() == null
+                                ? handle.getBaseOffset()
+                                : handle.getRiding().getMountedOffset(player).getY(),
                         0
                 ).asVector3();
 
-        double distSqr = clientPosition.distanceSquared(p);
+        double distSqr = clientPosition.distanceSquared(player);
 
         if (distSqr == 0.0
-                && authPacket.getYaw() % 360 == p.yaw
-                && authPacket.getPitch() % 360 == p.pitch) {
+                && packet.getYaw() % 360 == player.yaw
+                && packet.getPitch() % 360 == player.pitch) {
             return;
         }
 
-        if (h.getLastTeleportTick() + 10 > server.getTick()
+        if (handle.getLastTeleportTick() + 10 > server.getTick()
                 && clientPosition.distance(
-                h.getTemporalVector()
-                        .setComponents(h.getLastX(), h.getLastY(), h.getLastZ())
+                handle.getTemporalVector()
+                        .setComponents(handle.getLastX(), handle.getLastY(), handle.getLastZ())
         ) < 5) {
             return;
         }
 
         if (distSqr > 100) {
-            if (h.getLastTeleportTick() + 30 < server.getTick()) {
-                h.sendPosition(
-                        p,
-                        authPacket.getYaw(),
-                        authPacket.getPitch(),
+            if (handle.getLastTeleportTick() + 30 < server.getTick()) {
+                handle.sendPosition(
+                        player,
+                        packet.getYaw(),
+                        packet.getPitch(),
                         MovePlayerPacket.MODE_RESET
                 );
             }
@@ -462,36 +459,36 @@ public class PlayerAuthInputProcessor extends DataPacketProcessor<PlayerAuthInpu
         }
 
         boolean revertMotion = false;
-        if (!p.isAlive() || !h.isSpawned()) {
+        if (!player.isAlive() || !handle.isSpawned()) {
             revertMotion = true;
-            h.setForceMovement(new Vector3(p.x, p.y, p.z));
+            handle.setForceMovement(new Vector3(player.x, player.y, player.z));
         }
 
-        if (h.getForceMovement() != null
-                && (clientPosition.distanceSquared(h.getForceMovement()) > 0.1 || revertMotion)) {
+        if (handle.getForceMovement() != null
+                && (clientPosition.distanceSquared(handle.getForceMovement()) > 0.1 || revertMotion)) {
 
-            h.sendPosition(
-                    h.getForceMovement(),
-                    authPacket.getYaw(),
-                    authPacket.getPitch(),
+            handle.sendPosition(
+                    handle.getForceMovement(),
+                    packet.getYaw(),
+                    packet.getPitch(),
                     MovePlayerPacket.MODE_RESET
             );
         } else {
-            float yaw = authPacket.getYaw() % 360;
-            float headYaw = authPacket.getHeadYaw() % 360;
-            float pitch = authPacket.getPitch() % 360;
+            float yaw = packet.getYaw() % 360;
+            float headYaw = packet.getHeadYaw() % 360;
+            float pitch = packet.getPitch() % 360;
 
             if (yaw < 0) yaw += 360;
             if (headYaw < 0) headYaw += 360;
 
-            h.setRotation(yaw, pitch, headYaw);
+            handle.setRotation(yaw, pitch, headYaw);
 
             if (!ignoreCoordinateMove) {
-                h.setNewPosition(clientPosition);
-                h.offerClientMovement(clientPosition);
+                handle.setNewPosition(clientPosition);
+                handle.offerClientMovement(clientPosition);
             }
 
-            h.setForceMovement(null);
+            handle.setForceMovement(null);
         }
     }
 

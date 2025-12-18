@@ -18,33 +18,33 @@ public class ResourcePackClientResponseProcessor extends DataPacketProcessor<Res
     public static final ResourcePackClientResponseProcessor INSTANCE = new ResourcePackClientResponseProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle h, @NotNull ResourcePackClientResponsePacket pk) {
-        Player p = h.player;
+    public void handle(@NotNull PlayerHandle handle, @NotNull ResourcePackClientResponsePacket packet) {
+        Player p = handle.player;
         Server server = p.getServer();
 
-        switch (pk.responseStatus) {
-            case ResourcePackClientResponsePacket.STATUS_REFUSED -> h.close("", "disconnectionScreen.noReason");
+        switch (packet.responseStatus) {
+            case ResourcePackClientResponsePacket.STATUS_REFUSED -> handle.close("", "disconnectionScreen.noReason");
 
             case ResourcePackClientResponsePacket.STATUS_SEND_PACKS -> {
-                if (h.isShouldPack()
-                        || pk.packEntries.length >
+                if (handle.isShouldPack()
+                        || packet.packEntries.length >
                         server.getResourcePackManager()
                                 .getResourceStack().length) {
-                    h.close("", "disconnectionScreen.resourcePack");
+                    handle.close("", "disconnectionScreen.resourcePack");
                     return;
                 }
 
-                h.setShouldPack(true);
+                handle.setShouldPack(true);
 
                 Set<String> uniqueIds = new LinkedHashSet<>();
-                for (ResourcePackClientResponsePacket.Entry entry : pk.packEntries) {
+                for (ResourcePackClientResponsePacket.Entry entry : packet.packEntries) {
                     ResourcePack pack =
                             server.getResourcePackManager()
                                     .getPackById(entry.uuid);
 
                     if (pack == null
                             || !uniqueIds.add(entry.uuid.toString())) {
-                        h.close("", "disconnectionScreen.resourcePack");
+                        handle.close("", "disconnectionScreen.resourcePack");
                         return;
                     }
 
@@ -62,16 +62,16 @@ public class ResourcePackClientResponseProcessor extends DataPacketProcessor<Res
                 stack.resourcePackStack =
                         server.getResourcePackManager().getResourceStack();
 
-                stack.experiments.addAll(h.getExperiments());
+                stack.experiments.addAll(handle.getExperiments());
 
                 p.dataPacket(stack);
             }
 
             case ResourcePackClientResponsePacket.STATUS_COMPLETED -> {
-                h.setShouldLogin(true);
+                handle.setShouldLogin(true);
 
-                if (h.getPreLoginEventTask().isFinished()) {
-                    h.getPreLoginEventTask().onCompletion(server);
+                if (handle.getPreLoginEventTask().isFinished()) {
+                    handle.getPreLoginEventTask().onCompletion(server);
                 }
             }
         }

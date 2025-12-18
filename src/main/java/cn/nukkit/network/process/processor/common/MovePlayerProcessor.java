@@ -14,55 +14,55 @@ public class MovePlayerProcessor extends DataPacketProcessor<MovePlayerPacket> {
     public static final MovePlayerProcessor INSTANCE = new MovePlayerProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle h, @NotNull MovePlayerPacket pk) {
-        Player p = h.player;
-        Server server = p.getServer();
+    public void handle(@NotNull PlayerHandle handle, @NotNull MovePlayerPacket packet) {
+        Player player = handle.player;
+        Server server = player.getServer();
 
-        int protocol = h.getProtocol();
+        int protocol = handle.getProtocol();
         if (protocol > ProtocolInfo.v1_21_90) {
-            h.close("", "Client sent invalid packet");
+            handle.close("", "Client sent invalid packet");
             return;
         }
 
-        if (h.getTeleportPosition() != null
-                || !h.isSpawned()
-                || h.isMovementServerAuthoritative()
-                || h.isLockMovementInput()) {
+        if (handle.getTeleportPosition() != null
+                || !handle.isSpawned()
+                || handle.isMovementServerAuthoritative()
+                || handle.isLockMovementInput()) {
             return;
         }
 
         Vector3 newPos = new Vector3(
-                pk.x,
-                pk.y - h.getBaseOffset(),
-                pk.z
+                packet.x,
+                packet.y - handle.getBaseOffset(),
+                packet.z
         );
 
-        double dis = newPos.distanceSquared(p);
+        double dis = newPos.distanceSquared(player);
 
         if (dis == 0
-                && pk.yaw % 360 == p.yaw
-                && pk.pitch % 360 == p.pitch) {
+                && packet.yaw % 360 == player.yaw
+                && packet.pitch % 360 == player.pitch) {
             return;
         }
 
-        if (h.getLastTeleportTick() + 10 > server.getTick()
+        if (handle.getLastTeleportTick() + 10 > server.getTick()
                 && newPos.distance(
-                        h.getTemporalVector()
+                        handle.getTemporalVector()
                                 .setComponents(
-                                        h.getLastX(),
-                                        h.getLastY(),
-                                        h.getLastZ()
+                                        handle.getLastX(),
+                                        handle.getLastY(),
+                                        handle.getLastZ()
                                 )
                 ) < 5) {
             return;
         }
 
         if (dis > 100) {
-            if (h.getLastTeleportTick() + 30 < server.getTick()) {
-                h.sendPosition(
-                        p,
-                        pk.yaw,
-                        pk.pitch,
+            if (handle.getLastTeleportTick() + 30 < server.getTick()) {
+                handle.sendPosition(
+                        player,
+                        packet.yaw,
+                        packet.pitch,
                         MovePlayerPacket.MODE_RESET
                 );
             }
@@ -70,35 +70,35 @@ public class MovePlayerProcessor extends DataPacketProcessor<MovePlayerPacket> {
         }
 
         boolean revert = false;
-        if (!h.isAlive() || !h.isSpawned()) {
+        if (!handle.isAlive() || !handle.isSpawned()) {
             revert = true;
-            h.setForceMovement(p);
+            handle.setForceMovement(player);
         }
 
-        if (h.getForceMovement() != null
-                && (newPos.distanceSquared(h.getForceMovement()) > 0.1 || revert)) {
+        if (handle.getForceMovement() != null
+                && (newPos.distanceSquared(handle.getForceMovement()) > 0.1 || revert)) {
 
-            h.sendPosition(
-                    h.getForceMovement(),
-                    pk.yaw,
-                    pk.pitch,
+            handle.sendPosition(
+                    handle.getForceMovement(),
+                    packet.yaw,
+                    packet.pitch,
                     MovePlayerPacket.MODE_RESET
             );
             return;
         }
 
         // normalize rotations
-        pk.yaw %= 360;
-        pk.headYaw %= 360;
-        pk.pitch %= 360;
+        packet.yaw %= 360;
+        packet.headYaw %= 360;
+        packet.pitch %= 360;
 
-        if (pk.yaw < 0) pk.yaw += 360;
-        if (pk.headYaw < 0) pk.headYaw += 360;
+        if (packet.yaw < 0) packet.yaw += 360;
+        if (packet.headYaw < 0) packet.headYaw += 360;
 
-        h.setRotation(pk.yaw, pk.pitch, pk.headYaw);
-        h.setNewPosition(newPos);
-        h.offerClientMovement(newPos);
-        h.setForceMovement(null);
+        handle.setRotation(packet.yaw, packet.pitch, packet.headYaw);
+        handle.setNewPosition(newPos);
+        handle.offerClientMovement(newPos);
+        handle.setForceMovement(null);
     }
 
     @Override

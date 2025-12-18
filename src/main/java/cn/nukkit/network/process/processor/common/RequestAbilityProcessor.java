@@ -22,31 +22,31 @@ public class RequestAbilityProcessor extends DataPacketProcessor<RequestAbilityP
     public static final RequestAbilityProcessor INSTANCE = new RequestAbilityProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull RequestAbilityPacket pk) {
-        Player player = playerHandle.player;
+    public void handle(@NotNull PlayerHandle handle, @NotNull RequestAbilityPacket packet) {
+        Player player = handle.player;
         if (player.protocol >= ProtocolInfo.v1_20_30_24) { //1.20.30开始飞行切换使用PlayerAuthInputPacket/PlayerActionPacket
             return;
         }
-        PlayerAbility ability = pk.getAbility();
+        PlayerAbility ability = packet.getAbility();
         if (ability != PlayerAbility.FLYING) {
-            log.info("[" + player.getName() + "] has tried to trigger " + ability + " ability " + (pk.isBoolValue() ? "on" : "off"));
+            log.info("[" + player.getName() + "] has tried to trigger " + ability + " ability " + (packet.isBoolValue() ? "on" : "off"));
             return;
         }
 
-        if (!player.getServer().getSettings().player().allowFlight() && pk.boolValue && !player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)) {
+        if (!player.getServer().getSettings().player().allowFlight() && packet.boolValue && !player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)) {
             player.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
             return;
         }
 
-        PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(player, pk.isBoolValue());
+        PlayerToggleFlightEvent event = new PlayerToggleFlightEvent(player, packet.isBoolValue());
         if (player.isSpectator()) {
-            playerToggleFlightEvent.setCancelled();
+            event.setCancelled();
         }
 
-        if (!playerToggleFlightEvent.call()) {
+        if (!event.call()) {
             player.getAdventureSettings().update();
         } else {
-            player.getAdventureSettings().set(AdventureSettings.Type.FLYING, playerToggleFlightEvent.isFlying());
+            player.getAdventureSettings().set(AdventureSettings.Type.FLYING, event.isFlying());
         }
     }
 

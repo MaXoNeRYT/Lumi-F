@@ -22,55 +22,55 @@ public class BookEditProcessor extends DataPacketProcessor<BookEditPacket> {
     public static final BookEditProcessor INSTANCE = new BookEditProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull BookEditPacket pk) {
-        Player player = playerHandle.player;
+    public void handle(@NotNull PlayerHandle handle, @NotNull BookEditPacket packet) {
+        Player player = handle.player;
 
-        if(pk.inventorySlot < 0 || pk.inventorySlot > player.getInventory().getSize()) {
-            player.getServer().getLogger().debug(playerHandle.getUsername() + ": BookEditPacket with invalid slot index (" + pk.inventorySlot + ")");
+        if(packet.inventorySlot < 0 || packet.inventorySlot > player.getInventory().getSize()) {
+            player.getServer().getLogger().debug(handle.getUsername() + ": BookEditPacket with invalid slot index (" + packet.inventorySlot + ")");
             return;
         }
 
-        Item oldBook = player.getInventory().getItem(pk.inventorySlot);
+        Item oldBook = player.getInventory().getItem(packet.inventorySlot);
         if (oldBook.getId() != Item.BOOK_AND_QUILL) {
             return;
         }
 
-        if (pk.text != null && pk.text.length() > 256) {
-            player.getServer().getLogger().debug(playerHandle.getUsername() + ": BookEditPacket with too long text");
+        if (packet.text != null && packet.text.length() > 256) {
+            player.getServer().getLogger().debug(handle.getUsername() + ": BookEditPacket with too long text");
             return;
         }
 
         Item newBook = oldBook.clone();
         boolean success;
-        switch (pk.action) {
+        switch (packet.action) {
             case REPLACE_PAGE:
-                success = ((ItemBookAndQuill) newBook).setPageText(pk.pageNumber, pk.text);
+                success = ((ItemBookAndQuill) newBook).setPageText(packet.pageNumber, packet.text);
                 break;
             case ADD_PAGE:
-                success = ((ItemBookAndQuill) newBook).insertPage(pk.pageNumber, pk.text);
+                success = ((ItemBookAndQuill) newBook).insertPage(packet.pageNumber, packet.text);
                 break;
             case DELETE_PAGE:
-                success = ((ItemBookAndQuill) newBook).deletePage(pk.pageNumber);
+                success = ((ItemBookAndQuill) newBook).deletePage(packet.pageNumber);
                 break;
             case SWAP_PAGES:
-                success = ((ItemBookAndQuill) newBook).swapPages(pk.pageNumber, pk.secondaryPageNumber);
+                success = ((ItemBookAndQuill) newBook).swapPages(packet.pageNumber, packet.secondaryPageNumber);
                 break;
             case SIGN_BOOK:
-                if (pk.title == null || pk.author == null || pk.xuid == null || pk.title.length() > 64 || pk.author.length() > 64 || pk.xuid.length() > 64) {
-                    player.getServer().getLogger().debug(playerHandle.getUsername() + ": Invalid BookEditPacket action SIGN_BOOK: title/author/xuid is too long");
+                if (packet.title == null || packet.author == null || packet.xuid == null || packet.title.length() > 64 || packet.author.length() > 64 || packet.xuid.length() > 64) {
+                    player.getServer().getLogger().debug(handle.getUsername() + ": Invalid BookEditPacket action SIGN_BOOK: title/author/xuid is too long");
                     return;
                 }
                 newBook = Item.get(Item.WRITTEN_BOOK, 0, 1, oldBook.getCompoundTag());
-                success = ((ItemBookWritten) newBook).signBook(pk.title, pk.author, pk.xuid, ItemBookWritten.GENERATION_ORIGINAL);
+                success = ((ItemBookWritten) newBook).signBook(packet.title, packet.author, packet.xuid, ItemBookWritten.GENERATION_ORIGINAL);
                 break;
             default:
                 return;
         }
 
         if (success) {
-            PlayerEditBookEvent editBookEvent = new PlayerEditBookEvent(player, oldBook, newBook, pk.action);
-            if (!editBookEvent.call()) {
-                player.getInventory().setItem(pk.inventorySlot, editBookEvent.getNewBook());
+            PlayerEditBookEvent event = new PlayerEditBookEvent(player, oldBook, newBook, packet.action);
+            if (event.call()) {
+                player.getInventory().setItem(packet.inventorySlot, event.getNewBook());
             }
         }
     }

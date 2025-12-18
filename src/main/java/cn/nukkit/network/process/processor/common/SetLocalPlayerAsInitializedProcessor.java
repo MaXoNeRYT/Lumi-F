@@ -16,14 +16,14 @@ public class SetLocalPlayerAsInitializedProcessor extends DataPacketProcessor<Se
     public static final SetLocalPlayerAsInitializedProcessor INSTANCE = new SetLocalPlayerAsInitializedProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull SetLocalPlayerAsInitializedPacket pk) {
-        if (playerHandle.player.locallyInitialized) {
+    public void handle(@NotNull PlayerHandle handle, @NotNull SetLocalPlayerAsInitializedPacket packet) {
+        if (handle.player.locallyInitialized) {
             return;
         }
 
-        playerHandle.doFirstSpawn();
+        handle.doFirstSpawn();
 
-        new PlayerLocallyInitializedEvent(playerHandle.player).call();
+        new PlayerLocallyInitializedEvent(handle.player).call();
     }
 
     @Override

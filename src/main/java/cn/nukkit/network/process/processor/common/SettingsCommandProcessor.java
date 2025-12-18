@@ -18,10 +18,10 @@ public class SettingsCommandProcessor extends DataPacketProcessor<SettingsComman
     public static SettingsCommandProcessor INSTANCE = new SettingsCommandProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull SettingsCommandPacket pk) {
-        Player player = playerHandle.player.asPlayer();
+    public void handle(@NotNull PlayerHandle handle, @NotNull SettingsCommandPacket packet) {
+        Player player = handle.player.asPlayer();
 
-        String command = pk.command.toLowerCase(Locale.ENGLISH).replace("/", "");
+        String command = packet.command.toLowerCase(Locale.ENGLISH).replace("/", "");
         Server.getInstance().dispatchCommand(player, command);
     }
 

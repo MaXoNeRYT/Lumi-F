@@ -24,23 +24,23 @@ public class PlayerSkinProcessor extends DataPacketProcessor<PlayerSkinPacket> {
     public static final PlayerSkinProcessor INSTANCE = new PlayerSkinProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull PlayerSkinPacket pk) {
-        Skin skin = pk.skin;
-        Player player = playerHandle.player;
+    public void handle(@NotNull PlayerHandle handle, @NotNull PlayerSkinPacket packet) {
+        Skin skin = packet.skin;
+        Player player = handle.player;
 
         if (!skin.isValid()) {
-            player.getServer().getLogger().warning(playerHandle.getUsername() + ": PlayerSkinPacket with invalid skin");
+            player.getServer().getLogger().warning(handle.getUsername() + ": PlayerSkinPacket with invalid skin");
             player.close("", "disconnectionScreen.invalidSkin");
             return;
         }
 
-        PlayerChangeSkinEvent playerChangeSkinEvent = new PlayerChangeSkinEvent(player, skin);
+        PlayerChangeSkinEvent event = new PlayerChangeSkinEvent(player, skin);
         int skinChangeCooldown = Server.getInstance().getSettings().player().skinChangeCooldown();
         if (TimeUnit.SECONDS.toMillis(skinChangeCooldown) > System.currentTimeMillis() - player.lastSkinChange) {
-            playerChangeSkinEvent.setCancelled(true);
-            Server.getInstance().getLogger().warning("Player " + playerHandle.getUsername() + " change skin too quick!");
+            event.setCancelled(true);
+            Server.getInstance().getLogger().warning("Player " + handle.getUsername() + " change skin too quick!");
         }
-        if (playerChangeSkinEvent.call()) {
+        if (event.call()) {
             boolean personaSkins = Server.getInstance().getSettings().player().personaSkins();
             player.lastSkinChange = System.currentTimeMillis();
             player.setSkin(skin.isPersona() && !personaSkins ? Skin.NO_PERSONA_SKIN : skin);

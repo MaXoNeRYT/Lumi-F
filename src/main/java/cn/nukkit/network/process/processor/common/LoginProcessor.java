@@ -32,36 +32,36 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
     public static final LoginProcessor INSTANCE = new LoginProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle h, @NotNull LoginPacket pk) {
-        Player p = h.player;
+    public void handle(@NotNull PlayerHandle handle, @NotNull LoginPacket packet) {
+        Player p = handle.player;
         Server server = p.getServer();
 
-        if (h.isLoginPacketReceived()) {
-            h.close("", "Invalid login packet");
+        if (handle.isLoginPacketReceived()) {
+            handle.close("", "Invalid login packet");
             return;
         }
 
-        h.setLoginPacketReceived(true);
-        h.setProtocol(pk.getProtocol());
+        handle.setLoginPacketReceived(true);
+        handle.setProtocol(packet.getProtocol());
 
-        String cleanName = TextFormat.clean(pk.username);
+        String cleanName = TextFormat.clean(packet.username);
         switch (server.getSettings().player().spaceNameMode()) {
             case DISABLED -> {
                 if (cleanName.contains(" ")) {
-                    h.close("", "Invalid name (please remove spaces)");
+                    handle.close("", "Invalid name (please remove spaces)");
                     return;
                 }
-                h.setUnverifiedUsername(cleanName);
+                handle.setUnverifiedUsername(cleanName);
             }
-            case REPLACING -> h.setUnverifiedUsername(cleanName.replace(" ", "_"));
-            default -> h.setUnverifiedUsername(cleanName);
+            case REPLACING -> handle.setUnverifiedUsername(cleanName.replace(" ", "_"));
+            default -> handle.setUnverifiedUsername(cleanName);
         }
 
-        int protocol = h.getProtocol();
+        int protocol = handle.getProtocol();
 
         if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(protocol)) {
-            h.close("", "You are running unsupported Minecraft version");
-            server.getLogger().debug(h.getUnverifiedUsername() +
+            handle.close("", "You are running unsupported Minecraft version");
+            server.getLogger().debug(handle.getUnverifiedUsername() +
                     " disconnected with protocol (SupportedProtocols) " + protocol);
             return;
         }
@@ -70,21 +70,21 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
         int max = server.getSettings().general().multiversion().maxProtocol();
 
         if (protocol < min) {
-            h.close("", "Multiversion support for this Minecraft version is disabled");
-            server.getLogger().debug(h.getUnverifiedUsername() +
+            handle.close("", "Multiversion support for this Minecraft version is disabled");
+            server.getLogger().debug(handle.getUnverifiedUsername() +
                     " disconnected with protocol (minProtocol) " + protocol);
             return;
         }
 
         if (max >= Math.max(0, min) && protocol > max) {
-            h.close("", "Support for this Minecraft version is not enabled");
-            server.getLogger().debug(h.getUnverifiedUsername() +
+            handle.close("", "Support for this Minecraft version is not enabled");
+            server.getLogger().debug(handle.getUnverifiedUsername() +
                     " disconnected with protocol (maxProtocol) " + protocol);
             return;
         }
 
-        if (pk.skin == null) {
-            h.close("", "disconnectionScreen.invalidSkin");
+        if (packet.skin == null) {
+            handle.close("", "disconnectionScreen.invalidSkin");
             return;
         }
 
@@ -96,16 +96,16 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
 
         ClientChainData chainData;
         try {
-            chainData = ClientChainData.read(pk);
+            chainData = ClientChainData.read(packet);
         } catch (ClientChainData.TooBigSkinException e) {
-            h.close("", "disconnectionScreen.invalidSkin");
+            handle.close("", "disconnectionScreen.invalidSkin");
             return;
         }
 
-        h.setLoginChainData(chainData);
+        handle.setLoginChainData(chainData);
 
         if (!chainData.isXboxAuthed() && server.getSettings().network().xboxAuth()) {
-            h.close("", "disconnectionScreen.notAuthenticated");
+            handle.close("", "disconnectionScreen.notAuthenticated");
             if (server.getSettings().network().xboxAuthTempIpBan()) {
                 server.getNetwork().blockAddress(
                         p.getSocketAddress().getAddress(), 5
@@ -119,47 +119,47 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
 
         if (server.getSettings().general().useWaterdog()
                 && chainData.getWaterdogIP() != null) {
-            h.setSocketAddress(new InetSocketAddress(
+            handle.setSocketAddress(new InetSocketAddress(
                     chainData.getWaterdogIP(), p.getRawPort()
             ));
         }
 
-        h.setVersion(chainData.getGameVersion());
+        handle.setVersion(chainData.getGameVersion());
 
-        String username = h.getUnverifiedUsername();
-        h.setUsername(username);
-        h.setUnverifiedUsername(null);
-        h.setDisplayName(username);
-        h.setIusername(username.toLowerCase(Locale.ROOT));
+        String username = handle.getUnverifiedUsername();
+        handle.setUsername(username);
+        handle.setUnverifiedUsername(null);
+        handle.setDisplayName(username);
+        handle.setIusername(username.toLowerCase(Locale.ROOT));
         p.setDataProperty(new StringEntityData(DATA_NAMETAG, username), false);
 
-        h.setRandomClientId(pk.clientId);
+        handle.setRandomClientId(packet.clientId);
 
-        UUID loginUuid = pk.clientUUID;
+        UUID loginUuid = packet.clientUUID;
         UUID finalUuid = server.lookupName(username).orElse(
                 chainData.isXboxAuthed()
                         ? loginUuid
                         : UUID.nameUUIDFromBytes(username.getBytes())
         );
 
-        h.setLoginUuid(loginUuid);
-        h.setUuid(finalUuid);
-        h.setRawUUID(Binary.writeUUID(finalUuid));
+        handle.setLoginUuid(loginUuid);
+        handle.setUuid(finalUuid);
+        handle.setRawUUID(Binary.writeUUID(finalUuid));
 
-        Matcher matcher = PLAYER_NAME_PATTERN.matcher(pk.username);
+        Matcher matcher = PLAYER_NAME_PATTERN.matcher(packet.username);
         if (!matcher.matches()
-                || Objects.equals(h.getIusername(), "rcon")
-                || Objects.equals(h.getIusername(), "console")) {
-            h.close("", "disconnectionScreen.invalidName");
+                || Objects.equals(handle.getIusername(), "rcon")
+                || Objects.equals(handle.getIusername(), "console")) {
+            handle.close("", "disconnectionScreen.invalidName");
             return;
         }
 
-        if (!pk.skin.isValid()) {
-            h.close("", "disconnectionScreen.invalidSkin");
+        if (!packet.skin.isValid()) {
+            handle.close("", "disconnectionScreen.invalidSkin");
             return;
         }
 
-        Skin skin = pk.skin;
+        Skin skin = packet.skin;
         p.setSkin(
                 skin.isPersona()
                         && !server.getSettings().player().personaSkins()
@@ -167,11 +167,11 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
                         : skin
         );
 
-        PlayerPreLoginEvent ev =
+        PlayerPreLoginEvent event =
                 new PlayerPreLoginEvent(p, "Plugin reason");
 
-        if (!ev.call()) {
-            h.close("", ev.getKickMessage());
+        if (!event.call()) {
+            handle.close("", event.getKickMessage());
             return;
         }
 
@@ -197,8 +197,8 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
                                     new ServerToClientHandshakePacket();
                             out.setJwt(getHandshakeJwt());
                             p.forceDataPacket(out, () -> {
-                                h.setAwaitingEncryptionHandshake(true);
-                                h.getNetworkSession().setEncryption(
+                                handle.setAwaitingEncryptionHandshake(true);
+                                handle.getNetworkSession().setEncryption(
                                         getEncryptionKey(),
                                         getEncryptionCipher(),
                                         getDecryptionCipher()
@@ -208,7 +208,7 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
                     }
             );
         } else {
-            h.processPreLogin();
+            handle.processPreLogin();
         }
     }
 

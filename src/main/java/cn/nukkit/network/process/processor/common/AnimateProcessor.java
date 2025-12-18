@@ -30,7 +30,6 @@ public class AnimateProcessor extends DataPacketProcessor<AnimatePacket> {
         }
 
         PlayerAnimationEvent event = new PlayerAnimationEvent(handle.player, packet.action);
-
         if (!event.call()) return;
 
         AnimatePacket.Action action = event.getAnimationType();

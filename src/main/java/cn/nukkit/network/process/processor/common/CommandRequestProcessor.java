@@ -20,18 +20,18 @@ public class CommandRequestProcessor extends DataPacketProcessor<CommandRequestP
     public static final CommandRequestProcessor INSTANCE = new CommandRequestProcessor();
 
     @Override
-    public void handle(@NotNull PlayerHandle playerHandle, @NotNull CommandRequestPacket pk) {
-        Player player = playerHandle.player;
+    public void handle(@NotNull PlayerHandle handle, @NotNull CommandRequestPacket packet) {
+        Player player = handle.player;
         if (!player.spawned || !player.isAlive()) {
             return;
         }
         player.craftingType = Player.CRAFTING_SMALL;
-        PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(player, pk.command + ' ');
-        if (!playerCommandPreprocessEvent.call()) {
+        PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(player, packet.command + ' ');
+        if (!event.call()) {
             return;
         }
 
-        player.getServer().dispatchCommand(playerCommandPreprocessEvent.getPlayer(), playerCommandPreprocessEvent.getMessage().substring(1));
+        player.getServer().dispatchCommand(event.getPlayer(), event.getMessage().substring(1));
     }
 
     @Override
