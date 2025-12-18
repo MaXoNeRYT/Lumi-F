@@ -169,8 +169,8 @@ public class LoginProcessor extends DataPacketProcessor<LoginPacket> {
 
         PlayerPreLoginEvent ev =
                 new PlayerPreLoginEvent(p, "Plugin reason");
-        server.getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
+
+        if (ev.call()) {
             h.close("", ev.getKickMessage());
             return;
         }

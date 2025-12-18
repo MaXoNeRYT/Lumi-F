@@ -536,9 +536,7 @@ public class InventoryTransactionProcessor extends DataPacketProcessor<Inventory
 
                         PlayerInteractEvent interactEvent = new PlayerInteractEvent(player, item, directionVector, face, PlayerInteractEvent.Action.RIGHT_CLICK_AIR);
 
-                        server.getPluginManager().callEvent(interactEvent);
-
-                        if (interactEvent.isCancelled()) {
+                        if (interactEvent.call()) {
                             playerHandle.setNeedSendHeldItem(true);
                             return;
                         }
@@ -601,9 +599,8 @@ public class InventoryTransactionProcessor extends DataPacketProcessor<Inventory
 
                         PlayerInteractEntityEvent playerInteractEntityEvent = new PlayerInteractEntityEvent(player, targetEntity, item, useItemOnEntityData.clickPos);
                         if (player.isSpectator()) playerInteractEntityEvent.setCancelled();
-                        server.getPluginManager().callEvent(playerInteractEntityEvent);
 
-                        if (playerInteractEntityEvent.isCancelled()) {
+                        if (playerInteractEntityEvent.call()) {
                             break;
                         }
 

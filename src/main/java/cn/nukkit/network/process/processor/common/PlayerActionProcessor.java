@@ -172,8 +172,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
         if (!value && handle.hasRidingOrSleeping()) {
             evt.setCancelled(true);
         }
-        Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) {
+        if (evt.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setSwimming(value);
@@ -186,8 +185,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
         if (handle.hasRidingOrSleeping() || (value && (chestplate == null || chestplate.getId() != 0xEL))) {
             evt.setCancelled(true);
         }
-        Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) {
+        if (evt.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setGliding(value);
@@ -196,8 +194,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
 
     private void toggleCrawl(PlayerHandle handle, boolean value) {
         PlayerToggleCrawlEvent evt = new PlayerToggleCrawlEvent(handle.player, value);
-        Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) {
+        if (evt.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setCrawling(value);
@@ -206,8 +203,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
 
     private void toggleFlight(PlayerHandle handle, boolean value) {
         PlayerToggleFlightEvent evt = new PlayerToggleFlightEvent(handle.player, value);
-        Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) {
+        if (evt.call()) {
             handle.setNeedSendAdventureSettings(true);
         } else {
             handle.player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, value);

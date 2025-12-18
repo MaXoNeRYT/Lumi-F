@@ -23,7 +23,7 @@ public class SetLocalPlayerAsInitializedProcessor extends DataPacketProcessor<Se
 
         playerHandle.doFirstSpawn();
 
-        playerHandle.player.getServer().getPluginManager().callEvent(new PlayerLocallyInitializedEvent(playerHandle.player));
+        new PlayerLocallyInitializedEvent(playerHandle.player).call();
     }
 
     @Override

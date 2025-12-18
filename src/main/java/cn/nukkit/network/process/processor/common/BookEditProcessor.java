@@ -69,8 +69,7 @@ public class BookEditProcessor extends DataPacketProcessor<BookEditPacket> {
 
         if (success) {
             PlayerEditBookEvent editBookEvent = new PlayerEditBookEvent(player, oldBook, newBook, pk.action);
-            player.getServer().getPluginManager().callEvent(editBookEvent);
-            if (!editBookEvent.isCancelled()) {
+            if (!editBookEvent.call()) {
                 player.getInventory().setItem(pk.inventorySlot, editBookEvent.getNewBook());
             }
         }

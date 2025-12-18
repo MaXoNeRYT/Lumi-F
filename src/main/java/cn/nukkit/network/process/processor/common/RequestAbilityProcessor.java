@@ -42,8 +42,8 @@ public class RequestAbilityProcessor extends DataPacketProcessor<RequestAbilityP
         if (player.isSpectator()) {
             playerToggleFlightEvent.setCancelled();
         }
-        player.getServer().getPluginManager().callEvent(playerToggleFlightEvent);
-        if (playerToggleFlightEvent.isCancelled()) {
+
+        if (playerToggleFlightEvent.call()) {
             player.getAdventureSettings().update();
         } else {
             player.getAdventureSettings().set(AdventureSettings.Type.FLYING, playerToggleFlightEvent.isFlying());

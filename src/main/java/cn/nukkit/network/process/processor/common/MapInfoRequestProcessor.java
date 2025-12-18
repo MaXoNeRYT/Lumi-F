@@ -56,10 +56,7 @@ public class MapInfoRequestProcessor extends DataPacketProcessor<MapInfoRequestP
                 }
             }
         } else {
-            PlayerMapInfoRequestEvent event;
-            player.getServer().getPluginManager().callEvent(event = new PlayerMapInfoRequestEvent(player, mapItem));
-
-            if (!event.isCancelled()) {
+            if (!new PlayerMapInfoRequestEvent(player, mapItem).call()) {
                 if (mapItem.trySendImage(player)) {
                     return;
                 }
