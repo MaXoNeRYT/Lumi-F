@@ -47,6 +47,15 @@ public abstract class InventoryAction {
     /**
      * Returns the item that the action attempted to replace the source item with.
      *
+     * @return source item
+     */
+    public Item getSourceItemUnsafe() {
+        return sourceItem;
+    }
+
+    /**
+     * Returns the item that the action attempted to replace the source item with.
+     *
      * @return target item
      */
     public Item getTargetItemUnsafe() {

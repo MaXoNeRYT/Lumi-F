@@ -27,9 +27,9 @@ public class RecipeParser {
 
         final Item result;
         if(item.has("id")) {
-            result = Registries.ITEM.get(item.get("id").getAsString()).clone();
+            result = Registries.ITEM.get(item.get("id").getAsString());
         } else {
-            result = Registries.ITEM.get(item.get("itemId").getAsString()).clone();
+            result = Registries.ITEM.get(item.get("itemId").getAsString());
         }
 
         if(item.has("count")) {

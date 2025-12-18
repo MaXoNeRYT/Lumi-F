@@ -16,9 +16,4 @@ public class ItemWardArmorTrimSmithingTemplate extends StringItemBase implements
     public ItemTrimPatternType getPattern() {
         return ItemTrimPatternType.WARD_ARMOR_TRIM;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_80;
-    }
 }

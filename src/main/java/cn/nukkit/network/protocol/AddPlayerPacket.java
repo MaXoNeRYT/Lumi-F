@@ -60,9 +60,6 @@ public class AddPlayerPacket extends DataPacket {
             this.putString("");
             this.putVarInt(0);
         }
-        if (protocol < ProtocolInfo.v1_19_10) {
-            this.putEntityUniqueId(this.entityUniqueId);
-        }
         this.putEntityRuntimeId(this.entityRuntimeId);
         if (protocol >= 223) {
             this.putString(this.platformChatId);
@@ -73,44 +70,30 @@ public class AddPlayerPacket extends DataPacket {
         this.putLFloat(this.yaw);
         this.putLFloat(this.yaw);
         this.putSlot(protocol, this.item);
-        if (protocol >= ProtocolInfo.v1_18_30) {
-            this.putVarInt(this.gameType);
-        }
+        this.putVarInt(this.gameType);
         this.put(Binary.writeMetadata(protocol, this.metadata));
-        if (protocol > 274) {
-            if (protocol < ProtocolInfo.v1_19_10) {
-                this.putUnsignedVarInt(0);
-                this.putUnsignedVarInt(0);
-                this.putUnsignedVarInt(0);
-                this.putUnsignedVarInt(0);
-                this.putUnsignedVarInt(0);
-            }else if (protocol >= ProtocolInfo.v1_19_40) {
-                this.putUnsignedVarInt(0); // Entity properties int
-                this.putUnsignedVarInt(0); // Entity properties float
-            }
-            this.putLLong(entityUniqueId);
-            if (protocol >= ProtocolInfo.v1_19_10) {
-                this.putUnsignedVarInt(0); // playerPermission
-                this.putUnsignedVarInt(0); // commandPermission
-                this.putUnsignedVarInt(1); // abilitiesLayer size
-                this.putLShort(1); // BASE layer type
-                this.putLInt(262143); // abilitiesSet - all abilities
-                this.putLInt(63); // abilityValues - survival abilities
-                this.putLFloat(0.1f); // flySpeed
-                this.putLFloat(0.05f); // walkSpeed
-                if (this.protocol >= ProtocolInfo.v1_21_60) {
-                    this.putLFloat(1.0f); // getVerticalFlySpeed()
-                }
-            }
-            this.putUnsignedVarInt(this.links.length);
-            for (EntityLink link : links) {
-                putEntityLink(protocol, link);
-            }
+        this.putUnsignedVarInt(0); // Entity properties int
+        this.putUnsignedVarInt(0); // Entity properties float
+        this.putLLong(entityUniqueId);
+        this.putUnsignedVarInt(0); // playerPermission
+        this.putUnsignedVarInt(0); // commandPermission
+        this.putUnsignedVarInt(1); // abilitiesLayer size
+        this.putLShort(1); // BASE layer type
+        this.putLInt(262143); // abilitiesSet - all abilities
+        this.putLInt(63); // abilityValues - survival abilities
+        this.putLFloat(0.1f); // flySpeed
+        this.putLFloat(0.05f); // walkSpeed
+        if (this.protocol >= ProtocolInfo.v1_21_60) {
+            this.putLFloat(1.0f); // getVerticalFlySpeed()
+        }
+        this.putUnsignedVarInt(this.links.length);
+        for (EntityLink link : links) {
+            putEntityLink(protocol, link);
+        }
 
-            this.putString(deviceId);
-            if (protocol >= 388) {
-                this.putLInt(buildPlatform);
-            }
+        this.putString(deviceId);
+        if (protocol >= 388) {
+            this.putLInt(buildPlatform);
         }
     }
 }

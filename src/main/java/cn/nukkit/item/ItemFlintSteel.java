@@ -43,6 +43,17 @@ public class ItemFlintSteel extends ItemTool {
 
         // 1.18 vanilla allows flint & steel to be used even if fire exists
         if ((block.getId() == AIR || block.getId() == FIRE || block.getId() == SOUL_FIRE) && (target instanceof BlockSolid || target instanceof BlockSolidMeta || target instanceof BlockLeaves)) {
+            // when player uses it on the side of the portal
+            Block side = target.getSide(face);
+            if (side.getId() == AIR) {
+                Block sideBottom = side.down();
+                if (sideBottom.getId() == OBSIDIAN && level.createPortal(sideBottom, false)) {
+                    level.addLevelSoundEvent(sideBottom, LevelSoundEventPacket.SOUND_IGNITE);
+                    return true;
+                }
+            }
+
+            // when player uses it on the bottom of the portal
             if (target.getId() == OBSIDIAN) {
                 if (level.createPortal(target, false)) {
                     level.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);

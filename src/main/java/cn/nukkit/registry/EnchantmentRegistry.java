@@ -171,11 +171,11 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
 
     @Override
     public Enchantment get(Identifier key) {
-        return IDENTIFIER_TO_ENCHANTMENT.get(key);
+        return IDENTIFIER_TO_ENCHANTMENT.get(key).clone();
     }
 
     public Enchantment get(int id) {
-        return ID_TO_ENCHANTMENT.get(id);
+        return ID_TO_ENCHANTMENT.get(id).clone();
     }
 
     public Map<Integer, Enchantment> getIdToEnchantment() {

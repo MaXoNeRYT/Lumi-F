@@ -6,6 +6,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.network.protocol.AnimatePacket;
+import cn.nukkit.network.protocol.types.SwingSource;
 
 public abstract class BlockLog extends BlockSolidMeta {
 
@@ -74,6 +75,7 @@ public abstract class BlockLog extends BlockSolidMeta {
             AnimatePacket packet = new AnimatePacket();
             packet.eid = player.getId();
             packet.action = AnimatePacket.Action.SWING_ARM;
+            packet.swingSource = SwingSource.EVENT;
             player.dataPacket(packet);
             
             this.level.setBlock(this, strippedBlock, true, true);

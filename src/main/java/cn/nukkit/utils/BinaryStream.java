@@ -333,9 +333,7 @@ public class BinaryStream {
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
 
-        if (protocol >= ProtocolInfo.v1_16_210) {
-            this.putString(skin.getPlayFabId());
-        }
+        this.putString(skin.getPlayFabId());
         this.putString(skin.getSkinResourcePatch());
         this.putImage(skin.getSkinData());
 
@@ -345,22 +343,13 @@ public class BinaryStream {
             this.putImage(animation.image);
             this.putLInt(animation.type);
             this.putLFloat(animation.frames);
-            if (protocol >= ProtocolInfo.v1_16_100) {
-                this.putLInt(animation.expression);
-            }
+            this.putLInt(animation.expression);
         }
 
         this.putImage(skin.getCapeData());
         this.putString(skin.getGeometryData());
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            this.putString(skin.getGeometryDataEngineVersion());
-        }
+        this.putString(skin.getGeometryDataEngineVersion());
         this.putString(skin.getAnimationData());
-        if (protocol < ProtocolInfo.v1_17_30) {
-            this.putBoolean(skin.isPremium());
-            this.putBoolean(skin.isPersona());
-            this.putBoolean(skin.isCapeOnClassic());
-        }
         this.putString(skin.getCapeId());
         this.putString(skin.getFullSkinId());
         this.putString(skin.getArmSize());
@@ -387,15 +376,11 @@ public class BinaryStream {
             }
         }
 
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            this.putBoolean(skin.isPremium());
-            this.putBoolean(skin.isPersona());
-            this.putBoolean(skin.isCapeOnClassic());
-            this.putBoolean(skin.isPrimaryUser());
-            if (protocol >= ProtocolInfo.v1_19_63) {
-                this.putBoolean(skin.isOverridingPlayerAppearance());
-            }
-        }
+        this.putBoolean(skin.isPremium());
+        this.putBoolean(skin.isPersona());
+        this.putBoolean(skin.isCapeOnClassic());
+        this.putBoolean(skin.isPrimaryUser());
+        this.putBoolean(skin.isOverridingPlayerAppearance());
     }
 
     public void putImage(SerializedImage image) {
@@ -426,9 +411,7 @@ public class BinaryStream {
     public Skin getSkin(int protocol) { // Can be used only with protocol >= 388
         Skin skin = new Skin();
         skin.setSkinId(this.getString());
-        if (protocol >= ProtocolInfo.v1_16_210) {
-            skin.setPlayFabId(this.getString());
-        }
+        skin.setPlayFabId(this.getString());
         skin.setSkinResourcePatch(this.getString());
         skin.setSkinData(this.getImage(Skin.SKIN_PERSONA_SIZE));
 
@@ -437,21 +420,14 @@ public class BinaryStream {
             SerializedImage image = this.getImage(Skin.SKIN_128_128_SIZE);
             int type = this.getLInt();
             float frames = this.getLFloat();
-            int expression = protocol >= ProtocolInfo.v1_16_100 ? this.getLInt() : 0;
+            int expression = this.getLInt();
             skin.getAnimations().add(new SkinAnimation(image, type, frames, expression));
         }
 
         skin.setCapeData(this.getImage(Skin.SINGLE_SKIN_SIZE));
         skin.setGeometryData(this.getString());
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            skin.setGeometryDataEngineVersion(this.getString());
-        }
+        skin.setGeometryDataEngineVersion(this.getString());
         skin.setAnimationData(this.getString());
-        if (protocol < ProtocolInfo.v1_17_30) {
-            skin.setPremium(this.getBoolean());
-            skin.setPersona(this.getBoolean());
-            skin.setCapeOnClassic(this.getBoolean());
-        }
         skin.setCapeId(this.getString());
         skin.setFullSkinId(this.getString());
         skin.setArmSize(this.getString());
@@ -478,15 +454,11 @@ public class BinaryStream {
             skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
         }
 
-        if (protocol >= ProtocolInfo.v1_17_30) {
-            skin.setPremium(this.getBoolean());
-            skin.setPersona(this.getBoolean());
-            skin.setCapeOnClassic(this.getBoolean());
-            skin.setPrimaryUser(this.getBoolean());
-            if (protocol >= ProtocolInfo.v1_19_63) {
-                skin.setOverridingPlayerAppearance(this.getBoolean());
-            }
-        }
+        skin.setPremium(this.getBoolean());
+        skin.setPersona(this.getBoolean());
+        skin.setCapeOnClassic(this.getBoolean());
+        skin.setPrimaryUser(this.getBoolean());
+        skin.setOverridingPlayerAppearance(this.getBoolean());
         return skin;
     }
 
@@ -501,189 +473,6 @@ public class BinaryStream {
     }
 
     public Item getSlot(int protocolId) {
-        if (protocolId >= ProtocolInfo.v1_16_220) {
-            return this.getSlotNew(protocolId);
-        }
-
-        int runtimeId = this.getVarInt();
-        if (runtimeId == 0) {
-            return Item.get(Item.AIR, 0, 0);
-        }
-
-        int auxValue = this.getVarInt();
-        int damage = auxValue >> 8;
-        if (damage == Short.MAX_VALUE) {
-            damage = -1;
-        }
-
-        Integer id = null;
-        String stringId = null;
-        if (protocolId < ProtocolInfo.v1_16_100) {
-            id = runtimeId;
-        } else {
-            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
-            try {
-                LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
-                id = legacyEntry.getLegacyId();
-                if (legacyEntry.isHasDamage()) {
-                    damage = legacyEntry.getDamage();
-                }
-            } catch (IllegalArgumentException e) {
-
-            }
-
-            if (id == null || !Utils.hasItemOrBlock(id)) {
-                stringId = mapping.getNamespacedIdByNetworkId(runtimeId);
-                if (stringId == null) {
-                    throw new IllegalArgumentException("Unknown item: runtimeID=" + runtimeId + " protocol=" + protocolId);
-                }
-                id = null;
-            }
-        }
-
-        int cnt = auxValue & 0xff;
-
-        int nbtLen = this.getLShort();
-        byte[] nbt = new byte[0];
-        if (nbtLen < Short.MAX_VALUE) {
-            nbt = this.get(nbtLen);
-        } else if (nbtLen == 65535) {
-            int nbtTagCount = (int) getUnsignedVarInt();
-            int offset = this.offset;
-            FastByteArrayInputStream stream = new FastByteArrayInputStream(get());
-            for (int i = 0; i < nbtTagCount; i++) {
-                try {
-                    // TODO: 05/02/2019 This hack is necessary because we keep the raw NBT tag. Try to remove it.
-                    CompoundTag tag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN, true);
-                    // Hack for tool damage
-                    if (tag.contains("Damage")) {
-                        damage = tag.getInt("Damage");
-                        tag.remove("Damage");
-                    }
-                    if (tag.contains("__DamageConflict__")) {
-                        tag.put("Damage", tag.removeAndGet("__DamageConflict__"));
-                    }
-                    if (tag.containsList("ench")) {
-                        int enchCount = tag.getList("ench", CompoundTag.class).getAll().size();
-                        if (enchCount > Enchantment.getEnchantments().length * 1.5) {
-                            throw new RuntimeException("Too many enchantment: " + enchCount);
-                        }
-                    }
-                    if (!tag.getAllTags().isEmpty()) {
-                        nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, false);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            setOffset(offset + (int) stream.position());
-        }
-
-        int canPlaceCount = this.getVarInt();
-        if (canPlaceCount > 4096) {
-            throw new RuntimeException("Too many CanPlaceOn blocks: " + canPlaceCount);
-        }
-
-        String[] canPlaceOn = new String[canPlaceCount];
-        for (int i = 0; i < canPlaceOn.length; ++i) {
-            canPlaceOn[i] = this.getString();
-        }
-
-        int canBreakCount = this.getVarInt();
-        if (canBreakCount > 4096) {
-            throw new RuntimeException("Too many CanDestroy blocks: " + canBreakCount);
-        }
-
-        String[] canDestroy = new String[canBreakCount];
-        for (int i = 0; i < canDestroy.length; ++i) {
-            canDestroy[i] = this.getString();
-        }
-
-        try {
-            if (nbt.length > 0) { // Protocol always < v1_16_220
-                CompoundTag tag = Item.parseCompoundTag(nbt.clone());
-                if (tag.contains(MV_ORIGIN_ID) && tag.contains(MV_ORIGIN_META)) {
-                    int originID = tag.getInt(MV_ORIGIN_ID);
-                    int originMeta = tag.getInt(MV_ORIGIN_META);
-
-                    Item item;
-                    if (protocolId < ProtocolInfo.v1_16_100
-                            && id == Item.INFO_UPDATE
-                            && originID == ItemID.STRING_IDENTIFIED_ITEM
-                            && tag.contains(MV_ORIGIN_NAMESPACE)) {
-                        stringId = tag.getString(MV_ORIGIN_NAMESPACE);
-                        id = null;
-                    } else if (id != null) { //数字id
-                        if ((id == Item.INFO_UPDATE && originID >= Item.SUSPICIOUS_STEW) ||
-                                (id == Item.DIAMOND_SWORD && originID == Item.NETHERITE_SWORD) ||
-                                (id == Item.DIAMOND_SHOVEL && originID == Item.NETHERITE_SHOVEL) ||
-                                (id == Item.DIAMOND_PICKAXE && originID == Item.NETHERITE_PICKAXE) ||
-                                (id == Item.DIAMOND_AXE && originID == Item.NETHERITE_AXE) ||
-                                (id == Item.DIAMOND_HOE && originID == Item.NETHERITE_HOE) ||
-                                (id == Item.DIAMOND_HELMET && originID == Item.NETHERITE_HELMET) ||
-                                (id == Item.DIAMOND_CHESTPLATE && originID == Item.NETHERITE_CHESTPLATE) ||
-                                (id == Item.DIAMOND_LEGGINGS && originID == Item.NETHERITE_LEGGINGS) ||
-                                (id == Item.DIAMOND_BOOTS && originID == Item.NETHERITE_BOOTS) ||
-                                (id == Item.CARROT_ON_A_STICK && originID == Item.WARPED_FUNGUS_ON_A_STICK) ||
-                                (id == Item.RECORD_13 && originID == Item.RECORD_PIGSTEP)) {
-                            id = originID;
-                        }
-                    }
-
-                    if (tag.contains(MV_ORIGIN_NBT)) {
-                        nbt = NBTIO.write(tag.getCompound(MV_ORIGIN_NBT), ByteOrder.LITTLE_ENDIAN);
-                    } else {
-                        nbt = new byte[0];
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Server.getInstance().getLogger().logException(e);
-        }
-
-        Item item;
-        if (id != null) {
-            item = Item.get(id, damage, cnt, nbt);
-        } else {
-            item = Item.fromString(stringId);
-            item.setDamage(damage);
-            item.setCount(cnt);
-            item.setCompoundTag(nbt);
-        }
-
-        if (canDestroy.length > 0 || canPlaceOn.length > 0) {
-            CompoundTag namedTag = item.getNamedTag();
-            if (namedTag == null) {
-                namedTag = new CompoundTag();
-            }
-
-            if (canDestroy.length > 0) {
-                ListTag<StringTag> listTag = new ListTag<>("CanDestroy");
-                for (String blockName : canDestroy) {
-                    listTag.add(new StringTag("", blockName));
-                }
-                namedTag.put("CanDestroy", listTag);
-            }
-
-            if (canPlaceOn.length > 0) {
-                ListTag<StringTag> listTag = new ListTag<>("CanPlaceOn");
-                for (String blockName : canPlaceOn) {
-                    listTag.add(new StringTag("", blockName));
-                }
-                namedTag.put("CanPlaceOn", listTag);
-            }
-
-            item.setNamedTag(namedTag);
-        }
-
-        if (item.getId() == ItemID.SHIELD) {
-            this.getVarLong();
-        }
-
-        return item;
-    }
-
-    private Item getSlotNew(int protocolId) {
         int runtimeId = this.getVarInt();
         if (runtimeId == 0) {
             return Item.get(Item.AIR, 0, 0);
@@ -720,16 +509,8 @@ public class BinaryStream {
             this.getVarInt(); // netId
         }
 
-        int blockRuntimeId = this.getVarInt();// blockRuntimeId
+        this.getVarInt();// blockRuntimeId
         //TODO 在1.21.30会得到错误数据
-        if (protocolId < ProtocolInfo.v1_19_0_31) {
-            if (id != null && id < 256 && id != 166) { // ItemBlock
-                int fullId = GlobalBlockPalette.getLegacyFullId(protocolId, blockRuntimeId);
-                if (fullId != -1) {
-                    damage = fullId & Block.DATA_MASK;
-                }
-            }
-        }
 
         byte[] bytes = this.getByteArray();
         ByteBuf buf = AbstractByteBufAllocator.DEFAULT.ioBuffer(bytes.length);
@@ -867,169 +648,7 @@ public class BinaryStream {
         this.putSlot(protocolId, item, false);
     }
 
-    public void putSlot(int protocolId, Item item, boolean crafting) {
-        if (protocolId >= ProtocolInfo.v1_16_220) {
-            this.putSlotNew(protocolId, item, crafting);
-            return;
-        }
-
-        if (item == null || item.getId() == Item.AIR) {
-            this.putVarInt(0);
-            return;
-        }
-
-        int runtimeId = item.getId();
-        boolean isStringItem = item instanceof StringItem;
-
-        // Multiversion: Replace unsupported items
-        boolean saveOriginalID = false;
-        if (!crafting) {
-            if (runtimeId == Item.SPYGLASS || // Protocol always < v1_16_220
-                    (protocolId < ProtocolInfo.v1_16_100 && (isStringItem || runtimeId >= 10000))) { //StringItem & CustomItem
-                saveOriginalID = true;
-                runtimeId = Item.INFO_UPDATE;
-            } else if (protocolId < ProtocolInfo.v1_16_0) {
-                if (runtimeId >= Item.LODESTONECOMPASS) {
-                    saveOriginalID = true;
-                    switch (runtimeId) {
-                        case Item.NETHERITE_SWORD:
-                            runtimeId = Item.DIAMOND_SWORD;
-                            break;
-                        case Item.NETHERITE_SHOVEL:
-                            runtimeId = Item.DIAMOND_SHOVEL;
-                            break;
-                        case Item.NETHERITE_PICKAXE:
-                            runtimeId = Item.DIAMOND_PICKAXE;
-                            break;
-                        case Item.NETHERITE_AXE:
-                            runtimeId = Item.DIAMOND_AXE;
-                            break;
-                        case Item.NETHERITE_HOE:
-                            runtimeId = Item.DIAMOND_HOE;
-                            break;
-                        case Item.NETHERITE_HELMET:
-                            runtimeId = Item.DIAMOND_HELMET;
-                            break;
-                        case Item.NETHERITE_CHESTPLATE:
-                            runtimeId = Item.DIAMOND_CHESTPLATE;
-                            break;
-                        case Item.NETHERITE_LEGGINGS:
-                            runtimeId = Item.DIAMOND_LEGGINGS;
-                            break;
-                        case Item.NETHERITE_BOOTS:
-                            runtimeId = Item.DIAMOND_BOOTS;
-                            break;
-                        default:
-                            runtimeId = Item.INFO_UPDATE;
-                            break;
-                    }
-                }
-            }
-        }
-
-        int damage = item.hasMeta() ? item.getDamage() : -1;
-        if (protocolId >= ProtocolInfo.v1_16_100) {
-            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
-            RuntimeEntry runtimeEntry;
-            if (runtimeId == Item.INFO_UPDATE) { // Fix unknown item mapping errors with 1.16.100+ item replacements
-                runtimeEntry = mapping.toRuntime(Item.INFO_UPDATE, item.getDamage());
-            } else {
-                try {
-                    runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
-                } catch (IllegalArgumentException e) {
-                    runtimeEntry = mapping.toRuntime(Item.INFO_UPDATE, item.getDamage());
-                    saveOriginalID = true;
-                    Server.getInstance().getLogger().debug("Unknown Item", e);
-                }
-            }
-            runtimeId = runtimeEntry.getRuntimeId();
-            damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
-        }
-
-        this.putVarInt(runtimeId);
-
-        boolean isDurable = item instanceof ItemDurable;
-        int auxValue = item.getCount();
-        if (!isDurable) {
-            int meta;
-            if (protocolId < ProtocolInfo.v1_16_100) {
-                meta = item.hasMeta() ? item.getDamage() : -1;
-            } else {
-                meta = damage;
-            }
-            auxValue |= ((meta & 0x7fff) << 8);
-        }
-
-        this.putVarInt(auxValue);
-
-        // Hack: fix recipe list not displaying some items
-        if (crafting) {
-            this.putLShort(0);
-            this.putVarInt(0);
-            this.putVarInt(0);
-            if (item.getId() == ItemID.SHIELD) {
-                this.putVarLong(0);
-            }
-            return;
-        }
-
-        if (item.hasCompoundTag() || isDurable || saveOriginalID) {
-            try {
-                // Hack for tool damage
-                byte[] nbt = item.getCompoundTag();
-                CompoundTag tag;
-                if (nbt == null || nbt.length == 0) {
-                    tag = new CompoundTag();
-                } else {
-                    tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN, false);
-                }
-                if (tag.contains("Damage")) {
-                    tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
-                }
-                if (isDurable) {
-                    tag.putInt("Damage", item.getDamage());
-                }
-
-                if (saveOriginalID) {
-                    try {
-                        item.setNamedTag(new CompoundTag().putCompound(MV_ORIGIN_NBT, tag));
-                        item.setCustomName(item.getName());
-                        item.setNamedTag(item.getNamedTag().putInt(MV_ORIGIN_ID, item.getId()).putInt(MV_ORIGIN_META, item.getDamage()));
-                        if (isStringItem) {
-                            item.setNamedTag(item.getNamedTag().putString(MV_ORIGIN_NAMESPACE, item.getNamespaceId(protocolId)));
-                        }
-                        tag = item.getNamedTag();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                this.putLShort(0xffff);
-                this.putByte((byte) 1);
-                this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            this.putLShort(0);
-        }
-        List<String> canPlaceOn = extractStringList(item, "CanPlaceOn");
-        List<String> canDestroy = extractStringList(item, "CanDestroy");
-        this.putVarInt(canPlaceOn.size());
-        for (String block : canPlaceOn) {
-            this.putString(block);
-        }
-        this.putVarInt(canDestroy.size());
-        for (String block : canDestroy) {
-            this.putString(block);
-        }
-
-        if (item.getId() == ItemID.SHIELD) {
-            this.putVarLong(0); //"blocking tick" (ffs mojang)
-        }
-    }
-
-    private void putSlotNew(int protocolId, Item item, boolean instanceItem) {
+    public void putSlot(int protocolId, Item item, boolean instanceItem) {
         if (item == null || item.getId() == Item.AIR) {
             this.putByte((byte) 0);
             return;
@@ -1153,16 +772,11 @@ public class BinaryStream {
             damage = -1;
         }
 
-        int id;
-        if (protocolId < ProtocolInfo.v1_16_100) {
-            id = runtimeId;
-        } else {
-            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
-            LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
-            id = legacyEntry.getLegacyId();
-            if (legacyEntry.isHasDamage()) {
-                damage = legacyEntry.getDamage();
-            }
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+        LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
+        int id = legacyEntry.getLegacyId();
+        if (legacyEntry.isHasDamage()) {
+            damage = legacyEntry.getDamage();
         }
 
         int count = this.getVarInt();
@@ -1386,11 +1000,9 @@ public class BinaryStream {
         this.putEntityUniqueId(link.toEntityUniquieId);
         this.putByte(link.type);
         this.putBoolean(link.immediate);
-        if (protocol >= ProtocolInfo.v1_16_0) {
-            this.putBoolean(link.riderInitiated);
-            if (protocol >= ProtocolInfo.v1_21_20) {
-                this.putLFloat(link.vehicleAngularVelocity);
-            }
+        this.putBoolean(link.riderInitiated);
+        if (protocol >= ProtocolInfo.v1_21_20) {
+            this.putLFloat(link.vehicleAngularVelocity);
         }
     }
 

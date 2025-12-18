@@ -60,7 +60,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
         if (this.protocol >= ProtocolInfo.v1_21_90) {
             this.putBoolean(this.forceDisableVibrantVisuals);
         }
-        if (this.protocol >= ProtocolInfo.v1_17_10 && this.protocol < ProtocolInfo.v1_21_30) {
+        if (this.protocol < ProtocolInfo.v1_21_30) {
             this.putBoolean(this.forceServerPacks);
         }
         if (this.protocol >= ProtocolInfo.v1_21_50) {
@@ -115,14 +115,12 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putString(""); // sub-pack name
             this.putString(!"".equals(entry.getEncryptionKey()) ? entry.getPackId().toString() : ""); // content identity
             this.putBoolean(false); // scripting
-            if (protocol >= ProtocolInfo.v1_16_200) {
-                if (protocol >= ProtocolInfo.v1_21_20) {
-                    this.putBoolean(entry.isAddonPack());
-                }
-                this.putBoolean(false); // raytracing capable
-                if (protocol >= ProtocolInfo.v1_21_40) {
-                    this.putString(entry.getCDNUrl());
-                }
+            if (protocol >= ProtocolInfo.v1_21_20) {
+                this.putBoolean(entry.isAddonPack());
+            }
+            this.putBoolean(false); // raytracing capable
+            if (protocol >= ProtocolInfo.v1_21_40) {
+                this.putString(entry.getCDNUrl());
             }
         }
     }

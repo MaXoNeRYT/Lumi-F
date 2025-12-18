@@ -45,9 +45,4 @@ public class ItemSpyglass extends Item {
     public boolean canRelease() {
         return true;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_17_0;
-    }
 }

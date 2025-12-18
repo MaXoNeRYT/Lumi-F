@@ -37,9 +37,4 @@ public abstract class StringItemBase extends Item implements StringItem {
     public StringItemBase clone() {
         return (StringItemBase) super.clone();
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_100;
-    }
 }

@@ -53,6 +53,7 @@ import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.level.persistence.impl.DelegatePersistentDataContainer;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.level.util.BlockUpdateEntry;
+import cn.nukkit.level.util.PortalCreator;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
 import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.level.vibration.VibrationManager;
@@ -264,7 +265,7 @@ public class Level implements ChunkManager, Metadatable {
     private final String folderName;
 
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
-    private final Long2ObjectOpenHashMap<SoftReference<Int2ObjectOpenHashMap<Object>>> changedBlocks= new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<SoftReference<Int2ObjectOpenHashMap<Object>>> changedBlocks = new Long2ObjectOpenHashMap<>();
     // Storing the vector is redundant
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
@@ -288,6 +289,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private boolean autoSave;
     private boolean autoCompaction;
+
     @Getter
     @Setter
     private boolean saveOnUnloadEnabled = true;
@@ -353,6 +355,8 @@ public class Level implements ChunkManager, Metadatable {
     public GameRules gameRules;
 
     private final boolean randomTickingEnabled;
+
+    private final PortalCreator portalCreator = new PortalCreator(this);
 
     @Getter
     private ExecutorService asyncChuckExecutor;
@@ -1087,7 +1091,7 @@ public class Level implements ChunkManager, Metadatable {
 
         this.levelCurrentTick++;
 
-        if(currentTick % 200 == 0) {
+        if (currentTick % 200 == 0) {
             this.unloadChunks(true);
         }
 
@@ -1704,27 +1708,25 @@ public class Level implements ChunkManager, Metadatable {
         return updateQueue.getPendingBlockUpdates(boundingBox);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb) {
         return this.getCollisionBlocks(bb, false);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst) {
         return getCollisionBlocks(bb, targetFirst, false);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck) {
         return getCollisionBlocks(bb, targetFirst, ignoreCollidesCheck, block -> block.getId() != 0);
     }
 
-    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck, Predicate<Block> condition) {
+    public @NotNull Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck, Predicate<Block> condition) {
         int minX = NukkitMath.floorDouble(bb.getMinX());
         int minY = NukkitMath.floorDouble(bb.getMinY());
         int minZ = NukkitMath.floorDouble(bb.getMinZ());
         int maxX = NukkitMath.ceilDouble(bb.getMaxX());
         int maxY = NukkitMath.ceilDouble(bb.getMaxY());
         int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
-
-        List<Block> collides = new ArrayList<>();
 
         if (targetFirst) {
             for (int z = minZ; z <= maxZ; ++z) {
@@ -1738,18 +1740,26 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
         } else {
+            int capacity = Math.max(0, maxX - minX + 1) * Math.max(0, maxY - minY + 1) * Math.max(0, maxZ - minZ + 1);
+            if (capacity == 0) {
+                return Block.EMPTY_ARRAY;
+            }
+            Block[] collides = new Block[capacity];
+            int count = 0;
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
                         Block block = this.getBlock(x, y, z, false);
                         if (block != null && condition.test(block) && (ignoreCollidesCheck || block.collidesWithBB(bb))) {
-                            collides.add(block);
+                            collides[count++] = block;
                         }
                     }
                 }
             }
+            return count == capacity ? collides : Arrays.copyOf(collides, count);
         }
-        return collides.toArray(new Block[0]);
+
+        return Block.EMPTY_ARRAY;
     }
 
     public boolean hasCollisionBlocks(AxisAlignedBB bb) {
@@ -2234,6 +2244,15 @@ public class Level implements ChunkManager, Metadatable {
         return true;
     }
 
+    public void breakBlock(@NotNull Block block) {
+        if(block.isValid() && block.level == this) {
+            this.setBlock(block, Block.get(Block.AIR));
+            Position position = block.add(0.5, 0.5, 0.5);
+            this.addParticle(new DestroyBlockParticle(position, block));
+            this.getVibrationManager().callVibrationEvent(new VibrationEvent(null, position, VanillaVibrationTypes.BLOCK_DESTROY));
+        }
+    }
+
     private void addBlockChange(int x, int y, int z) {
         long index = Level.chunkHash(x >> 4, z >> 4);
         addBlockChange(index, x, y, z);
@@ -2422,7 +2441,7 @@ public class Level implements ChunkManager, Metadatable {
             breakTime -= 0.15;
 
             Item[] eventDrops;
-            if (isSilkTouch && target.canSilkTouch() || target.isDropOriginal(player)) {
+            if (isSilkTouch && target.canSilkTouch()) {
                 eventDrops = new Item[]{target.toItem()};
             } else {
                 eventDrops = target.getDrops(player, item);
@@ -2491,7 +2510,8 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (this.gameRules.getBoolean(GameRule.DO_TILE_DROPS)) {
-            if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
+            //TODO: rework the way how the experience is dropped
+            if (!isSilkTouch && player != null && (drops.length != 0 || target.getId() == BlockID.SCULK)) { // For example no xp from redstone if it's mined with stone pickaxe + trick for xp with sculk block
                 if (player.isSurvival() || player.isAdventure()) {
                     this.dropExpOrb(vector.add(0.5, 0.5, 0.5), dropExp);
                 }
@@ -2749,49 +2769,6 @@ public class Level implements ChunkManager, Metadatable {
                         return null;
                     }
                 }
-            } else if (item.getBlock() instanceof BlockSkull && item.getDamage() == 1) {
-                if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
-                    Block first, second;
-
-                    if (!(((first = block.getSide(BlockFace.EAST)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)) instanceof BlockSkull && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)) instanceof BlockSkull && second.toItem().getDamage() == 1))) {
-                        return null;
-                    }
-
-                    block = block.getSide(BlockFace.DOWN);
-
-                    Block first2, second2;
-
-                    if (!((first2 = block.getSide(BlockFace.EAST)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.WEST)).getId() == Item.SOUL_SAND || (first2 = block.getSide(BlockFace.NORTH)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.SOUTH)).getId() == Item.SOUL_SAND)) {
-                        return null;
-                    }
-
-                    block.getLevel().setBlock(first, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(second, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(first2, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(second2, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(block, Block.get(BlockID.AIR));
-                    block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
-
-                    Position spawnPos = block.add(0.5, -1, 0.5);
-
-                    CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_WITHER, player);
-                    server.getPluginManager().callEvent(ev);
-
-                    if (ev.isCancelled()) {
-                        return null;
-                    }
-
-                    if (!player.isCreative()) {
-                        item.setCount(item.getCount() - 1);
-                        player.getInventory().setItemInHand(item);
-                    }
-
-                    EntityWither wither = (EntityWither) Entity.createEntity("Wither", spawnPos);
-                    wither.stayTime = 220;
-                    wither.spawnToAll();
-                    this.addSoundToViewers(wither, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
-                    return null;
-                }
             }
         }
 
@@ -2990,7 +2967,7 @@ public class Level implements ChunkManager, Metadatable {
      * @param pos   方块实体所在的位置。
      *              The position where the block entity is located.
      * @return 如果区块已加载且存在方块实体，则返回该方块实体；否则返回 null。
-     *         If the chunk is loaded and there is a block entity, return the block entity; otherwise, return null.
+     * If the chunk is loaded and there is a block entity, return the block entity; otherwise, return null.
      */
     public BlockEntity getBlockEntityIfLoaded(FullChunk chunk, Vector3 pos) {
         int by = pos.getFloorY();
@@ -4297,18 +4274,6 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addEntityMovement(Entity entity, double x, double y, double z, double yaw, double pitch, double headYaw) {
-        MoveEntityAbsolutePacket pk = new MoveEntityAbsolutePacket();
-        pk.eid = entity.getId();
-        pk.x = x;
-        pk.y = y;
-        pk.z = z;
-        pk.yaw = yaw;
-        pk.headYaw = headYaw;
-        pk.pitch = pitch;
-        pk.onGround = entity.onGround;
-
-        entity.getViewers().values().stream().filter(p -> p.protocol < ProtocolInfo.v1_16_100).forEach(p -> p.dataPacket(pk));
-
         MoveEntityDeltaPacket pk2 = new MoveEntityDeltaPacket();
         pk2.eid = entity.getId();
         if (entity.lastX != x) {
@@ -4339,7 +4304,7 @@ public class Level implements ChunkManager, Metadatable {
             pk2.flags |= MoveEntityDeltaPacket.FLAG_ON_GROUND;
         }
 
-        entity.getViewers().values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_16_100).forEach(p -> p.dataPacket(pk2));
+        entity.getViewers().values().forEach(p -> p.dataPacket(pk2));
     }
 
     public boolean isRaining() {
@@ -4643,231 +4608,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {
-        if (this.getDimension() == DIMENSION_THE_END) return false;
-        final int maxPortalSize = 23;
-        final int targX = target.getFloorX();
-        final int targY = target.getFloorY();
-        final int targZ = target.getFloorZ();
-        //check if there's air above (at least 3 blocks)
-        for (int i = 1; i < 4; i++) {
-            if (this.getBlockIdAt(targX, targY + i, targZ) != BlockID.AIR) {
-                return false;
-            }
-        }
-        int sizePosX = 0;
-        int sizeNegX = 0;
-        int sizePosZ = 0;
-        int sizeNegZ = 0;
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX + i, targY, targZ) == BlockID.OBSIDIAN) {
-                sizePosX++;
-            } else {
-                break;
-            }
-        }
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX - i, targY, targZ) == BlockID.OBSIDIAN) {
-                sizeNegX++;
-            } else {
-                break;
-            }
-        }
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX, targY, targZ + i) == BlockID.OBSIDIAN) {
-                sizePosZ++;
-            } else {
-                break;
-            }
-        }
-        for (int i = 1; i < maxPortalSize; i++) {
-            if (this.getBlockIdAt(targX, targY, targZ - i) == BlockID.OBSIDIAN) {
-                sizeNegZ++;
-            } else {
-                break;
-            }
-        }
-        //plus one for target block
-        int sizeX = sizePosX + sizeNegX + 1;
-        int sizeZ = sizePosZ + sizeNegZ + 1;
-        if (sizeX >= 2 && sizeX <= maxPortalSize) {
-            //start scan from 1 block above base
-            //find pillar or end of portal to start scan
-            int scanX = targX;
-            int scanY = targY + 1;
-            for (int i = 0; i < sizePosX + 1; i++) {
-                //this must be air
-                if (this.getBlockIdAt(scanX + i, scanY, targZ) != BlockID.AIR) {
-                    return false;
-                }
-                if (this.getBlockIdAt(scanX + i + 1, scanY, targZ) == BlockID.OBSIDIAN) {
-                    scanX += i;
-                    break;
-                }
-            }
-            //make sure that the above loop finished
-            if (this.getBlockIdAt(scanX + 1, scanY, targZ) != BlockID.OBSIDIAN) {
-                return false;
-            }
-
-            int innerWidth = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(scanX - i, scanY, targZ);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerWidth++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            int innerHeight = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(scanX, scanY + i, targZ);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerHeight++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            if (!(innerWidth <= 21
-                    && innerWidth >= 2
-                    && innerHeight <= 21
-                    && innerHeight >= 3)) {
-                return false;
-            }
-
-            for (int height = 0; height < innerHeight + 1; height++) {
-                if (height == innerHeight) {
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(scanX - width, scanY + height, targZ) != BlockID.OBSIDIAN) {
-                            return false;
-                        }
-                    }
-                } else {
-                    if (this.getBlockIdAt(scanX + 1, scanY + height, targZ) != BlockID.OBSIDIAN
-                            || this.getBlockIdAt(scanX - innerWidth, scanY + height, targZ) != BlockID.OBSIDIAN) {
-                        return false;
-                    }
-
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(scanX - width, scanY + height, targZ) != BlockID.AIR) {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            for (int height = 0; height < innerHeight; height++) {
-                for (int width = 0; width < innerWidth; width++) {
-                    this.setBlock(new Vector3(scanX - width, scanY + height, targZ), Block.get(BlockID.NETHER_PORTAL));
-                }
-            }
-
-            if (fireCharge) {
-                this.addSoundToViewers(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
-            } else {
-                this.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);
-            }
-            return true;
-        } else if (sizeZ >= 2 && sizeZ <= maxPortalSize) {
-            //start scan from 1 block above base
-            //find pillar or end of portal to start scan
-            int scanY = targY + 1;
-            int scanZ = targZ;
-            for (int i = 0; i < sizePosZ + 1; i++) {
-                //this must be air
-                if (this.getBlockIdAt(targX, scanY, scanZ + i) != BlockID.AIR) {
-                    return false;
-                }
-                if (this.getBlockIdAt(targX, scanY, scanZ + i + 1) == BlockID.OBSIDIAN) {
-                    scanZ += i;
-                    break;
-                }
-            }
-            //make sure that the above loop finished
-            if (this.getBlockIdAt(targX, scanY, scanZ + 1) != BlockID.OBSIDIAN) {
-                return false;
-            }
-
-            int innerWidth = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(targX, scanY, scanZ - i);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerWidth++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            int innerHeight = 0;
-            LOOP:
-            for (int i = 0; i < 21; i++) {
-                int id = this.getBlockIdAt(targX, scanY + i, scanZ);
-                switch (id) {
-                    case BlockID.AIR:
-                        innerHeight++;
-                        break;
-                    case BlockID.OBSIDIAN:
-                        break LOOP;
-                    default:
-                        return false;
-                }
-            }
-            if (!(innerWidth <= 21
-                    && innerWidth >= 2
-                    && innerHeight <= 21
-                    && innerHeight >= 3)) {
-                return false;
-            }
-
-            for (int height = 0; height < innerHeight + 1; height++) {
-                if (height == innerHeight) {
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(targX, scanY + height, scanZ - width) != BlockID.OBSIDIAN) {
-                            return false;
-                        }
-                    }
-                } else {
-                    if (this.getBlockIdAt(targX, scanY + height, scanZ + 1) != BlockID.OBSIDIAN
-                            || this.getBlockIdAt(targX, scanY + height, scanZ - innerWidth) != BlockID.OBSIDIAN) {
-                        return false;
-                    }
-
-                    for (int width = 0; width < innerWidth; width++) {
-                        if (this.getBlockIdAt(targX, scanY + height, scanZ - width) != BlockID.AIR) {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            for (int height = 0; height < innerHeight; height++) {
-                for (int width = 0; width < innerWidth; width++) {
-                    this.setBlock(new Vector3(targX, scanY + height, scanZ - width), Block.get(BlockID.NETHER_PORTAL));
-                }
-            }
-
-            if (fireCharge) {
-                this.addSoundToViewers(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
-            } else {
-                this.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);
-            }
-            return true;
-        }
-
-        return false;
+        return this.portalCreator.create(target, fireCharge);
     }
 
     public Position calculatePortalMirror(Vector3 portal) {
@@ -5070,69 +4811,11 @@ public class Level implements ChunkManager, Metadatable {
             return ProtocolInfo.v1_20_10;
         } else if (protocol >= ProtocolInfo.v1_20_0_23) {
             return ProtocolInfo.v1_20_0;
-        } else if (protocol >= ProtocolInfo.v1_19_80) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_80;
-        } else if (protocol >= ProtocolInfo.v1_19_70_24) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_70;
-        } else if (protocol >= ProtocolInfo.v1_19_60) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_60;
-        } else if (protocol >= ProtocolInfo.v1_19_50_20) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_50;
-        } else if (protocol >= ProtocolInfo.v1_19_20) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_20;
-        } else if (protocol >= ProtocolInfo.v1_19_0_29) { //调色板 物品运行时id
-            return ProtocolInfo.v1_19_0;
-        } else if (protocol >= ProtocolInfo.v1_18_30) { //调色板 物品运行时id
-            return ProtocolInfo.v1_18_30;
-        } else if (protocol >= ProtocolInfo.v1_18_10_26) { //调色板修改
-            return ProtocolInfo.v1_18_10;
-        } else if (protocol >= ProtocolInfo.v1_18_0) { //世界高度改变
-            return ProtocolInfo.v1_18_0;
-        } else if (protocol >= ProtocolInfo.v1_17_40) {
-            return ProtocolInfo.v1_17_40;
-        } else if (protocol >= ProtocolInfo.v1_17_30) {
-            return ProtocolInfo.v1_17_30;
-        } else if (protocol >= ProtocolInfo.v1_17_10) {
-            return ProtocolInfo.v1_17_10;
-        } else if (protocol >= ProtocolInfo.v1_17_0) {
-            return ProtocolInfo.v1_17_0;
-        } else if (protocol >= ProtocolInfo.v1_16_210) {
-            return ProtocolInfo.v1_16_210;
-        } else if (protocol >= ProtocolInfo.v1_16_100) {
-            return ProtocolInfo.v1_16_100;
-        } else if (protocol >= ProtocolInfo.v1_16_0 && protocol <= ProtocolInfo.v1_16_100_52) {
-            return ProtocolInfo.v1_16_0;
         }
         throw new IllegalArgumentException("Invalid chunk protocol: " + protocol);
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        if (chunk == ProtocolInfo.v1_16_0)
-            if (player >= ProtocolInfo.v1_16_0) if (player <= ProtocolInfo.v1_16_100_52) return true;
-        if (chunk == ProtocolInfo.v1_16_100)
-            if (player >= ProtocolInfo.v1_16_100) if (player < ProtocolInfo.v1_16_210) return true;
-        if (chunk == ProtocolInfo.v1_16_210)
-            if (player >= ProtocolInfo.v1_16_210) if (player < ProtocolInfo.v1_17_0) return true;
-        if (chunk == ProtocolInfo.v1_17_0) if (player == ProtocolInfo.v1_17_0) return true;
-        if (chunk == ProtocolInfo.v1_17_10)
-            if (player >= ProtocolInfo.v1_17_10) if (player < ProtocolInfo.v1_17_30) return true;
-        if (chunk == ProtocolInfo.v1_17_30) if (player == ProtocolInfo.v1_17_30) return true;
-        if (chunk == ProtocolInfo.v1_17_40) if (player == ProtocolInfo.v1_17_40) return true;
-        if (chunk == ProtocolInfo.v1_18_0) if (player == ProtocolInfo.v1_18_0) return true;
-        if (chunk == ProtocolInfo.v1_18_10)
-            if (player >= ProtocolInfo.v1_18_10_26) if (player < ProtocolInfo.v1_18_30) return true;
-        if (chunk == ProtocolInfo.v1_18_30) if (player == ProtocolInfo.v1_18_30) return true;
-        if (chunk == ProtocolInfo.v1_19_0)
-            if (player >= ProtocolInfo.v1_19_0_29) if (player < ProtocolInfo.v1_19_20) return true;
-        if (chunk == ProtocolInfo.v1_19_20)
-            if (player >= ProtocolInfo.v1_19_20) if (player < ProtocolInfo.v1_19_50) return true;
-        if (chunk == ProtocolInfo.v1_19_50)
-            if (player >= ProtocolInfo.v1_19_50_20) if (player < ProtocolInfo.v1_19_60) return true;
-        if (chunk == ProtocolInfo.v1_19_60)
-            if (player >= ProtocolInfo.v1_19_60) if (player < ProtocolInfo.v1_19_70) return true;
-        if (chunk == ProtocolInfo.v1_19_70)
-            if (player >= ProtocolInfo.v1_19_70_24) if (player < ProtocolInfo.v1_19_80) return true;
-        if (chunk == ProtocolInfo.v1_19_80) if (player == ProtocolInfo.v1_19_80) return true;
         if (chunk == ProtocolInfo.v1_20_0)
             if (player >= ProtocolInfo.v1_20_0_23) if (player < ProtocolInfo.v1_20_10_21) return true;
         if (chunk == ProtocolInfo.v1_20_10)

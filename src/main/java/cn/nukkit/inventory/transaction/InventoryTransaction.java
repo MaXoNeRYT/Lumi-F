@@ -182,19 +182,9 @@ public class InventoryTransaction {
     }
 
     protected void sendInventories() {
-        if (this.getSource().protocol >= ProtocolInfo.v1_16_0) {
-            for (InventoryAction action : this.actions) {
-                if (action instanceof SlotChangeAction) {
-                    SlotChangeAction sca = (SlotChangeAction) action;
-                    sca.getInventory().sendSlot(sca.getSlot(), this.source);
-                }
-            }
-        } else {
-            for (Inventory inventory : this.inventories) {
-                inventory.sendContents(this.source);
-                if (inventory instanceof PlayerInventory) {
-                    ((PlayerInventory) inventory).sendArmorContents(this.source);
-                }
+        for (InventoryAction action : this.actions) {
+            if (action instanceof SlotChangeAction sca) {
+                sca.getInventory().sendSlot(sca.getSlot(), this.source);
             }
         }
     }

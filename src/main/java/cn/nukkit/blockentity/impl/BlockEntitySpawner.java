@@ -33,7 +33,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final String TAG_MAXIMUM_SPAWN_COUNT = "MaximumSpawnerCount";
     public static final short SPAWN_RANGE = 4;
     public static final short MIN_SPAWN_DELAY = 200;
-    public static final short MAX_SPAWN_DELAY = 5000;
+    public static final short MAX_SPAWN_DELAY = 800;
     public static final short MAX_NEARBY_ENTITIES = 16;
     public static final short REQUIRED_PLAYER_RANGE = 16;
     public static final short MINIMUM_SPAWN_COUNT = 1;
@@ -109,6 +109,10 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public boolean onUpdate() {
         if (this.closed) {
             return false;
+        }
+
+        if(entityId.isEmpty()) {
+            return true;
         }
 
         if (this.delay++ >= Utils.rand(this.minSpawnDelay, this.maxSpawnDelay)) {

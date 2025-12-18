@@ -39,7 +39,6 @@ public class CustomItemDefinition {
     private final String identifier;
     private final CompoundTag nbt; //649
     private final CompoundTag nbt465;
-    private final CompoundTag nbt419;
 
     /**
      * Creative inventory page where the item is put into
@@ -75,11 +74,6 @@ public class CustomItemDefinition {
             wearable465.remove("protection");
         }
 
-        this.nbt419 = this.nbt465.clone();
-        this.nbt419.getCompound("components").getCompound("item_properties").remove("minecraft:icon");
-        this.nbt419.getCompound("components").putCompound("minecraft:icon", new CompoundTag().putString("texture", this.getTexture()));
-
-
         CompoundTag compound = this.nbt.getCompound("components").getCompound("item_properties");
         if (compound.containsInt("creative_category")) {
             this.creativeCategory = CreativeItemCategory.values()[compound.getInt("creative_category")];
@@ -100,10 +94,9 @@ public class CustomItemDefinition {
     public CompoundTag getNbt(int protocol) {
         if (protocol >= ProtocolInfo.v1_20_60) {
             return this.nbt;
-        } else if (protocol >= ProtocolInfo.v1_17_30) {
+        } else {
             return this.nbt465;
         }
-        return this.nbt419;
     }
 
     @Deprecated

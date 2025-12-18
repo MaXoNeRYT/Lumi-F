@@ -84,10 +84,10 @@ public class SmithingInventory extends FakeBlockUIComponent {
 
     @Override
     public void onSlotChange(int index, Item before, boolean send) {
+        super.onSlotChange(index, before, send);
         if (index == EQUIPMENT || index == INGREDIENT || index == TEMPLATE) {
             updateResult();
         }
-        super.onSlotChange(index, before, send);
     }
 
     public void updateResult() {

@@ -23,9 +23,4 @@ public class ItemChestBoatMangrove extends ItemChestBoatBase {
     public int getBoatId() {
         return 6;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_0_29;
-    }
 }

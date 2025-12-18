@@ -5,9 +5,9 @@ import cn.nukkit.network.process.processor.common.*;
 import cn.nukkit.network.process.processor.common.CommandRequestProcessor;
 import cn.nukkit.network.process.processor.common.SetLocalPlayerAsInitializedProcessor;
 import cn.nukkit.network.process.processor.common.LecternUpdateProcessor;
-import cn.nukkit.network.process.processor.v422.FilterTextProcessor_v422;
-import cn.nukkit.network.process.processor.v527.RequestAbilityProcessor_v527;
-import cn.nukkit.network.process.processor.v554.RequestNetworkSettingsProcessor_v554;
+import cn.nukkit.network.process.processor.common.FilterTextProcessor;
+import cn.nukkit.network.process.processor.common.RequestAbilityProcessor;
+import cn.nukkit.network.process.processor.common.RequestNetworkSettingsProcessor;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -165,7 +165,6 @@ public final class DataPacketManager {
                 CommandRequestProcessor.INSTANCE,
                 SetLocalPlayerAsInitializedProcessor.INSTANCE,
                 LecternUpdateProcessor.INSTANCE,
-                AdventureSettingsProcessor.INSTANCE,
                 BookEditProcessor.INSTANCE,
                 ClientToServerHandshakeProcessor.INSTANCE,
                 EmoteListProcessor.INSTANCE,
@@ -186,22 +185,10 @@ public final class DataPacketManager {
                 ServerSettingsRequestProcessor.INSTANCE,
                 SetDifficultyProcessor.INSTANCE,
                 SetPlayerGameTypeProcessor.INSTANCE,
-                TextProcessor.INSTANCE
-        );
-
-        registerProcessor(
-                ProtocolInfo.v1_16_200,
-                FilterTextProcessor_v422.INSTANCE
-        );
-
-        registerProcessor(
-                ProtocolInfo.v1_19_0,
-                RequestAbilityProcessor_v527.INSTANCE
-        );
-
-        registerProcessor(
-                ProtocolInfo.v1_19_30,
-                RequestNetworkSettingsProcessor_v554.INSTANCE
+                TextProcessor.INSTANCE,
+                RequestAbilityProcessor.INSTANCE,
+                RequestNetworkSettingsProcessor.INSTANCE,
+                FilterTextProcessor.INSTANCE
         );
     }
 }

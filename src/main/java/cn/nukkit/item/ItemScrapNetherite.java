@@ -15,9 +15,4 @@ public class ItemScrapNetherite extends Item {
     public ItemScrapNetherite(Integer meta, int count) {
         super(NETHERITE_SCRAP, 0, count, "Netherite Scrap");
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

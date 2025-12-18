@@ -57,7 +57,7 @@ public class RuntimeItemMapping {
 
     public RuntimeItemMapping(Map<String, MappingEntry> mappings, int protocolId) {
         this.protocolId = protocolId;
-        String itemStatesFile = "runtime_item_states_" + protocolId + ".json";
+        String itemStatesFile = "gamedata/item/runtime/runtime_item_states_" + protocolId + ".json";
         InputStream stream = Server.class.getClassLoader().getResourceAsStream(itemStatesFile);
         if (stream == null) {
             throw new AssertionError("Unable to load " + itemStatesFile);
@@ -66,7 +66,7 @@ public class RuntimeItemMapping {
 
         CompoundTag itemComponents = null;
         if (protocolId >= ProtocolInfo.v1_21_60) {
-            try (InputStream inputStream = RuntimeItemMapping.class.getClassLoader().getResourceAsStream("ItemComponents/item_components_" + protocolId + ".nbt")) {
+            try (InputStream inputStream = RuntimeItemMapping.class.getClassLoader().getResourceAsStream("gamedata/item/component/item_components_" + protocolId + ".nbt")) {
                 itemComponents = NBTIO.read(new BufferedInputStream(new GZIPInputStream(inputStream)), ByteOrder.BIG_ENDIAN, false);
             } catch (Exception e) {
                 throw new AssertionError("Error while loading item_components_" + protocolId + ".nbt", e);
@@ -95,12 +95,7 @@ public class RuntimeItemMapping {
 
             //高版本"minecraft:wool"的名称改为"minecraft:white_wool"
             //他们的legacyId均为35，这里避免冲突忽略"minecraft:wool"
-            if (protocolId >= ProtocolInfo.v1_19_63 && "minecraft:wool".equalsIgnoreCase(identifier)) {
-                continue;
-            }
-
-            if (this.protocolId < ProtocolInfo.v1_16_100) {
-                this.registerOldItem(identifier, runtimeId);
+            if ("minecraft:wool".equalsIgnoreCase(identifier)) {
                 continue;
             }
 
@@ -284,20 +279,11 @@ public class RuntimeItemMapping {
         return new ArrayList<>(customItems);
     }
 
-    private void registerOldItem(String identifier, int legacyId) {
-        int fullId = this.getFullId(legacyId, 0);
-        LegacyEntry legacyEntry = new LegacyEntry(legacyId, false, 0);
-
-        this.runtime2Legacy.put(legacyId, legacyEntry);
-        this.identifier2Legacy.put(identifier, legacyEntry);
-        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false));
-    }
-
     public void generatePalette() {
         BinaryStream paletteBuffer = new BinaryStream();
         int size = 0;
         for (RuntimeEntry entry : this.itemPaletteEntries) {
-            if (entry.isCustomItem() && (!Server.getInstance().getSettings().features().enableExperimentMode() || protocolId < ProtocolInfo.v1_16_100)) {
+            if (entry.isCustomItem() && (!Server.getInstance().getSettings().features().enableExperimentMode())) {
                 break;
             }
             size++;
@@ -305,7 +291,7 @@ public class RuntimeItemMapping {
         paletteBuffer.putUnsignedVarInt(size);
         for (RuntimeEntry entry : this.itemPaletteEntries) {
             if (entry.isCustomItem()) {
-                if (Server.getInstance().getSettings().features().enableExperimentMode() && protocolId >= ProtocolInfo.v1_16_100) {
+                if (Server.getInstance().getSettings().features().enableExperimentMode()) {
                     paletteBuffer.putString(entry.getIdentifier());
                     paletteBuffer.putLShort(entry.getRuntimeId());
                     paletteBuffer.putBoolean(true); // Component item
@@ -313,9 +299,7 @@ public class RuntimeItemMapping {
             } else {
                 paletteBuffer.putString(entry.getIdentifier());
                 paletteBuffer.putLShort(entry.getRuntimeId());
-                if (this.protocolId >= ProtocolInfo.v1_16_100) {
-                    paletteBuffer.putBoolean(false); // Component item
-                }
+                paletteBuffer.putBoolean(false); // Component item
             }
         }
         this.itemPalette = paletteBuffer.getBuffer();

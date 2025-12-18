@@ -19,6 +19,11 @@ public class ObjectBirchTree extends ObjectTree {
     }
 
     @Override
+    protected int getLeafType() {
+        return 2;
+    }
+
+    @Override
     public int getTrunkBlock() {
         return BlockID.BIRCH_LOG;
     }

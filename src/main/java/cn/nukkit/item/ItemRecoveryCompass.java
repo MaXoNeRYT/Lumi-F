@@ -6,9 +6,4 @@ public class ItemRecoveryCompass extends StringItemBase {
     public ItemRecoveryCompass() {
         super(RECOVERY_COMPASS, "Recovery Compass");
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_19_0;
-    }
 }

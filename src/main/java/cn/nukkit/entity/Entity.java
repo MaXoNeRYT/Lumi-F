@@ -396,26 +396,23 @@ public abstract class Entity extends Location implements Metadatable {
 
     public static long entityCount = 1;
 
-    private static final Map<Integer, String> entityRuntimeMappingOld = new HashMap<>();
-    private static final Map<Integer, String> entityRuntimeMapping407 = new HashMap<>();
-    private static final Map<Integer, String> entityRuntimeMapping440 = new HashMap<>();
-    private static final Map<Integer, String> entityRuntimeMapping527 = new HashMap<>();
     private static final Map<Integer, String> entityRuntimeMapping589 = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMapping685 = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMapping766 = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMapping800 = new HashMap<>();
+
 
     private static final Map<Integer, CompoundTag> entityIdentifiersMap = new HashMap<>();
     private static final Map<Integer, byte[]> entityIdentifiersCache = new HashMap<>();
 
     static {
-        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping407, ProtocolInfo.v1_16_0);
-        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping440, ProtocolInfo.v1_17_0);
-        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping527, ProtocolInfo.v1_19_0);
-        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping589, ProtocolInfo.v1_20_0);
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping589, ProtocolInfo.v1_20_0); //1.20.0-1.20.80
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping685, ProtocolInfo.v1_21_0); //1.21.0-1.21.40
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping766, ProtocolInfo.v1_21_50); //1.21.50-1.21.70
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping800, ProtocolInfo.v1_21_80); //1.21.80-latest
 
-        initEntityIdentifiers(ProtocolInfo.v1_16_100, AvailableEntityIdentifiersPacket.NBT419);
-        initEntityIdentifiers(ProtocolInfo.v1_17_0, AvailableEntityIdentifiersPacket.NBT440);
-        initEntityIdentifiers(ProtocolInfo.v1_19_0, AvailableEntityIdentifiersPacket.NBT527);
-        initEntityIdentifiers(ProtocolInfo.v1_19_20, AvailableEntityIdentifiersPacket.NBT544);
-        initEntityIdentifiers(ProtocolInfo.v1_19_80, AvailableEntityIdentifiersPacket.TAG);
+        initEntityIdentifiers(ProtocolInfo.v1_20_0_23, AvailableEntityIdentifiersPacket.TAG);
+        initEntityIdentifiers(ProtocolInfo.v1_21_130, AvailableEntityIdentifiersPacket.TAG_898);
     }
 
     public final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
@@ -1197,16 +1194,14 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected static Map<Integer, String> getEntityRuntimeMappingInternal(int protocolId) {
-        if (protocolId >= ProtocolInfo.v1_20_0_23) {
-            return entityRuntimeMapping589;
-        } else if (protocolId >= ProtocolInfo.v1_19_0_29) {
-            return entityRuntimeMapping527;
-        } else if (protocolId >= ProtocolInfo.v1_17_0) {
-            return entityRuntimeMapping440;
-        } else if (protocolId >= ProtocolInfo.v1_16_0) {
-            return entityRuntimeMapping407;
+        if (protocolId >= ProtocolInfo.v1_21_80) {
+            return entityRuntimeMapping800;
+        } else if(protocolId >= ProtocolInfo.v1_21_50) {
+            return entityRuntimeMapping766;
+        } else if(protocolId >= ProtocolInfo.v1_21_0) {
+            return entityRuntimeMapping685;
         }
-        return entityRuntimeMappingOld;
+        return entityRuntimeMapping589;
     }
 
     private static void initEntityIdentifiers(int protocolId, byte[] bytes) {
@@ -1220,17 +1215,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     private static int correctEntityIdentifiersProtocol(int protocolId) {
-        if (protocolId >= ProtocolInfo.v1_19_80) {
-            return ProtocolInfo.v1_19_80;
-        } else if (protocolId >= ProtocolInfo.v1_19_20) {
-            return ProtocolInfo.v1_19_20;
-        } else if (protocolId >= ProtocolInfo.v1_19_0_29) {
-            return ProtocolInfo.v1_19_0;
-        } else if (protocolId >= ProtocolInfo.v1_17_0) {
-            return ProtocolInfo.v1_17_0;
-        } else {
-            return ProtocolInfo.v1_16_100;
+        if (protocolId >= ProtocolInfo.v1_21_130) {
+            return ProtocolInfo.v1_21_130;
         }
+        return ProtocolInfo.v1_20_0_23;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
@@ -1851,9 +1839,6 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.checkBlockCollision();
         int minY = level.getMinBlockY() - 18;
-        if (this.isPlayer && ((Player) this).protocol < ProtocolInfo.v1_18_0) {
-            minY = -18;
-        }
         if (this.y <= minY && this.isAlive()) {
             if (this.isPlayer) {
                 if (((Player) this).getGamemode() != Player.CREATIVE) this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
@@ -2418,6 +2403,11 @@ public abstract class Entity extends Location implements Metadatable {
         return new Location(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw, this.level);
     }
 
+    public boolean isInsideBubbleColumn() {
+        double y = this.y + this.getEyeHeight();
+        return this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)) == Block.BUBBLE_COLUMN;
+    }
+
     public boolean isSubmerged() {
         double y = this.y + this.getEyeHeight();
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
@@ -2621,25 +2611,33 @@ public abstract class Entity extends Location implements Metadatable {
 
     public List<Block> getBlocksAround() {
         if (this.blocksAround == null) {
-            int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
-            int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
-            int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
-            int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
-            int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
-            int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
+            AxisAlignedBB bb = this.boundingBox;
+            int minX = NukkitMath.floorDouble(bb.getMinX());
+            int minY = Math.max(NukkitMath.floorDouble(bb.getMinY()), this.level.getMinBlockY());
+            int minZ = NukkitMath.floorDouble(bb.getMinZ());
+            int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+            int maxY = Math.min(NukkitMath.ceilDouble(bb.getMaxY()), this.level.getMaxBlockY());
+            int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
 
-            this.blocksAround = new ArrayList<>();
+            int sizeX = maxX - minX + 1;
+            int sizeY = maxY - minY + 1;
+            int sizeZ = maxZ - minZ + 1;
+
+            if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0) {
+                return new ArrayList<>();
+            }
+
+            this.blocksAround = new ArrayList<>(sizeX * sizeY * sizeZ);
 
             try {
-                if (this.level.isYInRange(minY) || this.level.isYInRange(maxY)) {
-                    minY = Math.max(minY, this.level.getMinBlockY());
-                    maxY = Math.min(maxY, this.level.getMaxBlockY());
-                    for (int z = minZ; z <= maxZ; ++z) {
-                        for (int x = minX; x <= maxX; ++x) {
-                            for (int y = minY; y <= maxY; ++y) {
-                                Block block = this.level.getBlock(x, y, z, false);
-                                this.blocksAround.add(block);
-                            }
+                if (!this.level.isYInRange(minY) && !this.level.isYInRange(maxY)) {
+                    return this.blocksAround;
+                }
+                for (int x = minX; x <= maxX; x++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        for (int y = minY; y <= maxY; y++) {
+                            Block block = this.level.getBlock(x, y, z, false);
+                            this.blocksAround.add(block);
                         }
                     }
                 }
@@ -2656,15 +2654,62 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.collisionBlocks == null) {
             this.collisionBlocks = new ArrayList<>();
 
-            List<Block> bl = this.getBlocksAround();
-            for (Block b : bl) {
-                if (b.collidesWithBB(this.boundingBox, true)) {
-                    this.collisionBlocks.add(b);
+            AxisAlignedBB bb = this.boundingBox.clone();
+            double speed = this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ;
+            double expand = Math.max(0.5, Math.sqrt(speed) * 1.5);
+
+            AxisAlignedBB expandedBB = bb.grow(expand, expand, expand);
+            List<Block> blocks = getBlocksInBoundingBox(expandedBB);
+
+            for (Block block : blocks) {
+                if (block.getId() == Block.NETHER_PORTAL) {
+                    AxisAlignedBB portalBB = new SimpleAxisAlignedBB(
+                            block.x, block.y, block.z,
+                            block.x + 1, block.y + 1, block.z + 1
+                    );
+
+                    double motionAbsX = Math.abs(this.motionX), motionAbsY = Math.abs(this.motionY), motionAbsZ = Math.abs(this.motionZ);
+                    AxisAlignedBB trajectoryBB = bb.grow(motionAbsX + 0.3, motionAbsY + 0.3, motionAbsZ + 0.3);
+
+                    if (trajectoryBB.intersectsWith(portalBB)) {
+                        this.collisionBlocks.add(block);
+                    }
+                } else if (block.collidesWithBB(bb, true)) {
+                    this.collisionBlocks.add(block);
                 }
             }
         }
 
         return this.collisionBlocks;
+    }
+
+    private List<Block> getBlocksInBoundingBox(AxisAlignedBB bb) {
+        int minX = NukkitMath.floorDouble(bb.getMinX());
+        int minY = Math.max(NukkitMath.floorDouble(bb.getMinY()), this.level.getMinBlockY());
+        int minZ = NukkitMath.floorDouble(bb.getMinZ());
+        int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+        int maxY = Math.min(NukkitMath.ceilDouble(bb.getMaxY()), this.level.getMaxBlockY());
+        int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
+
+        int sizeX = maxX - minX + 1;
+        int sizeY = maxY - minY + 1;
+        int sizeZ = maxZ - minZ + 1;
+
+        if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0) {
+            return new ArrayList<>();
+        }
+
+        List<Block> blocks = new ArrayList<>(sizeX * sizeY * sizeZ);
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    Block block = this.level.getBlock(x, y, z, false);
+                    if (block != null) blocks.add(block);
+                }
+            }
+        }
+        return blocks;
     }
 
     /**

@@ -18,9 +18,4 @@ public class ItemDoorCrimson extends Item {
         super(CRIMSON_DOOR, 0, count, "Crimson Door");
         this.block = Block.get(BlockID.CRIMSON_DOOR_BLOCK);
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_0;
-    }
 }

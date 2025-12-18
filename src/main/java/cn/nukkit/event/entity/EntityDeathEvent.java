@@ -16,12 +16,14 @@ public class EntityDeathEvent extends EntityEvent {
     }
 
     private Item[] drops;
+    private int experience;
 
-    public EntityDeathEvent(EntityLiving entity) {
-        this(entity, Item.EMPTY_ARRAY);
+    public EntityDeathEvent(EntityLiving entity, int experience) {
+        this(entity, Item.EMPTY_ARRAY, experience);
     }
 
-    public EntityDeathEvent(EntityLiving entity, Item[] drops) {
+    public EntityDeathEvent(EntityLiving entity, Item[] drops, int experience) {
+        this.experience = experience;
         this.entity = entity;
         this.drops = drops;
     }
@@ -34,7 +36,14 @@ public class EntityDeathEvent extends EntityEvent {
         if (drops == null) {
             drops = Item.EMPTY_ARRAY;
         }
-
         this.drops = drops;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public void setExperience(int experience) {
+        this.experience = experience;
     }
 }

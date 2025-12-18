@@ -1,5 +1,6 @@
 package cn.nukkit.recipe.descriptor;
 
+import cn.nukkit.item.Item;
 import cn.nukkit.utils.BinaryStream;
 
 public abstract class ItemDescriptor implements Cloneable {
@@ -7,6 +8,10 @@ public abstract class ItemDescriptor implements Cloneable {
 
     @Override
     public boolean equals(Object entry) {
+        if(entry instanceof Item item) {
+            return this.equals(new DefaultDescriptor(item));
+        }
+
         if(this instanceof ItemTagDescriptor tag && entry instanceof DefaultDescriptor item) {
             return tag.getItemTag().has(item.getItem().getItemType());
         }
