@@ -43,7 +43,7 @@ public class BlockPickRequestProcessor extends DataPacketProcessor<BlockPickRequ
         PlayerBlockPickEvent event = new PlayerBlockPickEvent(handle.player, block, item);
         if (handle.player.isSpectator()) event.setCancelled();
 
-        if (!event.call()) {
+        if (event.call()) {
             PlayerInventory inventory = handle.player.getInventory();
             boolean itemExists = false;
             int itemSlot = -1;

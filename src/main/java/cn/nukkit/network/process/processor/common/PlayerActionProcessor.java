@@ -147,7 +147,7 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     private void toggleSprint(PlayerHandle handle, boolean value) {
         PlayerToggleSprintEvent evt = new PlayerToggleSprintEvent(handle.player, value);
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) {
+        if (!evt.isCancelled()) {
             handle.setNeedSendData(true);
         } else {
             handle.setSprinting(value);
@@ -157,7 +157,8 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     private void toggleSneak(PlayerHandle handle, boolean value) {
         PlayerToggleSneakEvent evt = new PlayerToggleSneakEvent(handle.player, value);
         Server.getInstance().getPluginManager().callEvent(evt);
-        if (evt.isCancelled()) {
+
+        if (!evt.isCancelled()) {
             handle.setNeedSendData(true);
         } else {
             handle.setSneaking(value);
@@ -166,13 +167,16 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
 
     private void toggleSwim(PlayerHandle handle, boolean value) {
         PlayerToggleSwimEvent evt = new PlayerToggleSwimEvent(handle.player, value);
+
         if (value && !handle.isInsideOfWater()) {
             evt.setCancelled(true);
         }
+
         if (!value && handle.hasRidingOrSleeping()) {
             evt.setCancelled(true);
         }
-        if (evt.call()) {
+
+        if (!evt.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setSwimming(value);
@@ -182,10 +186,12 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
     private void toggleGlide(PlayerHandle handle, boolean value) {
         PlayerToggleGlideEvent evt = new PlayerToggleGlideEvent(handle.player, value);
         Item chestplate = handle.getChestplate();
+
         if (handle.hasRidingOrSleeping() || (value && (chestplate == null || chestplate.getId() != 0xEL))) {
             evt.setCancelled(true);
         }
-        if (evt.call()) {
+
+        if (!evt.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setGliding(value);
@@ -194,7 +200,8 @@ public class PlayerActionProcessor extends DataPacketProcessor<PlayerActionPacke
 
     private void toggleCrawl(PlayerHandle handle, boolean value) {
         PlayerToggleCrawlEvent evt = new PlayerToggleCrawlEvent(handle.player, value);
-        if (evt.call()) {
+
+        if (!evt.call()) {
             handle.setNeedSendData(true);
         } else {
             handle.setCrawling(value);
