@@ -42,6 +42,11 @@ public abstract class DebugShape {
      * Can be {@code null}, and in that case that the color will be set to white client-side.
      */
     protected Color color;
+    /**
+     * The id of this debug shape.
+     */
+    @Getter
+    protected final int dimensionId;
 
     /**
      * Creates a new debug shape with the specified position, rotation, color, and scale.
@@ -49,11 +54,12 @@ public abstract class DebugShape {
      * @param position The position of the shape.
      * @param color    the color of the shape.
      */
-    public DebugShape(Vector3f position, Color color) {
+    public DebugShape(Vector3f position, Color color, int dimensionId) {
         this.id = DEBUG_SHAPE_ID_COUNTER.getAndIncrement();
         this.viewers = new Long2ObjectOpenHashMap<>();
         this.position = position;
         this.color = color;
+        this.dimensionId = dimensionId;
     }
 
     /**
@@ -109,7 +115,7 @@ public abstract class DebugShape {
         return new ScriptDebugShape(
                 this.id, null, null,
                 null, null, null,
-                null, null, null,
+                null, dimensionId,null, null,
                 null, null, null, null
         );
     }

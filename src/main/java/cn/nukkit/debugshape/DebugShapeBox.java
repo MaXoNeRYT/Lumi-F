@@ -31,8 +31,8 @@ public class DebugShapeBox extends DebugShape {
      * @param scale     the scale of the box, which is a multiplier for the size of the box.
      * @param boxBounds the bounds of the box, which is a vector representing the size of the box in each dimension (x, y and z).
      */
-    public DebugShapeBox(Vector3f position, Color color, Float scale, Vector3f boxBounds) {
-        super(position, color);
+    public DebugShapeBox(Vector3f position, Color color, int dimensionId, Float scale, Vector3f boxBounds) {
+        super(position, color, dimensionId);
         this.scale = scale;
         this.boxBounds = boxBounds;
     }
@@ -83,7 +83,7 @@ public class DebugShapeBox extends DebugShape {
         return new ScriptDebugShape(
                 id, getType(), position, scale,
                 null, null, color,
-                null, boxBounds, null,
+                dimensionId,null, boxBounds, null,
                 null, null, null
         );
     }

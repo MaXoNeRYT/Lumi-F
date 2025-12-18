@@ -22,8 +22,8 @@ public class DebugShapeText extends DebugShape {
      * @param color    The color of the text.
      * @param text     The text to display.
      */
-    public DebugShapeText(Vector3f position, Color color, String text) {
-        super(position, color);
+    public DebugShapeText(Vector3f position, Color color, int dimensionId, String text) {
+        super(position, color, dimensionId);
         this.text = text;
     }
 
@@ -46,7 +46,7 @@ public class DebugShapeText extends DebugShape {
         return new ScriptDebugShape(
                 id, getType(), position, null,
                 null, null, color,
-                text, null, null,
+                dimensionId, text, null, null,
                 null, null, null
         );
     }

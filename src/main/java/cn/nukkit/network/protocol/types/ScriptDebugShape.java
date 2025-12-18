@@ -21,6 +21,7 @@ public class ScriptDebugShape {
     Float totalTimeLeft;
     @Nullable
     Color color;
+    int dimensionId;
     @Nullable
     String text;
     @Nullable
@@ -33,5 +34,4 @@ public class ScriptDebugShape {
     Float arrowHeadRadius;
     @Nullable
     Integer segments;
-
 }

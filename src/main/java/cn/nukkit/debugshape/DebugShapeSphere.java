@@ -29,8 +29,8 @@ public class DebugShapeSphere extends DebugShape {
      * @param scale    the scale of the sphere, which is a multiplier for the size of the sphere.
      * @param segments the segments of the sphere, which determines how many segments the sphere will be divided into.
      */
-    public DebugShapeSphere(Vector3f position, Color color, Float scale, Integer segments) {
-        super(position, color);
+    public DebugShapeSphere(Vector3f position, Color color, int dimensionId, Float scale, Integer segments) {
+        super(position, color, dimensionId);
         this.scale = scale;
         this.segments = segments;
     }
@@ -81,7 +81,7 @@ public class DebugShapeSphere extends DebugShape {
         return new ScriptDebugShape(
                 id, getType(), position, scale,
                 null, null, color,
-                null, null, null,
+                dimensionId, null, null, null,
                 null, null, segments
         );
     }
