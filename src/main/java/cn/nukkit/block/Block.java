@@ -633,22 +633,16 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             return 1.0;
         }
         if (toolType == ItemTool.TYPE_NONE) return 1.0;
-        switch (toolTier) {
-            case ItemTool.TIER_WOODEN:
-                return 2.0;
-            case ItemTool.TIER_STONE:
-                return 4.0;
-            case ItemTool.TIER_IRON:
-                return 6.0;
-            case ItemTool.TIER_DIAMOND:
-                return 8.0;
-            case ItemTool.TIER_NETHERITE:
-                return 9.0;
-            case ItemTool.TIER_GOLD:
-                return 12.0;
-            default:
-                return 1.0;
-        }
+        return switch (toolTier) {
+            case ItemTool.TIER_WOODEN -> 2.0;
+            case ItemTool.TIER_STONE -> 4.0;
+            case ItemTool.TIER_COPPER -> 5.0;
+            case ItemTool.TIER_IRON -> 6.0;
+            case ItemTool.TIER_DIAMOND -> 8.0;
+            case ItemTool.TIER_NETHERITE -> 9.0;
+            case ItemTool.TIER_GOLD -> 12.0;
+            default -> 1.0;
+        };
     }
 
     private static double speedBonusByEfficiencyLore0(int efficiencyLoreLevel) {

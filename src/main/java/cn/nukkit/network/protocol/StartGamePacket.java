@@ -3,6 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.customblock.CustomBlockDefinition;
+import cn.nukkit.block.customblock.serializer.CustomBlockDefinitionSerializer;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
@@ -312,7 +313,7 @@ public class StartGamePacket extends DataPacket {
             for (CustomBlockDefinition definition : this.blockDefinitions) {
                 this.putString(definition.identifier());
                 try {
-                    this.put(NBTIO.write(definition.nbt(), ByteOrder.LITTLE_ENDIAN, true));
+                    this.put(NBTIO.write(CustomBlockDefinitionSerializer.serialize(definition.nbt(), protocol), ByteOrder.LITTLE_ENDIAN, true));
                 } catch (Exception e) {
                     log.error("Error while encoding NBT data of CustomBlockDefinition", e);
                 }

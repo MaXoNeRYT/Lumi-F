@@ -29,8 +29,8 @@ public class DebugShapeCircle extends DebugShape {
      * @param scale    the scale of the circle, which is a multiplier for the size of the circle.
      * @param segments the segments of the circle, which determines how many segments the circle will be divided into.
      */
-    public DebugShapeCircle(Vector3f position, Color color, Float scale, Integer segments) {
-        super(position, color);
+    public DebugShapeCircle(Vector3f position, Color color, int dimensionId, Float scale, Integer segments) {
+        super(position, color, dimensionId);
         this.scale = scale;
         this.segments = segments;
     }
@@ -81,7 +81,7 @@ public class DebugShapeCircle extends DebugShape {
         return new ScriptDebugShape(
                 id, getType(), position, scale,
                 null, null, color,
-                null, null, null,
+                dimensionId, null, null, null,
                 null, null, segments
         );
     }
