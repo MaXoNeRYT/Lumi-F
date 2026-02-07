@@ -8,6 +8,7 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.spawner.EntitySpawner;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -19,8 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author MagicDroidX
@@ -38,6 +38,11 @@ public abstract class Biome implements BlockID {
     private int id;
     private float baseHeight = 0.1f;
     private float heightVariation = 0.3f;
+
+    private final EnumSet<EntitySpawner.SpawnerType> disabledSpawnerTypes =
+            EnumSet.noneOf(EntitySpawner.SpawnerType.class);
+
+    private final Set<Class<?>> disabledEntities = new HashSet<>();
 
     static {
         try (InputStream stream = Biome.class.getClassLoader().getResourceAsStream("gamedata/biome/biome_id_map.json")) {
@@ -198,5 +203,25 @@ public abstract class Biome implements BlockID {
 
     public boolean canRain() {
         return true;
+    }
+
+    /* ==== SpawnerType ==== */
+
+    public void disableSpawnerType(EntitySpawner.SpawnerType type) {
+        disabledSpawnerTypes.add(type);
+    }
+
+    public boolean isSpawnerTypeAllowed(EntitySpawner.SpawnerType type) {
+        return !disabledSpawnerTypes.contains(type);
+    }
+
+    /* ==== Concrete entities ==== */
+
+    public void disableEntity(Class<?> entityClass) {
+        disabledEntities.add(entityClass);
+    }
+
+    public boolean isEntityAllowed(Class<?> entityClass) {
+        return !disabledEntities.contains(entityClass);
     }
 }

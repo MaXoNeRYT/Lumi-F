@@ -11,6 +11,7 @@ import cn.nukkit.entity.mob.EntityPhantom;
 import cn.nukkit.entity.passive.EntityStrider;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.biome.Biome;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Utils;
@@ -118,6 +119,20 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 
         Level level = player.getLevel();
         Position pos = new Position(player.getFloorX(), player.getFloorY(), player.getFloorZ(), level);
+
+        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+        Biome biome1 = cn.nukkit.level.biome.EnumBiome.getBiome(biomeId);
+
+        if (biome1 != null) {
+            if (!biome1.isSpawnerTypeAllowed(this.spawnerType)) {
+                return;
+            }
+
+            if (!biome1.isEntityAllowed(this.entityClass)) {
+                return;
+            }
+        }
+
 
         if (EntitySpawnerTask.entitySpawnAllowed(level, this.getEntityClass(), player, this)) {
             if (entityClass == EntityPhantom.class) {

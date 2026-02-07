@@ -24,6 +24,7 @@ public abstract class PathfindingMob extends BaseEntity {
     public PathfindingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         this.pathfinder = AStarPathfinder.getInstance(this.level);
+        this.currentPath = new ArrayList<>();
     }
 
     protected boolean findPathToTarget(Vector3 target) {
@@ -138,7 +139,12 @@ public abstract class PathfindingMob extends BaseEntity {
     }
 
     public void clearPath() {
-        currentPath.clear();
+        if (currentPath == null) {
+            currentPath = new ArrayList<>();
+        } else {
+            currentPath.clear();
+        }
+
         pathIndex = 0;
         stuckTicks = 0;
         if (pendingPathFuture != null && !pendingPathFuture.isDone()) {

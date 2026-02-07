@@ -38,7 +38,7 @@ public class PlainsBiome extends GrassyBiome {
         this.addPopulator(flower);
 
         this.setBaseHeight(0.125f);
-        this.setHeightVariation(0.05f);
+        this.setHeightVariation(0.01f);
     }
 
     @Override

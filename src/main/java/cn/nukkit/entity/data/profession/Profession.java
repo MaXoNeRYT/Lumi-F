@@ -24,11 +24,17 @@ public abstract class Profession {
     private final int index;
     private final int blockid;
     private final String name;
+    private final boolean requiresProfessionBlock;
 
     public Profession(int index, int blockid, String name) {
+        this(index, blockid, name, true);
+    }
+
+    public Profession(int index, int blockid, String name, boolean requiresProfessionBlock) {
         this.index = index;
         this.blockid = blockid;
         this.name = name;
+        this.requiresProfessionBlock = requiresProfessionBlock;
     }
 
     public ListTag<Tag> buildTrades(int seed) {
@@ -62,5 +68,9 @@ public abstract class Profession {
 
     public String getName() {
         return this.name;
+    }
+
+    public boolean requiresProfessionBlock() {
+        return this.requiresProfessionBlock;
     }
 }
