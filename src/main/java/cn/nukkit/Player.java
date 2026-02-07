@@ -174,6 +174,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int LOOM_WINDOW_ID = 5;
     public static final int SMITHING_WINDOW_ID = 6;
     public static final int GRINDSTONE_WINDOW_ID = 7;
+    public static final int STONECUTTER_WINDOW_ID = 8;
     /**
      * @since 649 1.20.60
      * 自1.20.60开始，需要发送ContainerOpenPacket给玩家才能正常打开讲台上的书
@@ -1615,9 +1616,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setAdventureSettings(ev.getNewAdventureSettings());
 
         if (this.isSpectator()) {
+            this.noClip = true;
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SILENT, true, false);
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, false);
         } else {
+            this.noClip = false;
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SILENT, false, false);
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, true);
         }
@@ -2695,6 +2698,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 .set(Type.ALLOW_FLIGHT, isCreative() || isSpectator())
                 .set(Type.NO_CLIP, isSpectator())
                 .set(Type.FLYING, isSpectator());
+
+        this.noClip = isSpectator();
 
         Level level;
         if ((level = this.server.getLevelByName(nbt.getString("Level"))) == null || nbt.getShort("Health") < 1) {
@@ -4822,6 +4827,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.moveBlockUIContents(Player.ENCHANT_WINDOW_ID);
             this.moveBlockUIContents(Player.BEACON_WINDOW_ID);
             this.moveBlockUIContents(Player.SMITHING_WINDOW_ID);
+            this.moveBlockUIContents(Player.STONECUTTER_WINDOW_ID);
 
             this.playerUIInventory.clearAll();
 
