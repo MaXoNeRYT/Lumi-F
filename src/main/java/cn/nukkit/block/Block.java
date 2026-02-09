@@ -113,18 +113,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        Block block;
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            block = Registries.BLOCK.getCustom(id).toCustomBlock(meta);
-            if (pos != null) {
-                block.x = pos.x;
-                block.y = pos.y;
-                block.z = pos.z;
-                block.level = pos.level;
-                block.layer = layer;
-            }
-            return block;
+            return Registries.BLOCK.getCustom(id).toCustomBlock(meta);
         }
+
+        Block block;
         int fullId = id << DATA_BITS;
         if (meta != null && meta > DATA_SIZE) {
             if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
@@ -189,13 +182,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         int id = fullId << DATA_BITS;
 
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            Block block = Registries.BLOCK.getCustom(id).toCustomBlock(fullId & DATA_BITS);
-            block.x = x;
-            block.y = y;
-            block.z = z;
-            block.level = level;
-            block.layer = layer;
-            return block;
+            return Registries.BLOCK.getCustom(id).toCustomBlock(fullId & DATA_BITS);
         }
 
         if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
@@ -208,7 +195,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         block.y = y;
         block.z = z;
         block.level = level;
-        block.layer = layer;
+        //block.layer = layer;
         return block;
     }
 
@@ -217,16 +204,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
-        Block block;
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            block = Registries.BLOCK.getCustom(id).toCustomBlock(meta);
-            block.x = x;
-            block.y = y;
-            block.z = z;
-            block.level = level;
-            block.layer = layer;
-            return block;
+            return Registries.BLOCK.getCustom(id).toCustomBlock(meta);
         }
+
+        Block block;
         if (meta <= DATA_SIZE) {
             block = Registries.BLOCK.get(id << DATA_BITS | meta).clone();
         } else {
@@ -509,7 +491,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
         // Throw an exception if for some reason the type cannot be determined.
         if (this.type == null) {
-            //         throw new IllegalStateException("Failed to initialize block type " + this.getName() + ": " + this.getId() + ":" + this.getDamage());
+            throw new IllegalStateException("Failed to initialize block type " + this.getName() + ": " + this.getId() + ":" + this.getDamage());
         }
 
         return this.type;
@@ -540,11 +522,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * @return String identifier
      */
     public String getIdentifier() {
-        if (this.getBlockType() != null) {
-            return this.getBlockType().getIdentifier();
-        } else {
-            return "";
-        }
+        return this.getBlockType().getIdentifier();
     }
 
     public int getItemId() {
