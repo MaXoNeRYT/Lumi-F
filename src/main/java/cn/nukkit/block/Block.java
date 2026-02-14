@@ -114,10 +114,19 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         Block block;
-        int fullId = id << DATA_BITS;
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
             block = Registries.BLOCK.getCustom(id).toCustomBlock(meta);
-        } else if (meta != null && meta > DATA_SIZE) {
+            if (pos != null) {
+                block.x = pos.x;
+                block.y = pos.y;
+                block.z = pos.z;
+                block.level = pos.level;
+                block.layer = layer;
+            }
+            return block;
+        }
+        int fullId = id << DATA_BITS;
+        if (meta != null && meta > DATA_SIZE) {
             if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
                 log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
                 return new BlockUnknown(id, meta);
@@ -179,18 +188,22 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static Block get(int fullId, Level level, int x, int y, int z, int layer) {
         int id = fullId << DATA_BITS;
 
-        Block block;
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            block = Registries.BLOCK.getCustom(id).toCustomBlock(fullId & DATA_BITS);
-        } else {
-            block = Registries.BLOCK.get(fullId).clone();
-            if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
-                int meta = fullId & DATA_BITS;
-                log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
-                return new BlockUnknown(id, meta);
-            }
+            Block block = Registries.BLOCK.getCustom(id).toCustomBlock(fullId & DATA_BITS);
+            block.x = x;
+            block.y = y;
+            block.z = z;
+            block.level = level;
+            block.layer = layer;
+            return block;
         }
 
+        if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
+            int meta = fullId & DATA_BITS;
+            log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
+            return new BlockUnknown(id, meta);
+        }
+        Block block = Registries.BLOCK.get(fullId).clone();
         block.x = x;
         block.y = y;
         block.z = z;
@@ -207,7 +220,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         Block block;
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
             block = Registries.BLOCK.getCustom(id).toCustomBlock(meta);
-        }else if (meta <= DATA_SIZE) {
+            block.x = x;
+            block.y = y;
+            block.z = z;
+            block.level = level;
+            block.layer = layer;
+            return block;
+        }
+        if (meta <= DATA_SIZE) {
             block = Registries.BLOCK.get(id << DATA_BITS | meta).clone();
         } else {
             block = Registries.BLOCK.get(id << DATA_BITS).clone();
@@ -479,21 +499,29 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             return this.type;
         }
 
-        if (this instanceof CustomBlock customBlock) {
-            this.type = BlockTypes.get(customBlock.getIdentifier());
-        } else if (this.isAir()) {
-            this.type = BlockTypes.AIR;
-        } else {
-            this.type = BlockTypes.get(Registries.BLOCK_TO_ITEM.get(this.getId() > 255 ? 255 - this.getId() : this.getId(), this.getDamage()));
+        try {
+            if (this instanceof CustomBlock customBlock) {
+                this.type = BlockTypes.get(customBlock.getIdentifier());
+            } else if (this.isAir()) {
+                this.type = BlockTypes.AIR;
+            } else {
+                this.type = BlockTypes.get(
+                        Registries.BLOCK_TO_ITEM.get(
+                                this.getId() > 255 ? 255 - this.getId() : this.getId(),
+                                this.getDamage()
+                        )
+                );
+            }
+        } catch (Throwable ignored) {
         }
 
-        // Throw an exception if for some reason the type cannot be determined.
         if (this.type == null) {
-            throw new IllegalStateException("Failed to initialize block type " + this.getName() + ": " + this.getId() + ":" + this.getDamage());
+            this.type = BlockTypes.AIR;
         }
 
         return this.type;
     }
+
 
     /**
      * Gets all item block.
@@ -520,8 +548,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * @return String identifier
      */
     public String getIdentifier() {
-        return this.getBlockType().getIdentifier();
+        BlockType type = this.getBlockType();
+        return type != null ? type.getIdentifier() : "";
     }
+
 
     public int getItemId() {
         int id = getId();

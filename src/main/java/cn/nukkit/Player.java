@@ -2267,15 +2267,35 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void sendAttributes() {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
         pk.entityId = this.getId();
+
+        float maxHealth = this.getMaxHealth();
+        float safeHealth = health > 0 ? Math.min(health, maxHealth) : 0;
+
+        float speed = Math.max(0f, this.getMovementSpeed());
+
         pk.entries = new Attribute[]{
-                Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0),
-                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.foodData.getFood()).setDefaultValue(this.foodData.getMaxFood()),
-                Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()).setDefaultValue(this.getMovementSpeed()),
-                Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL).setValue(this.expLevel),
-                Attribute.getAttribute(Attribute.EXPERIENCE).setValue(((float) this.exp) / calculateRequireExperience(this.expLevel))
+                Attribute.getAttribute(Attribute.MAX_HEALTH)
+                        .setMaxValue(maxHealth)
+                        .setValue(safeHealth),
+
+                Attribute.getAttribute(Attribute.MAX_HUNGER)
+                        .setValue(this.foodData.getFood())
+                        .setDefaultValue(this.foodData.getMaxFood()),
+
+                Attribute.getAttribute(Attribute.MOVEMENT_SPEED)
+                        .setValue(speed)
+                        .setDefaultValue(0.1f),
+
+                Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL)
+                        .setValue(this.expLevel),
+
+                Attribute.getAttribute(Attribute.EXPERIENCE)
+                        .setValue(((float) this.exp) / calculateRequireExperience(this.expLevel))
         };
+
         this.dataPacket(pk);
     }
+
 
     public void sendFogStack() {
         PlayerFogPacket pk = new PlayerFogPacket();

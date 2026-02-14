@@ -540,7 +540,16 @@ public abstract class Entity extends Location implements Metadatable {
 
     private Map<String, Integer> intProperties = new LinkedHashMap<>();
     private Map<String, Float> floatProperties = new LinkedHashMap<>();
+    private AxisAlignedBB cachedBoundingBox = null;
+    private long cachedBBTimestamp = 0;
+    private static final long BB_CACHE_DURATION = 2;
 
+    private Vector3 cachedPosition = null;
+    private long cachedPosTimestamp = 0;
+
+    private Boolean cachedCanSeeSky = null;
+    private long cachedCanSeeSkyTimestamp = 0;
+    private static final long SKY_CACHE_DURATION = 20;
     public float getHeight() {
         return 0;
     }
@@ -965,8 +974,12 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void removeAllEffects(EntityEffectUpdateEvent.Cause cause) {
-        for (Effect effect : this.effects.values()) {
-            this.removeEffect(effect.getType(), cause);
+        if (this.effects.isEmpty()) return;
+
+        List<EffectType> toRemove = new ArrayList<>(this.effects.keySet());
+
+        for (int i = 0, size = toRemove.size(); i < size; i++) {
+            this.removeEffect(toRemove.get(i), cause);
         }
     }
 
@@ -1100,35 +1113,45 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void recalculateEffectColor() {
-        int[] color = new int[3];
+        if (this.effects.isEmpty()) {
+            this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, 0));
+            this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, 0));
+            this.setDataProperty(new LongEntityData(Entity.DATA_VISIBLE_MOB_EFFECTS, 0L));
+            return;
+        }
+
+        int r = 0, g = 0, b = 0;
         int count = 0;
         boolean ambient = true;
         long effectsData = 0;
+
         for (Effect effect : effects.values()) {
-            if (effect.isVisible()) {
-                Color effectColor = effect.getColor();
-                color[0] += effectColor.getRed() * effect.getLevel();
-                color[1] += effectColor.getGreen() * effect.getLevel();
-                color[2] += effectColor.getBlue() * effect.getLevel();
-                count += effect.getLevel();
-                if (!effect.isAmbient()) {
-                    ambient = false;
-                }
-                effectsData = effectsData << 7 | ((effect.getId() & 0x3f) << 1) | (effect.isAmbient() ? 1 : 0);
+            if (!effect.isVisible()) continue;
+
+            Color effectColor = effect.getColor();
+            int level = effect.getLevel();
+
+            r += effectColor.getRed() * level;
+            g += effectColor.getGreen() * level;
+            b += effectColor.getBlue() * level;
+            count += level;
+
+            if (!effect.isAmbient()) {
+                ambient = false;
             }
+
+            effectsData = effectsData << 7 | ((effect.getId() & 0x3f) << 1) | (effect.isAmbient() ? 1 : 0);
         }
 
         if (count > 0) {
-            int r = (color[0] / count) & 0xff;
-            int g = (color[1] / count) & 0xff;
-            int b = (color[2] / count) & 0xff;
-
-            this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, (r << 16) + (g << 8) + b));
+            int color = ((r / count) & 0xff) << 16 | ((g / count) & 0xff) << 8 | ((b / count) & 0xff);
+            this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, color));
             this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, ambient ? 1 : 0));
         } else {
             this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, 0));
             this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, 0));
         }
+
         this.setDataProperty(new LongEntityData(Entity.DATA_VISIBLE_MOB_EFFECTS, effectsData));
     }
 
@@ -1467,20 +1490,24 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void sendData(Player[] players, EntityMetadata data) {
+        if (players.length == 0) return;
+
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = this.id;
-        //pk.metadata = data == null ? this.dataProperties : data;
         pk.syncedProperties = this.propertySyncData();
 
-        for (Player player : players) {
-            if (player == this) {
-                continue;
-            }
-            pk.metadata = data == null ? this.dataProperties.clone() : data;
+        EntityMetadata clonedData = data == null ? this.dataProperties.clone() : data;
+
+        for (int i = 0, len = players.length; i < len; i++) {
+            Player player = players[i];
+            if (player == this) continue;
+
+            pk.metadata = clonedData;
             player.dataPacket(pk);
         }
+
         if (this.isPlayer) {
-            pk.metadata = data == null ? this.dataProperties.clone() : data;
+            pk.metadata = clonedData;
             ((Player) this).dataPacket(pk);
         }
     }
@@ -2112,13 +2139,29 @@ public abstract class Entity extends Location implements Metadatable {
             return;
         }
 
-        for (Entity passenger : new ArrayList<>(this.passengers)) {
+        Entity[] passengersArray = null;
+        int removeCount = 0;
+
+        for (int i = 0, size = this.passengers.size(); i < size; i++) {
+            Entity passenger = this.passengers.get(i);
+
             if (!passenger.isAlive()) {
-                dismountEntity(passenger);
+                if (passengersArray == null) {
+                    passengersArray = this.passengers.toArray(new Entity[0]);
+                }
+                removeCount++;
                 continue;
             }
 
             updatePassengerPosition(passenger);
+        }
+
+        if (removeCount > 0 && passengersArray != null) {
+            for (Entity passenger : passengersArray) {
+                if (!passenger.isAlive()) {
+                    dismountEntity(passenger);
+                }
+            }
         }
     }
 
@@ -2399,6 +2442,22 @@ public abstract class Entity extends Location implements Metadatable {
 
     @NotNull
     public Position getPosition() {
+        long currentTick = this.server.getTick();
+
+        if (this.cachedPosition != null &&
+                currentTick == this.cachedPosTimestamp &&
+                !this.positionChanged) {
+            return new Position(this.cachedPosition.x, this.cachedPosition.y,
+                    this.cachedPosition.z, this.level);
+        }
+
+        if (this.cachedPosition == null) {
+            this.cachedPosition = new Vector3(this.x, this.y, this.z);
+        } else {
+            this.cachedPosition.setComponents(this.x, this.y, this.z);
+        }
+        this.cachedPosTimestamp = currentTick;
+
         return new Position(this.x, this.y, this.z, this.level);
     }
 
@@ -2492,112 +2551,108 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.keepMovement) {
             this.boundingBox.offset(dx, dy, dz);
-            this.setPosition(this.temporalVector.setComponents((this.boundingBox.getMinX() + this.boundingBox.getMaxX()) / 2, this.boundingBox.getMinY(), (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) / 2));
+            double newX = (this.boundingBox.getMinX() + this.boundingBox.getMaxX()) * 0.5;
+            double newZ = (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) * 0.5;
+            this.setPosition(this.temporalVector.setComponents(newX, this.boundingBox.getMinY(), newZ));
             this.onGround = this.isPlayer;
             return true;
-        } else {
-            this.ySize *= STEP_CLIP_MULTIPLIER;
+        }
 
-            double movX = dx;
-            double movY = dy;
-            double movZ = dz;
+        this.ySize *= STEP_CLIP_MULTIPLIER;
 
-            AxisAlignedBB axisalignedbb = this.boundingBox.clone();
+        double movX = dx;
+        double movY = dy;
+        double movZ = dz;
 
-            AxisAlignedBB[] list = this.noClip ? AxisAlignedBB.EMPTY_ARRAY : this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
+        AxisAlignedBB axisalignedbb = this.boundingBox.clone();
 
-            for (AxisAlignedBB bb : list) {
-                dy = bb.calculateYOffset(this.boundingBox, dy);
+        AxisAlignedBB[] list = this.noClip ? AxisAlignedBB.EMPTY_ARRAY :
+                this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
+
+        for (int i = 0, len = list.length; i < len; i++) {
+            dy = list[i].calculateYOffset(this.boundingBox, dy);
+        }
+
+        this.boundingBox.offset(0, dy, 0);
+
+        boolean fallingFlag = (this.onGround || (dy != movY && movY < 0));
+
+        for (int i = 0, len = list.length; i < len; i++) {
+            dx = list[i].calculateXOffset(this.boundingBox, dx);
+        }
+
+        this.boundingBox.offset(dx, 0, 0);
+
+        for (int i = 0, len = list.length; i < len; i++) {
+            dz = list[i].calculateZOffset(this.boundingBox, dz);
+        }
+
+        this.boundingBox.offset(0, 0, dz);
+
+        if (this.getStepHeight() > 0 && fallingFlag && (movX != dx || movZ != dz)) {
+            double cx = dx;
+            double cy = dy;
+            double cz = dz;
+            dx = movX;
+            dy = this.getStepHeight();
+            dz = movZ;
+
+            AxisAlignedBB axisalignedbb1 = this.boundingBox.clone();
+            this.boundingBox.setBB(axisalignedbb);
+
+            list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
+
+            for (int i = 0, len = list.length; i < len; i++) {
+                dy = list[i].calculateYOffset(this.boundingBox, dy);
             }
 
             this.boundingBox.offset(0, dy, 0);
 
-            boolean fallingFlag = (this.onGround || (dy != movY && movY < 0));
-
-            for (AxisAlignedBB bb : list) {
-                dx = bb.calculateXOffset(this.boundingBox, dx);
+            for (int i = 0, len = list.length; i < len; i++) {
+                dx = list[i].calculateXOffset(this.boundingBox, dx);
             }
 
             this.boundingBox.offset(dx, 0, 0);
 
-            for (AxisAlignedBB bb : list) {
-                dz = bb.calculateZOffset(this.boundingBox, dz);
+            for (int i = 0, len = list.length; i < len; i++) {
+                dz = list[i].calculateZOffset(this.boundingBox, dz);
             }
 
             this.boundingBox.offset(0, 0, dz);
 
-            if (this.getStepHeight() > 0 && fallingFlag && (movX != dx || movZ != dz)) {
-                double cx = dx;
-                double cy = dy;
-                double cz = dz;
-                dx = movX;
-                dy = this.getStepHeight();
-                dz = movZ;
-
-                AxisAlignedBB axisalignedbb1 = this.boundingBox.clone();
-
-                this.boundingBox.setBB(axisalignedbb);
-
-                list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
-
-                for (AxisAlignedBB bb : list) {
-                    dy = bb.calculateYOffset(this.boundingBox, dy);
-                }
-
-                this.boundingBox.offset(0, dy, 0);
-
-                for (AxisAlignedBB bb : list) {
-                    dx = bb.calculateXOffset(this.boundingBox, dx);
-                }
-
-                this.boundingBox.offset(dx, 0, 0);
-
-                for (AxisAlignedBB bb : list) {
-                    dz = bb.calculateZOffset(this.boundingBox, dz);
-                }
-
-                this.boundingBox.offset(0, 0, dz);
-
-                double reverseDY = -dy;
-                for (AxisAlignedBB bb : list) {
-                    reverseDY = bb.calculateYOffset(this.boundingBox, reverseDY);
-                }
-                dy += reverseDY;
-                this.boundingBox.offset(0, reverseDY, 0);
-
-                if ((cx * cx + cz * cz) >= (dx * dx + dz * dz)) {
-                    dx = cx;
-                    dy = cy;
-                    dz = cz;
-                    this.boundingBox.setBB(axisalignedbb1);
-                } else {
-                    this.ySize += dy;
-                }
+            double reverseDY = -dy;
+            for (int i = 0, len = list.length; i < len; i++) {
+                reverseDY = list[i].calculateYOffset(this.boundingBox, reverseDY);
             }
+            dy += reverseDY;
+            this.boundingBox.offset(0, reverseDY, 0);
 
-            this.x = (this.boundingBox.getMinX() + this.boundingBox.getMaxX()) / 2;
-            this.y = this.boundingBox.getMinY() - this.ySize;
-            this.z = (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) / 2;
+            double cSquared = cx * cx + cz * cz;
+            double dSquared = dx * dx + dz * dz;
 
-            this.checkChunks();
-
-            this.checkGroundState(movX, movY, movZ, dx, dy, dz);
-            this.updateFallState(this.onGround);
-
-            if (movX != dx) {
-                this.motionX = 0;
+            if (cSquared >= dSquared) {
+                dx = cx;
+                dy = cy;
+                dz = cz;
+                this.boundingBox.setBB(axisalignedbb1);
+            } else {
+                this.ySize += dy;
             }
-
-            if (movY != dy) {
-                this.motionY = 0;
-            }
-
-            if (movZ != dz) {
-                this.motionZ = 0;
-            }
-
-            return true;
         }
+
+        this.x = (this.boundingBox.getMinX() + this.boundingBox.getMaxX()) * 0.5;
+        this.y = this.boundingBox.getMinY() - this.ySize;
+        this.z = (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) * 0.5;
+
+        this.checkChunks();
+        this.checkGroundState(movX, movY, movZ, dx, dy, dz);
+        this.updateFallState(this.onGround);
+
+        if (movX != dx) this.motionX = 0;
+        if (movY != dy) this.motionY = 0;
+        if (movZ != dz) this.motionZ = 0;
+
+        return true;
     }
 
     protected void checkGroundState(double movX, double movY, double movZ, double dx, double dy, double dz) {
@@ -2615,47 +2670,55 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public List<Block> getBlocksAround() {
-        if (this.blocksAround == null) {
-            int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
-            int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
-            int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
-            int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
-            int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
-            int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
+        if (this.blocksAround != null && !this.positionChanged) {
+            return this.blocksAround;
+        }
 
-            this.blocksAround = new ArrayList<>();
+        int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
+        int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
+        int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
+        int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
+        int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
+        int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
 
-            try {
-                if (this.level.isYInRange(minY) || this.level.isYInRange(maxY)) {
-                    minY = Math.max(minY, this.level.getMinBlockY());
-                    maxY = Math.min(maxY, this.level.getMaxBlockY());
-                    for (int z = minZ; z <= maxZ; ++z) {
-                        for (int x = minX; x <= maxX; ++x) {
-                            for (int y = minY; y <= maxY; ++y) {
-                                Block block = this.level.getBlock(x, y, z, false);
-                                this.blocksAround.add(block);
-                            }
-                        }
+        int estimatedSize = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+        this.blocksAround = new ArrayList<>(Math.min(estimatedSize, 64));
+
+        if (!this.level.isYInRange(minY) && !this.level.isYInRange(maxY)) {
+            return this.blocksAround;
+        }
+
+        minY = Math.max(minY, this.level.getMinBlockY());
+        maxY = Math.min(maxY, this.level.getMaxBlockY());
+
+        try {
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        this.blocksAround.add(this.level.getBlock(x, y, z, false));
                     }
                 }
-            } catch (NullPointerException e) {
-                // 异步传送导致空指针 忽略结果
-                return new ArrayList<>();
             }
+        } catch (NullPointerException e) {
+            this.blocksAround.clear();
         }
 
         return this.blocksAround;
     }
 
-    public List<Block> getCollisionBlocks() {
-        if (this.collisionBlocks == null) {
-            this.collisionBlocks = new ArrayList<>();
 
-            List<Block> bl = this.getBlocksAround();
-            for (Block b : bl) {
-                if (b.collidesWithBB(this.boundingBox, true)) {
-                    this.collisionBlocks.add(b);
-                }
+    public List<Block> getCollisionBlocks() {
+        if (this.collisionBlocks != null && !this.positionChanged) {
+            return this.collisionBlocks;
+        }
+
+        List<Block> blocks = this.getBlocksAround();
+        this.collisionBlocks = new ArrayList<>(blocks.size() / 2);
+
+        for (int i = 0, size = blocks.size(); i < size; i++) {
+            Block b = blocks.get(i);
+            if (b.collidesWithBB(this.boundingBox, true)) {
+                this.collisionBlocks.add(b);
             }
         }
 
@@ -2676,23 +2739,32 @@ public abstract class Entity extends Location implements Metadatable {
             return;
         }
 
-        Vector3 vector = new Vector3(0, 0, 0);
+        Vector3 vector = null;
         boolean portal = false;
         boolean powderSnow = false;
 
-        for (Block block : this.getCollisionBlocks()) {
-            if (block.getId() == Block.NETHER_PORTAL) {
+        List<Block> blocks = this.getCollisionBlocks();
+
+        for (int i = 0, size = blocks.size(); i < size; i++) {
+            Block block = blocks.get(i);
+            int blockId = block.getId();
+
+            if (blockId == Block.NETHER_PORTAL) {
                 portal = true;
                 continue;
             }
 
-            if (block.getId() == Block.POWDER_SNOW) {
+            if (blockId == Block.POWDER_SNOW) {
                 powderSnow = true;
                 continue;
             }
 
             block.onEntityCollide(this);
             block.getLevelBlockAtLayer(1).onEntityCollide(this);
+
+            if (vector == null) {
+                vector = new Vector3(0, 0, 0);
+            }
             block.addVelocityToEntity(this, vector);
         }
 
@@ -2701,8 +2773,8 @@ public abstract class Entity extends Location implements Metadatable {
         } else {
             this.inPortalTicks = 0;
         }
-        
-        if (vector.lengthSquared() > 0) {
+
+        if (vector != null && vector.lengthSquared() > 0) {
             vector = vector.normalize();
             double d = 0.014d;
             this.motionX += vector.x * d;
@@ -2946,24 +3018,29 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    public void despawnFromAll() {
+        if (this.hasSpawned.isEmpty()) return;
+
+        Player[] players = this.hasSpawned.values().toArray(Player.EMPTY_ARRAY);
+
+        for (int i = 0, len = players.length; i < len; i++) {
+            this.despawnFrom(players[i]);
+        }
+    }
+
     public void spawnToAll() {
         if (this.chunk == null || this.closed) {
             return;
         }
 
-        for (Player player : this.level.getChunkPlayers(this.chunk.getX(), this.chunk.getZ()).values()) {
+        Map<Integer, Player> chunkPlayers = this.level.getChunkPlayers(this.chunk.getX(), this.chunk.getZ());
+
+        for (Player player : chunkPlayers.values()) {
             if (player.isOnline()) {
                 this.spawnTo(player);
             }
         }
     }
-
-    public void despawnFromAll() {
-        for (Player player : new ArrayList<>(this.hasSpawned.values())) {
-            this.despawnFrom(player);
-        }
-    }
-
     public void close() {
         if (!this.closed) {
             this.closed = true;
@@ -3261,15 +3338,29 @@ public abstract class Entity extends Location implements Metadatable {
      * @return no blocks above
      */
     public boolean canSeeSky() {
+        long currentTick = this.server.getTick();
+
+        if (this.cachedCanSeeSky != null &&
+                currentTick - this.cachedCanSeeSkyTimestamp < SKY_CACHE_DURATION &&
+                !this.positionChanged) {
+            return this.cachedCanSeeSky;
+        }
+
         int px = this.getFloorX();
         int py = this.getFloorY();
         int pz = this.getFloorZ();
+
+        boolean result = true;
         for (int i = this.level.getMaxBlockY(); i >= py; i--) {
             if (level.getBlockIdAt(chunk, px, i, pz) != 0) {
-                return false;
+                result = false;
+                break;
             }
         }
-        return true;
+
+        this.cachedCanSeeSky = result;
+        this.cachedCanSeeSkyTimestamp = currentTick;
+        return result;
     }
 
     public boolean isNoClip() {

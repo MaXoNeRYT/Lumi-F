@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * The base class of all entities that have an AI
- */
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
 
     private static final Map<String, Float> ARMOR_POINTS = new HashMap<>() {{
@@ -64,8 +61,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         put("minecraft:netherite_chestplate", 8f);
         put("minecraft:netherite_leggings", 6f);
         put("minecraft:netherite_boots", 3f);
-
-        //NOSENS
 
         put("minecraft:turtle_helmet", 2f);
 
@@ -118,10 +113,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         put("fireshaldrpg:rune_platebody", 9f);
         put("fireshaldrpg:rune_platelegs", 8f);
         put("fireshaldrpg:rune_boots", 7f);
-
     }};
-
-
 
     /**
      * Empty inventory
@@ -147,6 +139,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public Item[] armor;
 
+    private long lastPlayerCheckTime = 0;
+    private boolean cachedInTickingRange = false;
 
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -184,10 +178,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public double getSpeed() {
-        if (this.baby) {
-            return 1.2;
-        }
-        return 1;
+        return this.baby ? 1.2 : 1;
     }
 
     public int getAge() {
@@ -273,10 +264,25 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     @Override
     public boolean entityBaseTick(int tickDiff) {
         int ticksPerEntityDespawns = Server.getInstance().getSettings().world().entity().ticksPerEntityDespawns();
+
+        if (this.namedTag.getBoolean("PlayerBred") && this.age % 100 == 0) {
+            int playerBredCount = 0;
+            for (Entity entity : this.level.getNearbyEntities(this.boundingBox.grow(100, 100, 100))) {
+                if (entity instanceof BaseEntity && ((BaseEntity) entity).namedTag.getBoolean("PlayerBred")) {
+                    playerBredCount++;
+                    if (playerBredCount > 50) {
+                        this.close();
+                        return true;
+                    }
+                }
+            }
+        }
+
         if (this.canDespawn() &&
                 this.age > ticksPerEntityDespawns &&
                 !this.hasCustomName() &&
                 !this.namedTag.getBoolean("nodespawn") &&
+                !this.namedTag.getBoolean("PlayerBred") &&
                 !(this instanceof EntityBoss)) {
             this.close();
             return true;
@@ -288,9 +294,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             this.attackDelay++;
         }
 
-        if (this.moveTime > 0) {
-            this.moveTime -= tickDiff;
-        }
+        this.moveTime = Math.max(0, this.moveTime - tickDiff);
 
         if (this.isBaby() && this.age > 0) {
             this.setBaby(false);
@@ -299,9 +303,15 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this.isInLove()) {
             this.inLoveTicks -= tickDiff;
             if (!this.isBaby() && this.age > 0 && this.age % 20 == 0) {
+                Vector3 basePos = this.add(0, this.getMountedYOffset(), 0);
                 for (int i = 0; i < 3; i++) {
-                    this.level.addParticle(new HeartParticle(this.add(Utils.rand(-1.0, 1.0), this.getMountedYOffset() + Utils.rand(-1.0, 1.0), Utils.rand(-1.0, 1.0))));
+                    this.level.addParticle(new HeartParticle(basePos.add(
+                            Utils.rand(-1.0, 1.0),
+                            Utils.rand(-1.0, 1.0),
+                            Utils.rand(-1.0, 1.0)
+                    )));
                 }
+
                 Entity[] collidingEntities = this.level.getCollidingEntities(this.boundingBox.grow(0.5d, 0.5d, 0.5d));
                 for (Entity entity : collidingEntities) {
                     if (this.checkSpawnBaby(entity)) {
@@ -309,14 +319,14 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
                     }
                 }
             }
-        } else if (this.isInLoveCooldown()) {
+        } else if (this.inLoveCooldown > 0) {
             this.inLoveCooldown -= tickDiff;
         }
 
         if (isDayBurning() && !this.closed && level.shouldMobBurn(this)) {
-            if (this.armor == null || this.armor[0] == null || this.armor[0].getId() == 0) {
-                this.setOnFire(100);
-            } else if (this.armor[0].getId() == 0) {
+            boolean shouldBurn = this.armor == null || this.armor.length == 0 ||
+                    this.armor[0] == null || this.armor[0].getId() == 0;
+            if (shouldBurn) {
                 this.setOnFire(100);
             }
         }
@@ -348,11 +358,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         this.stayTime = 60;
         baseEntity.stayTime = 60;
 
-        int i = 0;
+        int count = 0;
         for (Entity entity2 : this.chunk.getEntities().values()) {
             if (entity2.getNetworkId() == getNetworkId()) {
-                i++;
-                if (i > 10) {
+                if (++count > 10) {
                     return true;
                 }
             }
@@ -360,11 +369,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         BaseEntity baby = (BaseEntity) Entity.createEntity(getNetworkId(), this, new Object[0]);
         baby.setBaby(true);
+        baby.namedTag.putBoolean("PlayerBred", true);
         baby.spawnToAll();
         this.level.dropExpOrb(this, Utils.rand(1, 7));
         return true;
     }
-
 
     @Override
     public boolean attack(EntityDamageEvent source) {
@@ -372,7 +381,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return false;
         }
 
-        if (this.fireProof && (source.getCause() == EntityDamageEvent.DamageCause.FIRE || source.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK || source.getCause() == EntityDamageEvent.DamageCause.LAVA || source.getCause() == EntityDamageEvent.DamageCause.MAGMA)) {
+        if (this.fireProof && (source.getCause() == EntityDamageEvent.DamageCause.FIRE ||
+                source.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK ||
+                source.getCause() == EntityDamageEvent.DamageCause.LAVA ||
+                source.getCause() == EntityDamageEvent.DamageCause.MAGMA)) {
             return false;
         }
 
@@ -396,10 +408,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean move(double dx, double dy, double dz) {
-        if (dy < -10 || dy > 10) {
-            if (!(this instanceof EntityFlyingMob)) {
-                this.kill();
-            }
+        if (!(this instanceof EntityFlyingMob) && (dy < -10 || dy > 10)) {
+            this.kill();
             return false;
         }
 
@@ -408,18 +418,21 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         }
 
         this.blocksAround = null;
+
         List<Entity> collidingEntities = List.of(this.level.getCollidingEntities(this.boundingBox.addCoord(dx, dy, dz)));
 
         for (Entity entity : collidingEntities) {
             if (entity instanceof EntityLiving && entity != this) {
-
                 double edx = this.x - entity.x;
                 double edz = this.z - entity.z;
-                double distance = Math.max(0.01, Math.sqrt(edx * edx + edz * edz));
+                double distSq = edx * edx + edz * edz;
 
-                double force = 0.15;
-                dx += (edx / distance) * force;
-                dz += (edz / distance) * force;
+                if (distSq > 0.0001) {
+                    double distance = Math.sqrt(distSq);
+                    double force = 0.15 / distance;
+                    dx += edx * force;
+                    dz += edz * force;
+                }
             }
         }
 
@@ -462,7 +475,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             this.namedTag.putBoolean("CustomNameVisible", true);
             this.setNameTag(name);
             this.setNameTagVisible(true);
-            return true; // onInteract: true = decrease count
+            return true;
         }
 
         return false;
@@ -511,184 +524,105 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
      */
     public Item[] getRandomArmor() {
         Item[] slots = new Item[4];
-        Item helmet = Item.get(0);
-        Item chestplate = Item.get(0);
-        Item leggings = Item.get(0);
-        Item boots = Item.get(0);
 
-        // Шлем
-        switch (Utils.rand(1, 7)) {
-            case 1 -> { // Leather
-                if (Utils.rand(1, 100) < 40) {
-                    helmet = Item.get("fireshaldrpg:leather_helmet", Utils.rand(30, 48), 1);
-                }
-            }
-            case 2 -> { // Copper
-                if (Utils.rand(1, 100) < 30) {
-                    helmet = Item.get("fireshaldrpg:copper_helm", Utils.rand(50, 70), 1);
-                }
-            }
-            case 3 -> { // Iron
-                if (Utils.rand(1, 100) < 20) {
-                    helmet = Item.get("fireshaldrpg:iron_helm", Utils.rand(100, 188), 1);
-                }
-            }
-            case 4 -> { // Black
-                if (Utils.rand(1, 100) < 15) {
-                    helmet = Item.get("fireshaldrpg:black_helm", Utils.rand(120, 200), 1);
-                }
-            }
-            case 5 -> { // Steel
-                if (Utils.rand(1, 100) < 10) {
-                    helmet = Item.get("fireshaldrpg:steel_helm", Utils.rand(150, 220), 1);
-                }
-            }
-            case 6 -> { // Mithril
-                if (Utils.rand(1, 100) < 5) {
-                    helmet = Item.get("fireshaldrpg:mithril_helm", Utils.rand(180, 250), 1);
-                }
-            }
-            case 7 -> { // Adamant
-                if (Utils.rand(1, 100) < 2) {
-                    helmet = Item.get("fireshaldrpg:adamant_helm", Utils.rand(200, 280), 1);
-                }
-            }
-        }
-        slots[0] = helmet;
+        slots[0] = generateArmorPiece(1, 7, new String[]{
+                "fireshaldrpg:leather_helmet",
+                "fireshaldrpg:copper_helm",
+                "fireshaldrpg:iron_helm",
+                "fireshaldrpg:black_helm",
+                "fireshaldrpg:steel_helm",
+                "fireshaldrpg:mithril_helm",
+                "fireshaldrpg:adamant_helm"
+        }, new int[][]{
+                {40, 30, 48},
+                {30, 50, 70},
+                {20, 100, 188},
+                {15, 120, 200},
+                {10, 150, 220},
+                {5, 180, 250},
+                {2, 200, 280}
+        });
 
-        // Нагрудник
         if (Utils.rand(1, 4) != 1) {
-            switch (Utils.rand(1, 7)) {
-                case 1 -> {
-                    if (Utils.rand(1, 100) < 40) {
-                        chestplate = Item.get("fireshaldrpg:leather_platebody", Utils.rand(60, 73), 1);
-                    }
-                }
-                case 2 -> {
-                    if (Utils.rand(1, 100) < 30) {
-                        chestplate = Item.get("fireshaldrpg:copper_platebody", Utils.rand(80, 120), 1);
-                    }
-                }
-                case 3 -> {
-                    if (Utils.rand(1, 100) < 20) {
-                        chestplate = Item.get("fireshaldrpg:iron_platebody", Utils.rand(170, 233), 1);
-                    }
-                }
-                case 4 -> {
-                    if (Utils.rand(1, 100) < 15) {
-                        chestplate = Item.get("fireshaldrpg:black_platebody", Utils.rand(180, 240), 1);
-                    }
-                }
-                case 5 -> {
-                    if (Utils.rand(1, 100) < 10) {
-                        chestplate = Item.get("fireshaldrpg:steel_platebody", Utils.rand(200, 260), 1);
-                    }
-                }
-                case 6 -> {
-                    if (Utils.rand(1, 100) < 5) {
-                        chestplate = Item.get("fireshaldrpg:mithril_platebody", Utils.rand(240, 300), 1);
-                    }
-                }
-                case 7 -> {
-                    if (Utils.rand(1, 100) < 2) {
-                        chestplate = Item.get("fireshaldrpg:adamant_platebody", Utils.rand(300, 360), 1);
-                    }
-                }
-            }
+            slots[1] = generateArmorPiece(1, 7, new String[]{
+                    "fireshaldrpg:leather_platebody",
+                    "fireshaldrpg:copper_platebody",
+                    "fireshaldrpg:iron_platebody",
+                    "fireshaldrpg:black_platebody",
+                    "fireshaldrpg:steel_platebody",
+                    "fireshaldrpg:mithril_platebody",
+                    "fireshaldrpg:adamant_platebody"
+            }, new int[][]{
+                    {40, 60, 73},
+                    {30, 80, 120},
+                    {20, 170, 233},
+                    {15, 180, 240},
+                    {10, 200, 260},
+                    {5, 240, 300},
+                    {2, 300, 360}
+            });
+        } else {
+            slots[1] = Item.get(0);
         }
-        slots[1] = chestplate;
 
-        // Поножи
         if (Utils.rand(1, 2) == 2) {
-            switch (Utils.rand(1, 7)) {
-                case 1 -> {
-                    if (Utils.rand(1, 100) < 40) {
-                        leggings = Item.get("fireshaldrpg:leather_platelegs", Utils.rand(35, 68), 1);
-                    }
-                }
-                case 2 -> {
-                    if (Utils.rand(1, 100) < 30) {
-                        leggings = Item.get("fireshaldrpg:copper_platelegs", Utils.rand(60, 100), 1);
-                    }
-                }
-                case 3 -> {
-                    if (Utils.rand(1, 100) < 20) {
-                        leggings = Item.get("fireshaldrpg:iron_platelegs", Utils.rand(170, 218), 1);
-                    }
-                }
-                case 4 -> {
-                    if (Utils.rand(1, 100) < 15) {
-                        leggings = Item.get("fireshaldrpg:black_platelegs", Utils.rand(180, 230), 1);
-                    }
-                }
-                case 5 -> {
-                    if (Utils.rand(1, 100) < 10) {
-                        leggings = Item.get("fireshaldrpg:steel_platelegs", Utils.rand(200, 250), 1);
-                    }
-                }
-                case 6 -> {
-                    if (Utils.rand(1, 100) < 5) {
-                        leggings = Item.get("fireshaldrpg:mithril_platelegs", Utils.rand(240, 290), 1);
-                    }
-                }
-                case 7 -> {
-                    if (Utils.rand(1, 100) < 2) {
-                        leggings = Item.get("fireshaldrpg:adamant_platelegs", Utils.rand(300, 350), 1);
-                    }
-                }
-            }
+            slots[2] = generateArmorPiece(1, 7, new String[]{
+                    "fireshaldrpg:leather_platelegs",
+                    "fireshaldrpg:copper_platelegs",
+                    "fireshaldrpg:iron_platelegs",
+                    "fireshaldrpg:black_platelegs",
+                    "fireshaldrpg:steel_platelegs",
+                    "fireshaldrpg:mithril_platelegs",
+                    "fireshaldrpg:adamant_platelegs"
+            }, new int[][]{
+                    {40, 35, 68},
+                    {30, 60, 100},
+                    {20, 170, 218},
+                    {15, 180, 230},
+                    {10, 200, 250},
+                    {5, 240, 290},
+                    {2, 300, 350}
+            });
+        } else {
+            slots[2] = Item.get(0);
         }
-        slots[2] = leggings;
 
-        // Ботинки
         if (Utils.rand(1, 5) < 3) {
-            switch (Utils.rand(1, 7)) {
-                case 1 -> {
-                    if (Utils.rand(1, 100) < 40) {
-                        boots = Item.get("fireshaldrpg:leather_boots", Utils.rand(35, 58), 1);
-                    }
-                }
-                case 2 -> {
-                    if (Utils.rand(1, 100) < 30) {
-                        boots = Item.get("fireshaldrpg:copper_boots", Utils.rand(50, 86), 1);
-                    }
-                }
-                case 3 -> {
-                    if (Utils.rand(1, 100) < 20) {
-                        boots = Item.get("fireshaldrpg:iron_boots", Utils.rand(100, 188), 1);
-                    }
-                }
-                case 4 -> {
-                    if (Utils.rand(1, 100) < 15) {
-                        boots = Item.get("fireshaldrpg:black_boots", Utils.rand(120, 200), 1);
-                    }
-                }
-                case 5 -> {
-                    if (Utils.rand(1, 100) < 10) {
-                        boots = Item.get("fireshaldrpg:steel_boots", Utils.rand(150, 220), 1);
-                    }
-                }
-                case 6 -> {
-                    if (Utils.rand(1, 100) < 5) {
-                        boots = Item.get("fireshaldrpg:mithril_boots", Utils.rand(180, 250), 1);
-                    }
-                }
-                case 7 -> {
-                    if (Utils.rand(1, 100) < 2) {
-                        boots = Item.get("fireshaldrpg:adamant_boots", Utils.rand(200, 280), 1);
-                    }
-                }
-            }
+            slots[3] = generateArmorPiece(1, 7, new String[]{
+                    "fireshaldrpg:leather_boots",
+                    "fireshaldrpg:copper_boots",
+                    "fireshaldrpg:iron_boots",
+                    "fireshaldrpg:black_boots",
+                    "fireshaldrpg:steel_boots",
+                    "fireshaldrpg:mithril_boots",
+                    "fireshaldrpg:adamant_boots"
+            }, new int[][]{
+                    {40, 35, 58},
+                    {30, 50, 86},
+                    {20, 100, 188},
+                    {15, 120, 200},
+                    {10, 150, 220},
+                    {5, 180, 250},
+                    {2, 200, 280}
+            });
+        } else {
+            slots[3] = Item.get(0);
         }
-        slots[3] = boots;
 
         return slots;
     }
 
+    private Item generateArmorPiece(int minTier, int maxTier, String[] types, int[][] chances) {
+        int tier = Utils.rand(minTier, maxTier);
+        int index = tier - 1;
 
-    /**
-     * Increases mob's health according to armor the mob has (temporary workaround until armor damage modifiers are implemented for mobs)
-     */
+        if (Utils.rand(1, 100) < chances[index][0]) {
+            return Item.get(types[index], Utils.rand(chances[index][1], chances[index][2]), 1);
+        }
+
+        return Item.get(0);
+    }
+
     protected void addArmorExtraHealth() {
         if (this.armor != null && this.armor.length == 4) {
             switch (armor[0].getId()) {
@@ -762,15 +696,20 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         double z = verticalMultiplier * Math.cos(yawR);
         double y = Math.sin(-(FastMath.toRadians(pitch)));
         double magnitude = Math.sqrt(x * x + y * y + z * z);
+
         if (magnitude > 0) {
-            x += (x * (speed - magnitude)) / magnitude;
-            y += (y * (speed - magnitude)) / magnitude;
-            z += (z * (speed - magnitude)) / magnitude;
+            double factor = (speed - magnitude) / magnitude;
+            x += x * factor;
+            y += y * factor;
+            z += z * factor;
         }
+
         ThreadLocalRandom rand = ThreadLocalRandom.current();
-        x += rand.nextGaussian() * 0.007499999832361937 * 6;
-        y += rand.nextGaussian() * 0.007499999832361937 * 6;
-        z += rand.nextGaussian() * 0.007499999832361937 * 6;
+        double randomFactor = 0.007499999832361937 * 6;
+        x += rand.nextGaussian() * randomFactor;
+        y += rand.nextGaussian() * randomFactor;
+        z += rand.nextGaussian() * randomFactor;
+
         projectile.setMotion(new Vector3(x, y, z));
     }
 
@@ -783,8 +722,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         for (Block block : this.getCollisionBlocks()) {
             block.onEntityCollide(this);
         }
-
-        // TODO: portals
     }
 
     /**
@@ -795,10 +732,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
      */
     protected float getArmorPoints(int item) {
         Float points = ARMOR_POINTS.get(item);
-        if (points == null) {
-            return 0;
-        }
-        return points;
+        return points == null ? 0 : points;
     }
 
     /**
@@ -837,11 +771,22 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     protected boolean isInTickingRange() {
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - lastPlayerCheckTime < 100) {
+            return cachedInTickingRange;
+        }
+
+        lastPlayerCheckTime = currentTime;
+
         for (Player player : this.level.getPlayers().values()) {
             if (player.distanceSquared(this) < 6400) { // 80 blocks
+                cachedInTickingRange = true;
                 return true;
             }
         }
+
+        cachedInTickingRange = false;
         return false;
     }
 }

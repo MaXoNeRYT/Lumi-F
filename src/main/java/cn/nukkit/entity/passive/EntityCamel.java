@@ -18,7 +18,7 @@ public class EntityCamel extends EntityWalkingAnimal {
     }
 
     @Override
-    protected void initEntity() {
+    public void initEntity() {
         this.setMaxHealth(32);
 
         super.initEntity();

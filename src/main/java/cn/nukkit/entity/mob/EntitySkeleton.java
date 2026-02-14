@@ -64,7 +64,7 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
     @Override
     public void attackEntity(Entity player) {
         if (!(player instanceof Player target)) return;
-        if (this.attackDelay > 20 && this.distanceSquared(player) <= 100) {
+        if (this.attackDelay > 38 && this.distanceSquared(player) <= 70) {
             this.attackDelay = 0;
 
             double distance = this.distance(player);

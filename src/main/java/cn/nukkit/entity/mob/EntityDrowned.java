@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
+public class EntityDrowned extends EntitySwimmingMob implements EntitySmite {
 
     public static final int NETWORK_ID = 110;
 
@@ -127,7 +127,7 @@ public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
             }
         }
     }
-    
+
     @Override
     public boolean entityBaseTick(int tickDiff) {
         if (this.server.getDifficulty() == Difficulty.PEACEFUL) {
@@ -141,8 +141,16 @@ public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
             this.setOnFire(100);
         }
 
+        this.setDataFlag(
+                Entity.DATA_FLAGS,
+                Entity.DATA_FLAG_SWIMMING,
+                this.isInsideOfWater()
+        );
+
         return hasUpdate;
     }
+
+
 
     @Override
     public Item[] getDrops() {

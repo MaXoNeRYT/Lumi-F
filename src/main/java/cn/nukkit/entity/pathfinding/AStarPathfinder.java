@@ -2,12 +2,15 @@ package cn.nukkit.entity.pathfinding;
 
 import cn.nukkit.block.*;
 import cn.nukkit.level.Level;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
 
 import java.util.*;
 import java.util.concurrent.*;
 
 public class AStarPathfinder {
+
     private static final int[][] DIRECTIONS = {
             {-1, 0, 0}, {1, 0, 0}, {0, 0, -1}, {0, 0, 1},
             {-1, 0, -1}, {-1, 0, 1}, {1, 0, -1}, {1, 0, 1},
@@ -21,8 +24,15 @@ public class AStarPathfinder {
     private static volatile boolean shutdown = false;
 
     private final Level level;
-    private final Map<String, Boolean> moveCache = new ConcurrentHashMap<>();
+    private final Map<Long, Boolean> moveCache = new ConcurrentHashMap<>();
     private final Map<PathRequest, Future<List<Vector3>>> pendingRequests = new ConcurrentHashMap<>();
+
+    private static final int MAX_CACHE_SIZE = 5000;
+    private int cacheCleanupCounter = 0;
+    private static final int CACHE_CLEANUP_INTERVAL = 200;
+
+    private static final double ENTITY_WIDTH = 0.6;
+    private static final double ENTITY_HEIGHT = 1.8;
 
     private AStarPathfinder(Level level) {
         this.level = level;
@@ -66,15 +76,16 @@ public class AStarPathfinder {
         startNode.hCost = getDistance(startNode, endNode);
         openSet.add(startNode);
 
-        int maxIterations = 200;
+        int maxIterations = 150;
         int iterations = 0;
 
         while (!openSet.isEmpty() && iterations < maxIterations) {
             iterations++;
+
             PathNode currentNode = openSet.poll();
             closedSet.add(currentNode);
 
-            if (currentNode.equals(endNode) || getDistance(currentNode, endNode) <= 2) {
+            if (currentNode.equals(endNode) || getDistance(currentNode, endNode) <= 0.2) {
                 return reconstructPath(currentNode);
             }
 
@@ -90,10 +101,13 @@ public class AStarPathfinder {
 
     private void exploreNeighbors(PathNode currentNode, PathNode endNode,
                                   PriorityQueue<PathNode> openSet, Set<PathNode> closedSet) {
-        for (PathNode neighbor : getNeighbors(currentNode)) {
+        List<PathNode> neighbors = getNeighbors(currentNode);
+
+        for (PathNode neighbor : neighbors) {
             if (closedSet.contains(neighbor)) continue;
 
             double newGCost = currentNode.gCost + getDistance(currentNode, neighbor);
+
             if (newGCost < neighbor.gCost || !openSet.contains(neighbor)) {
                 neighbor.gCost = newGCost;
                 neighbor.hCost = getDistance(neighbor, endNode);
@@ -158,7 +172,7 @@ public class AStarPathfinder {
 
             if (mag1 > 0 && mag2 > 0) {
                 double cosAngle = dot / (mag1 * mag2);
-                if (cosAngle < 0.95) {
+                if (cosAngle < 0.9) {
                     simplified.add(path.get(i));
                 }
             }
@@ -176,6 +190,15 @@ public class AStarPathfinder {
             int ny = node.y + dir[1];
             int nz = node.z + dir[2];
 
+            Block targetBlock = level.getBlock(nx, ny, nz);
+            AxisAlignedBB targetBB = targetBlock.getBoundingBox();
+            if (targetBB != null) {
+                double targetHeight = targetBB.getMaxY() - targetBB.getMinY();
+                if (targetHeight > 1.0) {
+                    continue;
+                }
+            }
+
             if (isValidMove(node, nx, ny, nz)) {
                 neighbors.add(new PathNode(nx, ny, nz));
             }
@@ -185,36 +208,71 @@ public class AStarPathfinder {
     }
 
     private boolean isValidMove(PathNode from, int x, int y, int z) {
-        String cacheKey = from.x + ":" + from.y + ":" + from.z + ":" + x + ":" + y + ":" + z;
-        return moveCache.computeIfAbsent(cacheKey, k -> calculateValidMove(from, x, y, z));
+        long cacheKey = packPosition(from.x, from.y, from.z, x, y, z);
+
+        Boolean cached = moveCache.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
+        boolean result = calculateValidMove(from, x, y, z);
+
+        if (moveCache.size() < MAX_CACHE_SIZE) {
+            moveCache.put(cacheKey, result);
+        } else {
+            cleanupCacheIfNeeded();
+            moveCache.put(cacheKey, result);
+        }
+
+        return result;
     }
 
     private boolean calculateValidMove(PathNode from, int x, int y, int z) {
         Block block = level.getBlock(x, y, z);
-        if (block.getId() != Block.AIR && block.getId() != Block.COBWEB && !block.canPassThrough()) {
+
+        AxisAlignedBB blockBB = block.getBoundingBox();
+        if (blockBB != null) {
+            double blockHeight = blockBB.getMaxY() - blockBB.getMinY();
+            if (blockHeight > 1.0) {
+                return false;
+            }
+        }
+
+        if (!canEntityPassThroughBlock(block, x, y, z)) {
             return false;
         }
 
         Block belowBlock = level.getBlock(x, y - 1, z);
-        boolean isBelowSolid = belowBlock.isSolid() ||
-                belowBlock instanceof BlockSlab ||
-                belowBlock instanceof BlockStairs;
-
-        if (!isBelowSolid) return false;
+        if (!isBlockWalkable(belowBlock)) {
+            return false;
+        }
 
         int deltaY = y - from.y;
         if (deltaY > 2 || deltaY < -3) return false;
 
         Block headBlock = level.getBlock(x, y + 1, z);
-        if (!headBlock.canPassThrough() && !(headBlock instanceof BlockSlab)) {
+        if (!canEntityPassThroughBlock(headBlock, x, y + 1, z)) {
             return false;
         }
 
         if (from.x != x && from.z != z) {
             Block corner1 = level.getBlock(from.x, y, z);
             Block corner2 = level.getBlock(x, y, from.z);
-            if ((!corner1.canPassThrough() && !(corner1 instanceof BlockSlab)) ||
-                    (!corner2.canPassThrough() && !(corner2 instanceof BlockSlab))) {
+
+            AxisAlignedBB corner1BB = corner1.getBoundingBox();
+            if (corner1BB != null) {
+                double corner1Height = corner1BB.getMaxY() - corner1BB.getMinY();
+                if (corner1Height > 1.0) return false;
+            }
+
+            AxisAlignedBB corner2BB = corner2.getBoundingBox();
+            if (corner2BB != null) {
+                double corner2Height = corner2BB.getMaxY() - corner2BB.getMinY();
+                if (corner2Height > 1.0) return false;
+            }
+
+            if (!canEntityPassThroughBlock(corner1, from.x, y, z) ||
+                    !canEntityPassThroughBlock(corner2, x, y, from.z)) {
                 return false;
             }
         }
@@ -222,8 +280,113 @@ public class AStarPathfinder {
         return true;
     }
 
+    private boolean canEntityPassThroughBlock(Block block, int x, int y, int z) {
+        if (block.getId() == Block.AIR) {
+            return true;
+        }
+
+        AxisAlignedBB blockBB = block.getBoundingBox();
+
+        if (blockBB != null) {
+            double blockHeight = blockBB.getMaxY() - blockBB.getMinY();
+
+            if (blockHeight > 1.0) {
+                return false;
+            }
+        }
+
+        if (block.canPassThrough()) {
+            return true;
+        }
+
+        if (blockBB == null) {
+            return true;
+        }
+
+        double blockHeight = blockBB.getMaxY() - blockBB.getMinY();
+
+        double entityMinX = x + 0.5 - ENTITY_WIDTH / 2;
+        double entityMaxX = x + 0.5 + ENTITY_WIDTH / 2;
+        double entityMinY = y;
+        double entityMaxY = y + ENTITY_HEIGHT;
+        double entityMinZ = z + 0.5 - ENTITY_WIDTH / 2;
+        double entityMaxZ = z + 0.5 + ENTITY_WIDTH / 2;
+
+        AxisAlignedBB entityBB = new SimpleAxisAlignedBB(
+                entityMinX, entityMinY, entityMinZ,
+                entityMaxX, entityMaxY, entityMaxZ
+        );
+
+        boolean intersects = blockBB.intersectsWith(entityBB);
+
+        if (!intersects) {
+            return true;
+        }
+
+        if (blockHeight < 0.5) {
+            return true;
+        }
+
+        double blockWidthX = blockBB.getMaxX() - blockBB.getMinX();
+        double blockWidthZ = blockBB.getMaxZ() - blockBB.getMinZ();
+
+        if (blockWidthX < 0.8 && blockWidthZ < 0.8 && blockHeight <= 1.0) {
+            return canWalkAround(blockBB, entityBB);
+        }
+
+        return false;
+    }
+
+
+    private boolean canWalkAround(AxisAlignedBB blockBB, AxisAlignedBB entityBB) {
+        double blockCenterX = (blockBB.getMinX() + blockBB.getMaxX()) / 2;
+        double blockCenterZ = (blockBB.getMinZ() + blockBB.getMaxZ()) / 2;
+
+        double entityCenterX = (entityBB.getMinX() + entityBB.getMaxX()) / 2;
+        double entityCenterZ = (entityBB.getMinZ() + entityBB.getMaxZ()) / 2;
+
+        double centerDistX = Math.abs(blockCenterX - entityCenterX);
+        double centerDistZ = Math.abs(blockCenterZ - entityCenterZ);
+
+        return centerDistX > 0.2 || centerDistZ > 0.2;
+    }
+
+    private boolean isBlockWalkable(Block block) {
+        AxisAlignedBB bb = block.getBoundingBox();
+
+        if (bb == null) {
+            return false;
+        }
+
+        double blockHeight = bb.getMaxY() - bb.getMinY();
+
+        if (block.isSolid() && blockHeight >= 0.5) {
+            return true;
+        }
+
+        if (blockHeight > 0 && blockHeight < 1.0) {
+            return true;
+        }
+
+        return false;
+    }
+
     private double getDistance(PathNode a, PathNode b) {
-        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
+        int dx = a.x - b.x;
+        int dy = a.y - b.y;
+        int dz = a.z - b.z;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    private void cleanupCacheIfNeeded() {
+        cacheCleanupCounter++;
+        if (cacheCleanupCounter >= CACHE_CLEANUP_INTERVAL) {
+            moveCache.clear();
+            synchronized (pendingRequests) {
+                pendingRequests.entrySet().removeIf(entry -> entry.getValue().isDone());
+            }
+            cacheCleanupCounter = 0;
+        }
     }
 
     public void clearCache() {
@@ -258,13 +421,24 @@ public class AStarPathfinder {
         }
     }
 
+    private static long packPosition(int fx, int fy, int fz, int tx, int ty, int tz) {
+        long hash = (long) fx * 73856093L ^ (long) fy * 19349663L ^ (long) fz * 83492791L;
+        hash ^= (long) tx * 50331653L ^ (long) ty * 25165843L ^ (long) tz * 12582917L;
+        return hash;
+    }
+
     private static class PathRequest {
         private final Vector3 start;
         private final Vector3 target;
+        private final int hashCode;
 
         public PathRequest(Vector3 start, Vector3 target) {
             this.start = start;
             this.target = target;
+            this.hashCode = Objects.hash(
+                    start.getFloorX(), start.getFloorY(), start.getFloorZ(),
+                    target.getFloorX(), target.getFloorY(), target.getFloorZ()
+            );
         }
 
         @Override
@@ -272,12 +446,18 @@ public class AStarPathfinder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             PathRequest that = (PathRequest) o;
-            return Objects.equals(start, that.start) && Objects.equals(target, that.target);
+
+            return start.getFloorX() == that.start.getFloorX() &&
+                    start.getFloorY() == that.start.getFloorY() &&
+                    start.getFloorZ() == that.start.getFloorZ() &&
+                    target.getFloorX() == that.target.getFloorX() &&
+                    target.getFloorY() == that.target.getFloorY() &&
+                    target.getFloorZ() == that.target.getFloorZ();
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(start, target);
+            return hashCode;
         }
     }
 }

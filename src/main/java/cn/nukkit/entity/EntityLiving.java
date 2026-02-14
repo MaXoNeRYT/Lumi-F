@@ -37,10 +37,6 @@ import cn.nukkit.network.protocol.types.SwingSource;
 
 import java.util.*;
 
-/**
- * @author MagicDroidX
- * Nukkit Project
- */
 public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public EntityLiving(FullChunk chunk, CompoundTag nbt) {
@@ -71,6 +67,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     private boolean blocking = false;
 
     protected final boolean isDrowned = this instanceof EntityDrowned;
+
+    private long lastLineOfSightCheck = 0;
+    private Block[] cachedLineOfSight = null;
 
     @Override
     protected void initEntity() {
@@ -103,7 +102,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     @Override
     public void saveNBT() {
         super.saveNBT();
-
         this.namedTag.putFloat("Health", this.getHealth());
     }
 
@@ -124,7 +122,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     public boolean attack(EntityDamageEvent source) {
         if (this.noDamageTicks > 0) {
             return false;
-        } else if (this.attackTime > 0) {
+        }
+
+        if (this.attackTime > 0) {
             EntityDamageEvent lastCause = this.getLastDamageCause();
             if (lastCause != null && lastCause.getDamage() >= source.getDamage()) {
                 return false;
@@ -152,7 +152,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     damager = ((EntityDamageByChildEntityEvent) source).getChild();
                 }
 
-                // Critical hit
                 if (source.isApplicable(EntityDamageEvent.DamageModifier.CRITICAL)) {
                     AnimatePacket animate = new AnimatePacket();
                     animate.action = AnimatePacket.Action.CRITICAL_HIT;
@@ -186,9 +185,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
             this.scheduleUpdate();
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     protected boolean blockedByShield(EntityDamageEvent source) {
@@ -196,7 +195,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             return false;
         }
 
-        Entity damager = source instanceof EntityDamageByChildEntityEvent ? ((EntityDamageByChildEntityEvent) source).getChild() : source instanceof EntityDamageByEntityEvent ? ((EntityDamageByEntityEvent) source).getDamager() : null;
+        Entity damager = source instanceof EntityDamageByChildEntityEvent ?
+                ((EntityDamageByChildEntityEvent) source).getChild() :
+                source instanceof EntityDamageByEntityEvent ?
+                        ((EntityDamageByEntityEvent) source).getDamager() : null;
+
         if (damager == null || damager instanceof EntityWeather) {
             return false;
         }
@@ -206,6 +209,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         Vector3 normalizedVector = this.getPosition().subtract(entityPos).normalize();
         boolean blocked = (normalizedVector.x * direction.x) + (normalizedVector.z * direction.z) < 0.0;
         boolean knockBack = !(damager instanceof EntityProjectile);
+
         EntityDamageBlockedEvent event = new EntityDamageBlockedEvent(this, source, knockBack, true);
         if (!blocked || !source.canBeReducedByArmor() || damager instanceof EntityProjectile && ((EntityProjectile) damager).piercing > 0) {
             event.setCancelled();
@@ -259,9 +263,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
 
         this.resetFallDistance();
-
         this.setMotion(motion);
-
         this.knockBackTime = 10;
     }
 
@@ -319,13 +321,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 isBreathing = true;
             }
 
-            // HACK!
             if (p.protocol <= 282) {
-                if (p.protocol <= 201) {
-                    this.setDataFlagSelfOnly(DATA_FLAGS, 33, isBreathing);
-                } else {
-                    this.setDataFlagSelfOnly(DATA_FLAGS, 34, isBreathing);
-                }
+                this.setDataFlagSelfOnly(DATA_FLAGS, p.protocol <= 201 ? 33 : 34, isBreathing);
             } else {
                 this.setDataFlagSelfOnly(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
             }
@@ -344,8 +341,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             boolean inBubbleColumn = this.isInsideBubbleColumn();
+
             if (inWater && !inBubbleColumn && !this.hasEffect(EffectType.WATER_BREATHING) && !this.hasEffect(EffectType.CONDUIT_POWER)) {
-                if (this instanceof EntitySwimming || this.isDrowned || this instanceof EntitySkeletonHorse || this instanceof EntityIronGolem || this instanceof Player player && (player.isCreative() || player.isSpectator())) {
+                boolean isImmuneToWater = this instanceof EntitySwimming ||
+                        this.isDrowned ||
+                        this instanceof EntitySkeletonHorse ||
+                        this instanceof EntityIronGolem ||
+                        this instanceof Player player && (player.isCreative() || player.isSpectator());
+
+                if (isImmuneToWater) {
                     this.setAirTicks(400);
                 } else {
                     if (turtleTicks == 0) {
@@ -381,14 +385,14 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
             }
 
-            // Check collisions with blocks
-            if ((this.isPlayer || this instanceof BaseEntity) && this.riding == null && this.age % (this instanceof Player ? 2 : 10) == 0) {
+            boolean shouldCheckBlockCollision = this.isPlayer || this instanceof BaseEntity;
+            int collisionCheckInterval = this instanceof Player ? 2 : 10;
+
+            if (shouldCheckBlockCollision && this.riding == null && this.age % collisionCheckInterval == 0) {
                 int floorY = NukkitMath.floorDouble(this.y - 0.25);
                 if (floorY != getFloorY()) {
                     Block block = this.level.getBlock(this.chunk, getFloorX(), floorY, getFloorZ(), false);
-                    if (block instanceof BlockCactus) {
-                        block.onEntityCollide(this);
-                    } else if (block instanceof BlockMagma) {
+                    if (block instanceof BlockCactus || block instanceof BlockMagma) {
                         block.onEntityCollide(this);
                     }
                 }
@@ -402,7 +406,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.attackCooldown -= tickDiff;
                 hasUpdate = true;
             }
-
             if (this.knockBackTime > 0) {
                 this.knockBackTime -= tickDiff;
             }
@@ -440,19 +443,16 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return this.getLineOfSight(maxDistance, maxLength, new HashSet<>(Arrays.asList(transparent)));
     }
 
-    /**
-     * 获取实体视线范围内的方块数组。
-     * Get an array of blocks within the entity's line of sight.
-     *
-     * @param maxDistance 视线的最大距离，超过 120 会被限制为 120 / The maximum distance of the line of sight. If it exceeds 120, it will be limited to 120.
-     * @param maxLength   返回的方块列表的最大长度，若不为 0，列表长度超过该值时会移除最早添加的方块 / The maximum length of the returned block list. If it is not 0, the earliest added block will be removed when the list length exceeds this value.
-     * @param transparent 透明方块 ID 的集合，若方块 ID 在该集合中，会停止遍历 / A set of transparent block IDs. If a block ID is in this set, the traversal will stop.
-     * @return 视线范围内的方块数组 / An array of blocks within the line of sight.
-     */
     public Block[] getLineOfSight(int maxDistance, int maxLength, Set<Integer> transparent) {
         if (maxDistance > 120) {
             maxDistance = 120;
         }
+
+        long currentTime = System.currentTimeMillis();
+        if (cachedLineOfSight != null && currentTime - lastLineOfSightCheck < 50) {
+            return cachedLineOfSight;
+        }
+        lastLineOfSightCheck = currentTime;
 
         boolean useTransparent = transparent != null && !transparent.isEmpty();
 
@@ -475,7 +475,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        return blocks.toArray(new Block[0]);
+        cachedLineOfSight = blocks.toArray(new Block[0]);
+        return cachedLineOfSight;
     }
 
     public Block getTargetBlock(int maxDistance) {
@@ -490,13 +491,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return getTargetBlock(maxDistance, new HashSet<>(Arrays.asList(transparent)));
     }
 
-    /**
-     * 获取实体视线范围内的第一个非透明方块。
-     * Get the first non-transparent block within the entity's line of sight.
-     *
-     * @param maxDistance 视线的最大距离，超过 120 会被限制为 120 / The maximum distance of the line of sight. If it exceeds 120, it will be limited to 120.
-     * @param transparent 透明方块 ID 的集合，若方块 ID 在该集合中，会停止遍历 / A set of transparent block IDs. If a block ID is in this set, the traversal will stop.
-     */
     public Block getTargetBlock(int maxDistance, Set<Integer> transparent) {
         try {
             Block[] blocks = this.getLineOfSight(maxDistance, 1, transparent);
@@ -594,52 +588,49 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     private void checkTameableEntityDeath() {
-        if (this instanceof EntityTameable) {
-            if (!((EntityTameable) this).hasOwner()) {
-                return;
-            }
-
-            if (((EntityTameable) this).getOwner() == null) {
-                return;
-            }
-
-            // TODO: More detailed death messages
-            String killedEntity;
-            if (this instanceof EntityWolf) {
-                killedEntity = "%entity.wolf.name";
-            } else {
-                killedEntity = this.getName();
-            }
-
-            TranslationContainer deathMessage = new TranslationContainer("death.attack.generic", killedEntity);
-            if (this.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                Entity damageEntity = ((EntityDamageByEntityEvent) this.getLastDamageCause()).getDamager();
-                if (damageEntity instanceof Player) {
-                    deathMessage = new TranslationContainer("death.attack.player", killedEntity, damageEntity.getName());
-                } else {
-                    if (damageEntity instanceof EntityWolf) {
-                        ((EntityWolf) damageEntity).setAngry(false);
-                    }
-                    deathMessage = new TranslationContainer("death.attack.mob", killedEntity, damageEntity.getName());
-                }
-            }
-
-            TextPacket tameDeathMessage = new TextPacket();
-            tameDeathMessage.type = TextPacket.TYPE_TRANSLATION;
-            tameDeathMessage.message = deathMessage.getText();
-            tameDeathMessage.parameters = deathMessage.getParameters();
-            tameDeathMessage.isLocalized = true;
-            ((EntityTameable) this).getOwner().dataPacket(tameDeathMessage);
+        if (!(this instanceof EntityTameable)) {
+            return;
         }
+
+        EntityTameable tameable = (EntityTameable) this;
+        if (!tameable.hasOwner() || tameable.getOwner() == null) {
+            return;
+        }
+
+        // TODO: More detailed death messages
+        String killedEntity = this instanceof EntityWolf ? "%entity.wolf.name" : this.getName();
+
+        TranslationContainer deathMessage = new TranslationContainer("death.attack.generic", killedEntity);
+        if (this.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+            Entity damageEntity = ((EntityDamageByEntityEvent) this.getLastDamageCause()).getDamager();
+            if (damageEntity instanceof Player) {
+                deathMessage = new TranslationContainer("death.attack.player", killedEntity, damageEntity.getName());
+            } else {
+                if (damageEntity instanceof EntityWolf) {
+                    ((EntityWolf) damageEntity).setAngry(false);
+                }
+                deathMessage = new TranslationContainer("death.attack.mob", killedEntity, damageEntity.getName());
+            }
+        }
+
+        TextPacket tameDeathMessage = new TextPacket();
+        tameDeathMessage.type = TextPacket.TYPE_TRANSLATION;
+        tameDeathMessage.message = deathMessage.getText();
+        tameDeathMessage.parameters = deathMessage.getParameters();
+        tameDeathMessage.isLocalized = true;
+        tameable.getOwner().dataPacket(tameDeathMessage);
     }
 
     public void lookAt(Vector3 target) {
         double dx = this.x - target.x;
         double dy = this.y - target.y;
         double dz = this.z - target.z;
-        double yaw = Math.asin(dx / Math.sqrt(dx * dx + dz * dz)) / Math.PI * 180.0d;
+
+        double dxz = Math.sqrt(dx * dx + dz * dz);
+        double yaw = Math.asin(dx / dxz) / Math.PI * 180.0d;
         double asin = Math.asin(dy / Math.sqrt(dx * dx + dz * dz + dy * dy)) / Math.PI * 180.0d;
         long pitch = Math.round(asin);
+
         if (dz > 0.0d) {
             yaw = -yaw + 180.0d;
         }
@@ -652,14 +643,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public EntityHuman getNearbyHuman(double distance) {
         AxisAlignedBB bb = this.boundingBox.clone().expand(distance, distance, distance);
-        EntityHuman human = null;
+
         for (Entity collidingEntity : this.level.getCollidingEntities(bb)) {
             if (collidingEntity instanceof EntityHuman) {
-                human = (EntityHuman) collidingEntity;
-                break;
+                return (EntityHuman) collidingEntity;
             }
         }
-        return human;
+        return null;
     }
-
 }

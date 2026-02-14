@@ -64,25 +64,37 @@ public class EntityWitch extends EntityWalkingMob {
         if (this.attackDelay > 60 && Utils.rand(1, 3) == 2 && this.distanceSquared(player) <= 60) {
             this.attackDelay = 0;
             if (player.isAlive() && !player.closed) {
-                for (Block block : this.getLineOfSight(7, 7)) {
-                    if (!block.canPassThrough()) {
-                        return;
+
+                boolean blocked = false;
+                try {
+                    for (Block block : this.getLineOfSight(7, 7)) {
+                        if (!block.canPassThrough()) {
+                            blocked = true;
+                            break;
+                        }
                     }
+                } catch (IllegalStateException ignored) {
+                    blocked = true;
                 }
+
+                if (blocked) return;
 
                 double f = 1;
                 double yaw = this.yaw + Utils.rand(-4.0, 4.0);
                 double yawR = FastMath.toRadians(yaw);
                 double pitchR = FastMath.toRadians(pitch);
-                Location pos = new Location(this.x - Math.sin(yawR) * Math.cos(pitchR) * 0.5, this.y + this.getEyeHeight(),
-                        this.z + Math.cos(yawR) * Math.cos(pitchR) * 0.5, yaw, pitch, this.level);
+                Location pos = new Location(
+                        this.x - Math.sin(yawR) * Math.cos(pitchR) * 0.5,
+                        this.y + this.getEyeHeight(),
+                        this.z + Math.cos(yawR) * Math.cos(pitchR) * 0.5,
+                        yaw, pitch, this.level
+                );
 
                 if (this.getLevel().getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ()) != Block.AIR) {
                     return;
                 }
 
                 EntityPotionSplash thrownPotion = (EntityPotionSplash) Entity.createEntity("ThrownPotion", pos, this);
-
                 double distance = this.distanceSquared(player);
 
                 if (!player.hasEffect(EffectType.SLOWNESS) && distance <= 64) {
@@ -95,10 +107,15 @@ public class EntityWitch extends EntityWalkingMob {
                     thrownPotion.potionId = PotionType.HARMING.id();
                 }
 
-                thrownPotion.setMotion(new Vector3(-Math.sin(yawR) * Math.cos(pitchR) * f * f, -Math.sin(pitchR) * f * f,
-                        Math.cos(yawR) * Math.cos(pitchR) * f * f));
+                thrownPotion.setMotion(new Vector3(
+                        -Math.sin(yawR) * Math.cos(pitchR) * f * f,
+                        -Math.sin(pitchR) * f * f,
+                        Math.cos(yawR) * Math.cos(pitchR) * f * f
+                ));
+
                 ProjectileLaunchEvent launch = new ProjectileLaunchEvent(thrownPotion);
                 this.server.getPluginManager().callEvent(launch);
+
                 if (launch.isCancelled()) {
                     thrownPotion.close();
                 } else {
@@ -108,6 +125,7 @@ public class EntityWitch extends EntityWalkingMob {
             }
         }
     }
+
 
     @Override
     public Item[] getDrops() {

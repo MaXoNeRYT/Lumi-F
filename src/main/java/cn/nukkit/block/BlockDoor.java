@@ -23,9 +23,9 @@ import cn.nukkit.block.data.Faceable;
 public abstract class BlockDoor extends BlockTransparentMeta implements Faceable {
 
     public static final int DOOR_DIRECTION_BIT = 0x03;
-    public static final int DOOR_OPEN_BIT = 0x04;
-    public static final int DOOR_TOP_BIT = 0x08;
-    public static final int DOOR_HINGE_BIT = 0x10;
+    public static final int DOOR_OPEN_BIT      = 0x04;
+    public static final int DOOR_TOP_BIT       = 0x08;
+    public static final int DOOR_HINGE_BIT     = 0x10;
 
     @Deprecated
     public static final int DOOR_POWERED_BIT = 0x02;
@@ -61,162 +61,89 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         return false;
     }
 
+    /**
+     * Builds a combined damage value that contains all bits needed by
+     * recalculateBoundingBox():
+     *
+     *   bits 0-1  DOOR_DIRECTION_BIT  – facing, always in bottom half
+     *   bit  2    DOOR_OPEN_BIT       – open/closed, always in bottom half
+     *   bit  3    DOOR_TOP_BIT        – set when this is the top half
+     *   bit  4    DOOR_HINGE_BIT      – left/right hinge, always in top half
+     *
+     * The previous implementation forgot to include DOOR_OPEN_BIT, so the
+     * bounding box was always calculated as if the door were closed.
+     */
     private int getFullDamage() {
-        int up;
-        int down;
+        int downDamage;
+        int upDamage;
+
         if (isTop()) {
-            down = this.down().getDamage();
-            up = this.getDamage();
+            downDamage = this.down().getDamage();
+            upDamage   = this.getDamage();
         } else {
-            down = this.getDamage();
-            up = this.up().getDamage();
+            downDamage = this.getDamage();
+            upDamage   = this.up().getDamage();
         }
 
-        return down & DOOR_DIRECTION_BIT | (isTop() ? DOOR_TOP_BIT : 0) | (this.isRightHinged() ? DOOR_HINGE_BIT : 0);
+        return (downDamage & (DOOR_DIRECTION_BIT | DOOR_OPEN_BIT))
+                | (isTop()              ? DOOR_TOP_BIT   : 0)
+                | (this.isRightHinged() ? DOOR_HINGE_BIT : 0);
     }
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
 
-        double f = 0.1875;
-        int damage = this.getFullDamage();
+        double f      = 0.1875;
+        int    damage = this.getFullDamage();
 
         AxisAlignedBB bb = new SimpleAxisAlignedBB(
-                this.x,
-                this.y,
-                this.z,
-                this.x + 1,
-                this.y + 2,
-                this.z + 1
+                this.x, this.y, this.z,
+                this.x + 1, this.y + 2, this.z + 1
         );
 
-        int j = damage & DOOR_DIRECTION_BIT;
-        boolean isOpen = ((damage & DOOR_OPEN_BIT) > 0);
+        int     j       = damage & DOOR_DIRECTION_BIT;
+        boolean isOpen  = (damage & DOOR_OPEN_BIT) > 0;
         boolean isRight = this.isRightHinged();
 
         if (j == 0) {
             if (isOpen) {
                 if (!isRight) {
-                    bb.setBounds(
-                            this.x,
-                            this.y,
-                            this.z,
-                            this.x + 1,
-                            this.y + 1,
-                            this.z + f
-                    );
+                    bb.setBounds(this.x, this.y, this.z, this.x + 1, this.y + 1, this.z + f);
                 } else {
-                    bb.setBounds(
-                            this.x,
-                            this.y,
-                            this.z + 1 - f,
-                            this.x + 1,
-                            this.y + 1,
-                            this.z + 1
-                    );
+                    bb.setBounds(this.x, this.y, this.z + 1 - f, this.x + 1, this.y + 1, this.z + 1);
                 }
             } else {
-                bb.setBounds(
-                        this.x,
-                        this.y,
-                        this.z,
-                        this.x + f,
-                        this.y + 1,
-                        this.z + 1
-                );
+                bb.setBounds(this.x, this.y, this.z, this.x + f, this.y + 1, this.z + 1);
             }
         } else if (j == 1) {
             if (isOpen) {
                 if (!isRight) {
-                    bb.setBounds(
-                            this.x + 1 - f,
-                            this.y,
-                            this.z,
-                            this.x + 1,
-                            this.y + 1,
-                            this.z + 1
-                    );
+                    bb.setBounds(this.x + 1 - f, this.y, this.z, this.x + 1, this.y + 1, this.z + 1);
                 } else {
-                    bb.setBounds(
-                            this.x,
-                            this.y,
-                            this.z,
-                            this.x + f,
-                            this.y + 1,
-                            this.z + 1
-                    );
+                    bb.setBounds(this.x, this.y, this.z, this.x + f, this.y + 1, this.z + 1);
                 }
             } else {
-                bb.setBounds(
-                        this.x,
-                        this.y,
-                        this.z,
-                        this.x + 1,
-                        this.y + 1,
-                        this.z + f
-                );
+                bb.setBounds(this.x, this.y, this.z, this.x + 1, this.y + 1, this.z + f);
             }
         } else if (j == 2) {
             if (isOpen) {
                 if (!isRight) {
-                    bb.setBounds(
-                            this.x,
-                            this.y,
-                            this.z + 1 - f,
-                            this.x + 1,
-                            this.y + 1,
-                            this.z + 1
-                    );
+                    bb.setBounds(this.x, this.y, this.z + 1 - f, this.x + 1, this.y + 1, this.z + 1);
                 } else {
-                    bb.setBounds(
-                            this.x,
-                            this.y,
-                            this.z,
-                            this.x + 1,
-                            this.y + 1,
-                            this.z + f
-                    );
+                    bb.setBounds(this.x, this.y, this.z, this.x + 1, this.y + 1, this.z + f);
                 }
             } else {
-                bb.setBounds(
-                        this.x + 1 - f,
-                        this.y,
-                        this.z,
-                        this.x + 1,
-                        this.y + 1,
-                        this.z + 1
-                );
+                bb.setBounds(this.x + 1 - f, this.y, this.z, this.x + 1, this.y + 1, this.z + 1);
             }
-        } else if (j == 3) {
+        } else { // j == 3
             if (isOpen) {
                 if (!isRight) {
-                    bb.setBounds(
-                            this.x,
-                            this.y,
-                            this.z,
-                            this.x + f,
-                            this.y + 1,
-                            this.z + 1
-                    );
+                    bb.setBounds(this.x, this.y, this.z, this.x + f, this.y + 1, this.z + 1);
                 } else {
-                    bb.setBounds(
-                            this.x + 1 - f,
-                            this.y,
-                            this.z,
-                            this.x + 1,
-                            this.y + 1,
-                            this.z + 1
-                    );
+                    bb.setBounds(this.x + 1 - f, this.y, this.z, this.x + 1, this.y + 1, this.z + 1);
                 }
             } else {
-                bb.setBounds(
-                        this.x,
-                        this.y,
-                        this.z + 1 - f,
-                        this.x + 1,
-                        this.y + 1,
-                        this.z + 1
-                );
+                bb.setBounds(this.x, this.y, this.z + 1 - f, this.x + 1, this.y + 1, this.z + 1);
             }
         }
 
@@ -228,12 +155,14 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (this.down().getId() == AIR) {
                 Block up = this.up();
-
                 if (up instanceof BlockDoor) {
                     this.getLevel().setBlock(up, Block.get(BlockID.AIR), false);
-                    this.getLevel().useBreakOn(this, getToolType() == ItemTool.TYPE_PICKAXE ? Item.get(ItemID.DIAMOND_PICKAXE) : Item.get(Item.WOODEN_PICKAXE), null, true); // Drop iron doors
+                    this.getLevel().useBreakOn(this,
+                            getToolType() == ItemTool.TYPE_PICKAXE
+                                    ? Item.get(ItemID.DIAMOND_PICKAXE)
+                                    : Item.get(Item.WOODEN_PICKAXE),
+                            null, true);
                 }
-
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         }
@@ -241,8 +170,8 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         if (type == Level.BLOCK_UPDATE_REDSTONE) {
             boolean powered = this.isGettingPower();
             if ((!isOpen() && powered) || (isOpen() && !powered)) {
-                this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, isOpen() ? 15 : 0, isOpen() ? 0 : 15));
-
+                this.level.getServer().getPluginManager().callEvent(
+                        new BlockRedstoneEvent(this, isOpen() ? 15 : 0, isOpen() ? 0 : 15));
                 this.toggle(null);
             }
         }
@@ -255,16 +184,15 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         Location up;
         if (this.isTop()) {
             down = down().getLocation();
-            up = getLocation();
+            up   = getLocation();
         } else {
             down = getLocation();
-            up = up().getLocation();
+            up   = up().getLocation();
         }
 
         for (BlockFace side : BlockFace.values()) {
             Block blockDown = down.getSide(side).getLevelBlock();
-            Block blockUp = up.getSide(side).getLevelBlock();
-
+            Block blockUp   = up.getSide(side).getLevelBlock();
             if (this.level.isSidePowered(blockDown.getLocation(), side)
                     || this.level.isSidePowered(blockUp.getLocation(), side)) {
                 return true;
@@ -275,34 +203,36 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.y > block.getLevel().getMaxBlockY() - 1) {
-            return false;
-        }
+    public boolean place(Item item, Block block, Block target, BlockFace face,
+                         double fx, double fy, double fz, Player player) {
+        if (this.y > block.getLevel().getMaxBlockY() - 1) return false;
+
         if (face == BlockFace.UP) {
-            Block blockUp = this.up();
+            Block blockUp   = this.up();
             Block blockDown = this.down();
-            if (!blockUp.canBeReplaced() || !blockDown.isSolid(BlockFace.UP) && !(blockDown instanceof BlockCauldron)) {
+            if (!blockUp.canBeReplaced()
+                    || (!blockDown.isSolid(BlockFace.UP) && !(blockDown instanceof BlockCauldron))) {
                 return false;
             }
 
             int direction = faces[player != null ? player.getDirection().getHorizontalIndex() : 0];
-
-            Block left = this.getSide(player.getDirection().rotateYCCW());
+            Block left  = this.getSide(player.getDirection().rotateYCCW());
             Block right = this.getSide(player.getDirection().rotateY());
+
             int metaUp = DOOR_TOP_BIT;
-            if (left.getId() == this.getId() || (!right.isTransparent() && left.isTransparent())) { //Door hinge
+            if (left.getId() == this.getId() || (!right.isTransparent() && left.isTransparent())) {
                 metaUp |= DOOR_HINGE_BIT;
             }
 
             this.setDamage(direction);
-            this.getLevel().setBlock(block, this, true, true); //Bottom
-            this.getLevel().setBlock(blockUp, Block.get(this.getId(), metaUp), true); //Top
+            this.getLevel().setBlock(block, this, true, true);
+            this.getLevel().setBlock(blockUp, Block.get(this.getId(), metaUp), true);
 
             if (!this.isOpen() && this.level.isBlockPowered(this.getLocation())) {
                 this.toggle(null);
                 metaUp |= DOOR_POWERED_BIT;
-                this.getLevel().setBlockDataAt(blockUp.getFloorX(), blockUp.getFloorY(), blockUp.getFloorZ(), metaUp);
+                this.getLevel().setBlockDataAt(
+                        blockUp.getFloorX(), blockUp.getFloorY(), blockUp.getFloorZ(), metaUp);
             }
 
             return true;
@@ -315,17 +245,12 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
     public boolean onBreak(Item item) {
         if (isTop(this.getDamage())) {
             Block down = this.down();
-            if (down.getId() == this.getId()) {
-                this.getLevel().setBlock(down, Block.get(BlockID.AIR), true);
-            }
+            if (down.getId() == this.getId()) this.getLevel().setBlock(down, Block.get(BlockID.AIR), true);
         } else {
             Block up = this.up();
-            if (up.getId() == this.getId()) {
-                this.getLevel().setBlock(up, Block.get(BlockID.AIR), true);
-            }
+            if (up.getId() == this.getId()) this.getLevel().setBlock(up, Block.get(BlockID.AIR), true);
         }
         this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
-
         return true;
     }
 
@@ -336,78 +261,59 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (player == null) {
-            return false;
-        }
-
+        if (player == null) return false;
         Item itemInHand = player.getInventory().getItemInHand();
-        if (player.isSneaking() && !(itemInHand.isTool() || itemInHand.isNull())) {
-            return false;
-        }
+        if (player.isSneaking() && !(itemInHand.isTool() || itemInHand.isNull())) return false;
         return toggle(player);
     }
 
     public boolean toggle(Player player) {
         DoorToggleEvent event = new DoorToggleEvent(this, player);
         this.getLevel().getServer().getPluginManager().callEvent(event);
-
-        if (event.isCancelled()) {
-            return false;
-        }
+        if (event.isCancelled()) return false;
 
         Block down;
         Block up;
         if (isTop(this.getDamage())) {
             down = this.down();
-            up = this;
+            up   = this;
         } else {
             down = this;
-            up = this.up();
+            up   = this.up();
         }
 
-        if (up.getId() != down.getId()) {
-            return false;
-        }
+        if (up.getId() != down.getId()) return false;
 
-        this.level.setBlockDataAt(down.getFloorX(), down.getFloorY(), down.getFloorZ(), down.getDamage() ^ 0x04);
+        this.level.setBlockDataAt(
+                down.getFloorX(), down.getFloorY(), down.getFloorZ(),
+                down.getDamage() ^ DOOR_OPEN_BIT);
+
         this.playOpenCloseSound();
 
         var source = this.add(0.5, 0.5, 0.5);
-        VibrationEvent vibrationEvent = isOpen() ? new VibrationEvent(player != null ? player : this, source, VanillaVibrationTypes.BLOCK_OPEN) : new VibrationEvent(player != null ? player : this, source, VanillaVibrationTypes.BLOCK_CLOSE);
+        VibrationEvent vibrationEvent = isOpen()
+                ? new VibrationEvent(player != null ? player : this, source, VanillaVibrationTypes.BLOCK_OPEN)
+                : new VibrationEvent(player != null ? player : this, source, VanillaVibrationTypes.BLOCK_CLOSE);
         this.level.getVibrationManager().callVibrationEvent(vibrationEvent);
         return true;
     }
 
     public void playOpenCloseSound() {
         if (this.isTop() && down() instanceof BlockDoor door) {
-            if (door.isOpen()) {
-                this.playOpenSound();
-            } else {
-                this.playCloseSound();
-            }
+            if (door.isOpen()) this.playOpenSound();
+            else               this.playCloseSound();
         } else if (up() instanceof BlockDoor) {
-            if (this.isOpen()) {
-                this.playOpenSound();
-            } else {
-                this.playCloseSound();
-            }
+            if (this.isOpen()) this.playOpenSound();
+            else               this.playCloseSound();
         }
     }
 
-    public void playOpenSound() {
-        this.level.addSound(this, Sound.RANDOM_DOOR_OPEN);
-    }
-
-    public void playCloseSound() {
-        this.level.addSound(this, Sound.RANDOM_DOOR_CLOSE);
-    }
+    public void playOpenSound()  { this.level.addSound(this, Sound.RANDOM_DOOR_OPEN);  }
+    public void playCloseSound() { this.level.addSound(this, Sound.RANDOM_DOOR_CLOSE); }
 
     public boolean isOpen() {
-        if (isTop(this.getDamage())) {
-            return (this.down().getDamage() & DOOR_OPEN_BIT) > 0;
-        } else {
-            return (this.getDamage() & DOOR_OPEN_BIT) > 0;
-        }
+        if (isTop(this.getDamage())) return (this.down().getDamage() & DOOR_OPEN_BIT) > 0;
+        return (this.getDamage() & DOOR_OPEN_BIT) > 0;
     }
 
     public boolean isTop() {
@@ -419,9 +325,7 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
     }
 
     public boolean isRightHinged() {
-        if (isTop()) {
-            return (this.getDamage() & DOOR_HINGE_BIT ) > 0;
-        }
+        if (isTop()) return (this.getDamage() & DOOR_HINGE_BIT) > 0;
         return (this.up().getDamage() & DOOR_HINGE_BIT) > 0;
     }
 

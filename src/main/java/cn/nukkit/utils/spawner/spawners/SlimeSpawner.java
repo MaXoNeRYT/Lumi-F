@@ -16,10 +16,15 @@ public class SlimeSpawner extends AbstractEntitySpawner {
     @Override
     public void spawn(Player player, Position pos, Level level) {
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
-        if (pos.y < 70 && (biomeId == 6 || biomeId == 134)) {
+
+        boolean isSwamp = biomeId == 6 || biomeId == 134;
+        boolean isNight = !level.isDaytime();
+
+        if (isSwamp && isNight && pos.y < 90) {
             if (level.isMobSpawningAllowedByTime()) {
                 this.spawnTask.createEntity("Slime", pos.add(0.5, 1, 0.5));
             }
         }
     }
+
 }
