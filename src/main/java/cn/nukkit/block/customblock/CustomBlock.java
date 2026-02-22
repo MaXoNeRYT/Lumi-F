@@ -7,6 +7,8 @@ import cn.nukkit.block.BlockMeta;
 import cn.nukkit.block.customblock.properties.BlockProperties;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.customitem.data.ItemCreativeGroup;
+import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
 import cn.nukkit.registry.Registries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -114,5 +116,16 @@ public interface CustomBlock extends BlockPropertiesHelper {
 
     default BlockProperties getBlockProperties() {
         return new BlockProperties();
+    }
+
+    default CreativeItemCategory getCreativeCategory() {
+        return CreativeItemCategory.CONSTRUCTION;
+    }
+
+    default String getCreativeGroup() {
+        return "";
+    }
+    default String getCreativeGroup(ItemCreativeGroup group) {
+        return group.getGroupName();
     }
 }

@@ -1,10 +1,11 @@
 package cn.nukkit.registry;
 
 import cn.nukkit.Server;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemNamespaceId;
-import cn.nukkit.item.RuntimeItemMapping;
-import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.customblock.CustomBlock;
+import cn.nukkit.item.*;
+import cn.nukkit.item.customitem.CustomItem;
+import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemData;
@@ -253,7 +254,35 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
         }
 
         public void add(Item item) {
-            add(item, CreativeItemCategory.ITEMS, ""); // TODO: vanilla items back to correct categories & groups
+            if (item instanceof CustomItem customItem) {
+                CustomItemDefinition def = customItem.getDefinition();
+                CreativeItemCategory category = def.getCreativeCategory();
+                String group = def.getCreativeGroup();
+
+                if (category == null || category == CreativeItemCategory.UNDEFINED) {
+                    category = CreativeItemCategory.ITEMS;
+                }
+
+                add(item, category, group != null ? group : "");
+                return;
+            }
+
+            if (item instanceof ItemBlock itemBlock) {
+                Block block = itemBlock.getBlockUnsafe();
+                if (block instanceof CustomBlock customBlock) {
+                    CreativeItemCategory category = customBlock.getCreativeCategory();
+                    String group = customBlock.getCreativeGroup();
+
+                    if (category == null || category == CreativeItemCategory.ITEMS) {
+                        category = CreativeItemCategory.ITEMS;
+                    }
+
+                    add(item, category, group != null ? group : "");
+                    return;
+                }
+            }
+
+            add(item, CreativeItemCategory.ITEMS, "");
         }
 
         public void add(Item item, CreativeItemGroup group) {
